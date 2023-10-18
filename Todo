@@ -1,0 +1,6 @@
+Run scripts with relative and absolute paths.
+Try to read files that are in an unreadable directory.
+Check that file reading is being doing well.
+
+Decision : Do i set point as an identifier or as a keyword.
+I built it progresively setting it as a keyword first.
