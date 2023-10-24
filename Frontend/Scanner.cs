@@ -36,6 +36,7 @@ public class Scanner
     private void ScanToken(){
         char c = Advance();
         switch(c){
+            case '"': ScanString(); break;
             case '(': AddToken(TokenType.LEFT_PAREN); break;
             case ')': AddToken(TokenType.RIGHT_PAREN); break; 
             case '/': if(Match('/')) ScanComment(); break;
@@ -50,10 +51,35 @@ public class Scanner
             case '\n': OnNewLineFound(); break;
 
             default:
-                if(IsAlpha(c)) ScanIdentifier();
-                break;
+                if(IsAlpha(c)) {
+                    ScanIdentifier();
+                    break;
+                }
+                throw new ExtendedException(line,ComputeOffset,$"Unrecognized character");
         }
     }
+    //Scan a string literal, the previous character was a quote '"'
+    //Consume characters until it hits another quote. If the end is reached then a quote is missing.
+    private void ScanString(){
+        //Stop at end or if a quote is found
+        
+        int openingQuoteLine = line;//Store the position on the code of the opening quote for error reporting
+        int openingQuoteOffset = ComputeOffset;
+
+        while(!IsAtEnd && Peek() != '"'){ 
+            char c = Advance();
+            if(c == '\n')OnNewLineFound();//This is for supporting multi-line strings
+        }
+
+        if(IsAtEnd) throw new ExtendedException(openingQuoteLine,openingQuoteOffset,"A quote is missing");//A quote is missing
+
+        Advance();//Consume the closing quote
+
+        string value = source.Substring(start + 1,current - start - 2);//The string content without the enclosing quotes
+
+        AddToken(TokenType.STRING,value);
+    }
+
     //Scan a comment.
     private void ScanComment(){
         //Discard tokens until a new line is found. The backslashes are already consumed.

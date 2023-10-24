@@ -44,14 +44,30 @@ class Client{
                 continue;
             }
             //At this point on source its the content of the G# script to be executed.
-            List<Token> tokens = new Scanner(source).Scan();
-            Utils.PrintTokens(tokens);
+            try{
+                List<Token> tokens = new Scanner(source).Scan();
+                Utils.PrintTokens(tokens);
+                Parser p = new Parser(tokens);
+                Program pro = p.Parse();
+                Utils.PrintAst(pro);
+            }
+            catch(Frontend.ExtendedException e){
+                ReportError(e);
+            }
+            catch(Exception e){
+                ReportError(e.Message);
+            }
         }
     }
 
     private static void ReportError(string message){
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine(message);
+        Console.ForegroundColor = ConsoleColor.White;
+    }
+    private static void ReportError(Frontend.ExtendedException e){
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"{e.Message} at line {e.Line} , column {e.Offset}");
         Console.ForegroundColor = ConsoleColor.White;
     }
 
