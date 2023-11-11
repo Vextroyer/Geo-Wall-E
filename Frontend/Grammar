@@ -1,6 +1,7 @@
 Program = Stmt*;
 
 Stmt = PointStmt ';';
+Stmt = 'draw' ID ';';
 
 PointStmt = 'point' ID STRING?;
 
