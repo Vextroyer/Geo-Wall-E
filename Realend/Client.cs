@@ -50,6 +50,9 @@ class Client{
                 Parser p = new Parser(tokens);
                 Program pro = p.Parse();
                 Utils.PrintAst(pro);
+                Interpreter interpreter = new Interpreter();
+                interpreter.Interpret(pro);
+                
             }
             catch(Frontend.ExtendedException e){
                 ReportError(e);
