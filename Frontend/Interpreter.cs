@@ -23,4 +23,11 @@ public class Interpreter : Visitor<object?>{
         scope.Set(point.Id.Lexeme,new Element.Point(point.Id.Lexeme,point.X,point.Y,point.Comment));
         return null;
     }
+    
+    public object? VisitDrawStmt(Stmt.Draw draw, Scope scope)
+    {
+        scope.Get(draw.Id.Lexeme);
+        System.Console.WriteLine("pinto");
+        return null;
+    }
 }
