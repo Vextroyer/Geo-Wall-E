@@ -3,7 +3,7 @@ Program = Stmt*;
 Stmt = PointStmt ';';
 Stmt = 'draw' ID ';';
 
-PointStmt = 'point' ID STRING?;
+PointStmt = 'point' ('(' NUMBER ',' NUMBER ')')?   ID STRING?;
 
 ID : Represents any identifier.
 An identifier is a sequence of contiguos symbols that follows these two rules:

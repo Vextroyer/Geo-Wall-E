@@ -4,19 +4,21 @@ On this class are defined the different objects that exist on a G# program execu
 namespace Frontend;
 
 //Base class for all elements that exist during runtime.
-abstract class Element{};
+public abstract class Element{
 
-//This class represents points on a 2D rectangular coordinate system.
-class Point:Element{
-    string name;
-    string comment;
-    float x;
-    float y;
+    //This class represents points on a 2D rectangular coordinate system.
+    public class Point:Element{
+        string name;
+        string comment;
+        float x;
+        float y;
 
-    public Point(string _name = "",string _comment = "",float _x = 0, float _y = 0){
-        this.name = _name;
-        this.comment = _comment;
-        x = _x;
-        y = _y;
+        public Point(string _name,float _x,float _y,string _comment){
+            name = _name;
+            comment = _comment;
+            x = _x;
+            y = _y;
+        }
     }
-}
+
+};

@@ -1,6 +1,13 @@
+#1
 Run scripts with relative and absolute paths.
 Try to read files that are in an unreadable directory.
 Check that file reading is being doing well.
+
+#2
+Check that random number generation is doing fine.
+Read maximum coordinates from a config file
+
+Add support for negative numbers.
 
 Decision : Do i set point as an identifier or as a keyword.
 I built it progresively setting it as a keyword first.
@@ -9,12 +16,7 @@ How can i split my keywords from my code:
     Idea: Let the keywords be on a separate file. Let some program extract those keywords and generate a code from them and then
           passing that code to the Frontend code before compilation is done. This would be done as a precompilation step.
 
-Put project on github.
-
-
 Automate Samples testing.
-
-
 
 Para el interprete:
 Hacen falta tipos de datos para guardar numeros y para guardar angulos.
@@ -22,3 +24,6 @@ Para los anuglos: si almacenarlos en radianes o en grados.
 
 El interprete puede fallar si se trata de recuperar una variable no declarada.
 El interprete falla al recuperar una variabe declarada en un scope anterior.
+
+The way of debugging the intepreter is throug debugging. There is no visual output yet.
+

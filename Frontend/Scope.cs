@@ -4,7 +4,7 @@ Represents a scope.
 
 namespace Frontend;
 
-class Scope{
+public class Scope{
     Scope? parent;
 
     Dictionary<string,Element> elements = new Dictionary<string, Element>();
@@ -15,10 +15,12 @@ class Scope{
     }
 
     //Associate the given varName with the given element.
+    //TODO-Treat redeclaration as an error
     public void Set(string varName, Element element){
         elements.Add(varName,element);
     }
     //Return the element associated with the given varName
+    //TODO-SEARCH in the parents scopes
     public Element Get(string varName){
         return elements[varName];
     }
