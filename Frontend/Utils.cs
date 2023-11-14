@@ -30,4 +30,15 @@ public static class Utils{
         Console.WriteLine("--END--");
         Console.ForegroundColor = ConsoleColor.White;
     }
+
+    //Random point generation
+    private static Random random = new Random();//Stores a random for future usage.
+    private static int MaxPointCoordinate = 1000;//Represents the maximum absolute value of point coordinates
+    public static (float,float) RandomPoint(){
+        return (RandomCoordinate(),RandomCoordinate());
+    }
+    //Generate an integer on the range [-MaxPointCoordinate,MaxPointCoordinate]
+    public static int RandomCoordinate(){
+        return (random.Next() % (2 * MaxPointCoordinate + 1)) - MaxPointCoordinate;
+    }
 }
