@@ -1,5 +1,6 @@
 /*
-Represents a scope.
+The state of the program is made of a nested scope structure.
+An scope is where variables and functions are stored.
 */
 
 namespace Frontend;

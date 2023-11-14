@@ -5,12 +5,13 @@ Several utility methods and features.
 namespace Frontend;
 
 public static class Utils{
+    //Used for printing the output of the Scanner
     public static void PrintTokens(List<Token> tokens){
         Console.WriteLine("{");
         foreach(Token t in tokens)Console.WriteLine("\t" + t);
         Console.WriteLine("}");
     }
-
+    //Used for printing the output of the Parser
     public static void PrintAst(Program program){
         AstPrinter printer = new AstPrinter();
 
