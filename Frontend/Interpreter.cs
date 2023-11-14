@@ -5,22 +5,22 @@ This class receives an AST an executes the stamentes it represents.
 namespace Frontend;
 
 public class Interpreter : Visitor<object?>{
-    private Scope scope = new Scope();
+    private Scope globalScope = new Scope();
 
     //Interpret a program.
     public object? Interpret (Program program){
         foreach(Stmt stmt in program.Stmts){
-            Interpret(stmt);
+            Interpret(stmt,globalScope);
         }
         return null;
     }
 
-    private object? Interpret (Stmt stmt){
-        stmt.Accept(this);
+    private object? Interpret (Stmt stmt,Scope scope){
+        stmt.Accept(this,scope);
         return null;
     }
-    public object? VisitPointStmt (Stmt.Point point){
-        scope.Set(point.Id.Lexeme,new Point(point.Id.Lexeme,point.Comment));
+    public object? VisitPointStmt (Stmt.Point point,Scope scope){
+        scope.Set(point.Id.Lexeme,new Element.Point(point.Id.Lexeme,point.X,point.Y,point.Comment));
         return null;
     }
 }

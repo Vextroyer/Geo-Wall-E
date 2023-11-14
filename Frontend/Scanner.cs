@@ -51,7 +51,11 @@ public class Scanner
             case '\n': OnNewLineFound(); break;
 
             default:
-                if(IsAlpha(c)) {
+                if(IsDigit(c)){
+                    ScanNumber();
+                    break;
+                }
+                else if(IsAlpha(c)) {
                     ScanIdentifier();
                     break;
                 }
@@ -99,6 +103,19 @@ public class Scanner
             type = TokenType.ID;
         }
         AddToken(type);
+    }
+
+    //Scan a number literal
+    private void ScanNumber(){
+        while(IsDigit(Peek()))Advance();//Consume the leading digits
+        
+        //If there exist a dot an at least a digit after the dot its a real number.
+        if(Peek() == '.' && IsDigit(PeekNext())){
+            Advance();//Consume the '.'
+            while(IsDigit(Peek()))Advance();//Consume the trailing digits
+        }
+
+        AddToken(TokenType.NUMBER,float.Parse(source.Substring(start,current - start)));
     }
 
     //Aid in the creation of tokens.

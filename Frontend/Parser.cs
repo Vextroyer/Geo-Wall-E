@@ -34,12 +34,26 @@ public class Parser{
 
     private Stmt.Point ParsePointStmt(){
         Consume(TokenType.POINT,"Expected `point` keyword");
+
+        //Since parsing phase points get their coordinates.
+        float x = Utils.RandomCoordinate();
+        float y = Utils.RandomCoordinate();
+        //A parenthesis after a point keyword means a constructor with the point coordinates.
+        if(Peek.Type == TokenType.LEFT_PAREN){
+            Consume(TokenType.LEFT_PAREN);
+            x = (float) Consume(TokenType.NUMBER,"Expected NUMBER as first parameter").Literal!;
+            Consume(TokenType.COMMA,"Expected comma `,`");
+            y = (float) Consume(TokenType.NUMBER,"Expected NUMBER as second parameter").Literal!;
+            Consume(TokenType.RIGHT_PAREN,"Expected `)`");
+        }
+
         Token id = Consume(TokenType.ID,"Expected identifier");
+        
         //If the current token is an string then its a comment on the point.
         string comment = "";
         if(Peek.Type == TokenType.STRING)comment =(string) Advance().Literal!;
 
-        return new Stmt.Point(id,comment);
+        return new Stmt.Point(id,x,y,comment);
     }
 
     private bool IsAtEnd {get => Peek.Type == TokenType.EOF;}
@@ -53,7 +67,7 @@ public class Parser{
     //Return the last processed token.
     private Token Previous {get => tokens[current - 1];}
     //If the current token is of the expected type consume it, if not throw an exception.
-    private Token Consume(TokenType type,string message){
+    private Token Consume(TokenType type,string message="(-_-)"){
         if(Peek.Type == type)return Advance();
         //Heuristically report the location of the error as the end of the previous token.
         throw new ExtendedException(Previous.Line,Previous.Offset + Previous.Lexeme.Length,message);
