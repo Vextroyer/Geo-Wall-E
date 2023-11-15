@@ -97,7 +97,6 @@ public class Parser{
             case TokenType.NUMBER:
                 return new Expr.Number(Peek.Line,Peek.Offset,(float) Advance().Literal!);
             case TokenType.STRING:
-                Token token = Advance();
                 return new Expr.String(Peek.Line,Peek.Offset,(string) Advance().Literal!);
             case TokenType.LEFT_PAREN://Grouping expressions
                 Consume(TokenType.LEFT_PAREN);
