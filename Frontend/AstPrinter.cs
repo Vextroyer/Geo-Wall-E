@@ -20,6 +20,10 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
         return $"print({Print(stmt._Expr)})";
     }
 
+    public string VisitColorStmt(Stmt.Color stmt,Scope<Element> scope){
+        if(stmt.IsRestore)return "restore";
+        return $"color {stmt._Color}";
+    }
     public string Print(Expr expr){
         return expr.Accept(this,null);
     }

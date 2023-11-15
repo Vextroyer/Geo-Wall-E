@@ -5,7 +5,11 @@ This class receives an AST an executes the stamentes it represents.
 namespace Frontend;
 
 public class Interpreter : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>{
+    //Store the state of the program as a nested scope structure
     private Scope<Element> globalScope = new Scope<Element>();
+
+    //Store the colors to draw
+    private ColorStack colorStack = new ColorStack();
 
     //Interpret a program.
     public object? Interpret (Program program){
@@ -29,6 +33,11 @@ public class Interpreter : IVisitorStmt<object?,Element>, IVisitorExpr<Element,E
     }
     public object? VisitPrintStmt(Stmt.Print stmt,Scope<Element> scope){
         Console.WriteLine(Evaluate(stmt._Expr,scope));
+        return null;
+    }
+    public object? VisitColorStmt(Stmt.Color stmt,Scope<Element> scope){
+        if(stmt.IsRestore)colorStack.Pop();
+        else colorStack.Push(stmt._Color);
         return null;
     }
     #endregion Interpret statements

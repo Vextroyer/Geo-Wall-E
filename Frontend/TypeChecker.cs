@@ -10,7 +10,7 @@ Type checking rules:
     1- Constants cant be redeclared. Therefore any instruccion that associates identifiers to values(create variables) must be checked to enforce this rule.
     2- Constants cant be assigned an empty expression.
     3- A variable cant be declared twice on the same scope.
-    4-Variables must be declared before being used.
+    4- Variables must be declared before being used.
 */
 
 public class TypeChecker : IVisitorStmt<object?,ElementType>, IVisitorExpr<ElementType,ElementType>
@@ -44,6 +44,10 @@ public class TypeChecker : IVisitorStmt<object?,ElementType>, IVisitorExpr<Eleme
     }
     public object? VisitPrintStmt(Stmt.Print stmt,Scope<ElementType> scope){
         Check(stmt._Expr,scope);
+        return null;
+    }
+    public object? VisitColorStmt(Stmt.Color stmt,Scope<ElementType> scope){
+        //A color statement doesnt invloves any checking.
         return null;
     }
     //Checking expressions

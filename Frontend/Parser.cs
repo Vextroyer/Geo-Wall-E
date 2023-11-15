@@ -36,6 +36,10 @@ public class Parser{
             case TokenType.PRINT:
                 aux = ParsePrintStmt();
                 break;
+            case TokenType.COLOR:
+            case TokenType.RESTORE:
+                aux = ParseColorStmt();
+                break;
             default:
                 throw new ExtendedException(Peek.Line,Peek.Offset,"Not a statement");
         }
@@ -78,6 +82,54 @@ public class Parser{
         int _offset = Peek.Offset;
         Consume(TokenType.PRINT);
         return new Stmt.Print(_line,_offset,ParseExpression());
+    }
+    private Stmt.Color ParseColorStmt(){
+        int line = Peek.Line;
+        int offset = Peek.Offset;
+        
+        //If the keyword `restore` is found the color doesnt matter
+        if(Peek.Type == TokenType.RESTORE){
+            Consume(TokenType.RESTORE);
+            return new Stmt.Color(line,offset,Color.BLACK,true);
+        }
+        
+        Color color;        
+        Consume(TokenType.COLOR);
+        //If the `color` keyword is found , a built-in color must be provided.
+        switch(Peek.Type){
+            case TokenType.COLOR_BLACK:
+                color = Color.BLACK;
+                break;
+            case TokenType.COLOR_BLUE:
+                color = Color.BLUE;
+                break;
+            case TokenType.COLOR_CYAN:
+                color = Color.CYAN;
+                break;
+            case TokenType.COLOR_GRAY:
+                color = Color.GRAY;
+                break;
+            case TokenType.COLOR_GREEN:
+                color = Color.GREEN;
+                break;
+            case TokenType.COLOR_MAGENTA:
+                color = Color.MAGENTA;
+                break;
+            case TokenType.COLOR_RED:
+                color = Color.RED;
+                break;
+            case TokenType.COLOR_WHITE:
+                color = Color.WHITE;
+                break;
+            case TokenType.COLOR_YELLOW:
+                color = Color.YELLOW;
+                break;
+            default:
+                throw new ExtendedException(Peek.Line,Peek.Offset,$"Expected built-in color");
+        }
+
+        Advance();//Consume the token who holds the color.
+        return new Stmt.Color(line,offset,color);
     }
     #endregion Statement parsing
     

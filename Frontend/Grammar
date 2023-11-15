@@ -8,8 +8,10 @@ Stmt = ConstantDeclaration ';'; //Declaration of a constant. Read only variable.
 
 Stmt = 'print' Expr ';';//Print statement
 
+Stmt = ('color' COLOR) | 'restore' ';'; //Color statement
+
 //Set of the terminals that made the first word of the stmt production.
-First(stmt) = { 'point' , ID , 'print'}
+First(stmt) = { 'point' , ID , 'print', 'color', 'restore'}
 
 Expr = VariableExpr;
 VariableExpr = ID | PrimaryExpr;
@@ -33,3 +35,5 @@ NUMBER : Represents any number.
 A number is a nonempty sequence of digits followed optionally by a dot and another sequence of digits.
 
 EMPTY : Represents the empty expression.
+
+COLOR : Represents a color terminal.

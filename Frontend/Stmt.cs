@@ -7,6 +7,7 @@ public interface IVisitorStmt<T,U>{
     public T VisitPointStmt(Stmt.Point stmt,Scope<U> scope);
     public T VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt,Scope<U> scope);
     public T VisitPrintStmt(Stmt.Print stmt,Scope<U> scope);
+    public T VisitColorStmt(Stmt.Color stmt,Scope<U> scope);
 }
 public interface IVisitableStmt{
     public T Accept<T,U>(IVisitorStmt<T,U> visitor,Scope<U> scope);
@@ -66,6 +67,20 @@ public abstract class Stmt : IVisitableStmt{
         public override T Accept<T,U>(IVisitorStmt<T,U> visitor,Scope<U> scope)
         {
             return visitor.VisitPrintStmt(this,scope);
+        }
+    }
+    //Color statement
+    public class Color : Stmt{
+        public Frontend.Color _Color{get; private set;}
+        public bool IsRestore {get; private set;}
+        public Color(int line,int offset,Frontend.Color _color,bool _restore = false):base(line,offset){
+            _Color = _color;
+            IsRestore = _restore;
+        }
+
+        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitColorStmt(this,scope);
         }
     }
 }
