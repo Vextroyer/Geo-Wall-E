@@ -15,7 +15,8 @@ public class Scanner
 
     private static readonly Dictionary<string,TokenType> keywords = new Dictionary<string, TokenType>()
     {
-        {"point",TokenType.POINT}
+        {"point",TokenType.POINT},
+        {"print",TokenType.PRINT}
     };
 
     public Scanner(string? _source){
@@ -42,6 +43,7 @@ public class Scanner
             case '/': if(Match('/')) ScanComment(); break;
             case ',': AddToken(TokenType.COMMA);  break;
             case ';': AddToken(TokenType.SEMICOLON);  break;
+            case '=': AddToken(TokenType.EQUAL); break;
 
             //Ignore tabs and whitespaces
             case ' ': 

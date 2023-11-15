@@ -5,13 +5,33 @@ Represents the different kinds of tokens on G#.
 namespace Frontend;
 
 public enum TokenType{
+    //Grouping symbols.
     LEFT_PAREN,RIGHT_PAREN,
-    COMMENT,//Represents a single line comment '//'
-    COMMA,
-    SEMICOLON,//Represents a semicolon ';'
-    ID,//Represents an identifier.
-    STRING,//Represents an string
-    NUMBER,//Represents number literals.
-    POINT,//The 'point' keyword
-    EOF//Represents the end of file token.
+
+    //Operators.
+    EQUAL,
+
+    //Represents a single line comment '//'.
+    COMMENT,
+
+    //Control symbols.
+    COMMA, SEMICOLON,
+
+    //Represents an identifier.
+    ID,
+
+    //Represents an string.
+    STRING,
+
+    //Represents number literals.
+    NUMBER,
+    
+    //The 'point' keyword.
+    POINT,
+
+    //The `print` keyword
+    PRINT,
+    
+    //Represents the end of file token.
+    EOF
 }
