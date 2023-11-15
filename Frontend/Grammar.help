@@ -14,6 +14,7 @@ Stmt = ('color' COLOR) | 'restore' ';'; //Color statement
 First(stmt) = { 'point' , ID , 'print', 'color', 'restore'}
 
 Expr = VariableExpr;
+UnaryExpr = ( ('!' | '-') UnaryExpr ) | VariableExpr;
 VariableExpr = ID | PrimaryExpr;
 PrimaryExpr = NUMBER | STRING | GroupedExpr | EMPTY;
 GroupedExpr = '(' Expr ')';

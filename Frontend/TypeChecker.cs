@@ -5,14 +5,6 @@ follows some rules.
 
 namespace Frontend;
 
-/*
-Type checking rules:
-    1- Constants cant be redeclared. Therefore any instruccion that associates identifiers to values(create variables) must be checked to enforce this rule.
-    2- Constants cant be assigned an empty expression.
-    3- A variable cant be declared twice on the same scope.
-    4- Variables must be declared before being used.
-*/
-
 public class TypeChecker : IVisitorStmt<object?,ElementType>, IVisitorExpr<ElementType,ElementType>
 {
     Scope<ElementType> globalScope = new Scope<ElementType>();
@@ -37,7 +29,6 @@ public class TypeChecker : IVisitorStmt<object?,ElementType>, IVisitorExpr<Eleme
     }
     public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt,Scope<ElementType> scope){
         if(scope.IsConstant(stmt.Id.Lexeme))throw new ExtendedException(stmt.Line,stmt.Offset,$"Redeclaration of constant {stmt.Id.Lexeme}");//Rule 1
-        if(stmt.Rvalue == Expr.EMPTY)throw new ExtendedException(stmt.Line,stmt.Offset,$"Assigned empty expression to constant `{stmt.Id.Lexeme}`");//Rule 2
         ElementType rValueType = Check(stmt.Rvalue,scope);
         scope.SetConstant(stmt.Id.Lexeme,rValueType);
         return null;
@@ -61,7 +52,7 @@ public class TypeChecker : IVisitorStmt<object?,ElementType>, IVisitorExpr<Eleme
         return ElementType.STRING;
     }
     public ElementType VisitVariableExpr(Expr.Variable expr,Scope<ElementType> scope){
-        if(!scope.HasBinding(expr.Id.Lexeme,true))throw new ExtendedException(expr.Line,expr.Offset,$"Variable `{expr.Id.Lexeme}` used but not declared");
+        if(!scope.HasBinding(expr.Id.Lexeme,true))throw new ExtendedException(expr.Line,expr.Offset,$"Variable `{expr.Id.Lexeme}` used but not declared");//Rule 4
         return scope.Get(expr.Id.Lexeme);
     }
 }

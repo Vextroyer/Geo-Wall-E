@@ -75,6 +75,7 @@ public class Parser{
         Token id = Consume(TokenType.ID,"Expected identifier");
         Consume(TokenType.EQUAL,"Expected `=`");
         Expr expr = ParseExpression();
+        if(expr == Expr.EMPTY)throw new ExtendedException(id.Line,id.Offset,$"Assigned empty expression to constant `{id.Lexeme}`");//Rule 2
         return new Stmt.ConstantDeclaration(id,expr);
     }
     private Stmt.Print ParsePrintStmt(){
