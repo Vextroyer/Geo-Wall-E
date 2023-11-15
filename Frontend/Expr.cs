@@ -5,13 +5,13 @@ On this case expressions represent elements.
 
 namespace Frontend;
 
-public interface IVisitorExpr<T>{
-    public T VisitNumberExpr(Expr.Number expr,Scope scope);
-    public T VisitStringExpr(Expr.String expr,Scope scope);
-    public T VisitVariableExpr(Expr.Variable expr,Scope scope);
+public interface IVisitorExpr<T,U>{
+    public T VisitNumberExpr(Expr.Number expr,Scope<U> scope);
+    public T VisitStringExpr(Expr.String expr,Scope<U> scope);
+    public T VisitVariableExpr(Expr.Variable expr,Scope<U> scope);
 }
 public interface IVisitableExpr{
-    public T Accept<T>(IVisitorExpr<T> visitor,Scope scope);
+    public T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope);
 }
 
 //Base class for expressions.
@@ -24,12 +24,12 @@ public abstract class Expr : IVisitableExpr{
     }
 
     //Required to work in conjuction with the VisitorStmt interface.
-    abstract public T Accept<T>(IVisitorExpr<T> visitor,Scope scope);
+    abstract public T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope);
 
     //Represents the empty expression.
     public class Empty : Expr{
         public Empty():base(0,0){}
-        public override T Accept<T>(IVisitorExpr<T> visitor,Scope scope)
+        public override T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope)
         {
             throw new NotImplementedException();
         }
@@ -41,7 +41,7 @@ public abstract class Expr : IVisitableExpr{
         public Number(int line,int offset,float _value):base(line,offset){
             Value = new Element.Number(_value);
         }
-        public override T Accept<T>(IVisitorExpr<T> visitor,Scope scope)
+        public override T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope)
         {
             return visitor.VisitNumberExpr(this,scope);
         }
@@ -51,7 +51,7 @@ public abstract class Expr : IVisitableExpr{
         public String(int line,int offset,string _value):base(line,offset){
             Value = new Element.String(_value);
         }
-        public override T Accept<T>(IVisitorExpr<T> visitor,Scope scope)
+        public override T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope)
         {
             return visitor.VisitStringExpr(this,scope);
         }
@@ -62,7 +62,7 @@ public abstract class Expr : IVisitableExpr{
         public Variable(Token _id):base(_id.Line,_id.Offset){
             Id = _id;
         }
-        public override T Accept<T>(IVisitorExpr<T> visitor,Scope scope)
+        public override T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope)
         {
             return visitor.VisitVariableExpr(this,scope);
         }

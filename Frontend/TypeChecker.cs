@@ -13,9 +13,9 @@ Type checking rules:
     4-Variables must be declared before being used.
 */
 
-public class TypeChecker : IVisitorStmt<object?>, IVisitorExpr<ElementType>
+public class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<ElementType,Element>
 {
-    Scope globalScope = new Scope();
+    Scope<Element> globalScope = new Scope<Element>();
     //Analyze the semantic of the program to see if it is correct.
     public void Check(Program program)
     {
@@ -29,33 +29,33 @@ public class TypeChecker : IVisitorStmt<object?>, IVisitorExpr<ElementType>
         stmt.Accept(this, globalScope);
     }
     //Checking statements
-    public object? VisitPointStmt(Stmt.Point stmt,Scope scope){
+    public object? VisitPointStmt(Stmt.Point stmt,Scope<Element> scope){
         if(scope.IsConstant(stmt.Id.Lexeme))throw new ExtendedException(stmt.Line,stmt.Offset,$"Redeclaration of constant {stmt.Id.Lexeme}");//Rule 1
         if(scope.HasBinding(stmt.Id.Lexeme))throw new ExtendedException(stmt.Line,stmt.Offset,$"Point `{stmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
         scope.SetArgument(stmt.Id.Lexeme,new Element.Point(new Element.String(stmt.Id.Lexeme),stmt.X,stmt.Y,stmt.Comment));
         return null;
     }
-    public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt,Scope scope){
+    public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt,Scope<Element> scope){
         if(scope.IsConstant(stmt.Id.Lexeme))throw new ExtendedException(stmt.Line,stmt.Offset,$"Redeclaration of constant {stmt.Id.Lexeme}");//Rule 1
         if(stmt.Rvalue == Expr.EMPTY)throw new ExtendedException(stmt.Line,stmt.Offset,$"Assigned empty expression to constant `{stmt.Id.Lexeme}`");//Rule 2
         Check(stmt.Rvalue,scope);
         return null;
     }
-    public object? VisitPrintStmt(Stmt.Print stmt,Scope scope){
+    public object? VisitPrintStmt(Stmt.Print stmt,Scope<Element> scope){
         Check(stmt._Expr,scope);
         return null;
     }
     //Checking expressions
-    private void Check(Expr expr,Scope scope){
+    private void Check(Expr expr,Scope<Element> scope){
         expr.Accept(this,scope);
     }
-    public ElementType VisitNumberExpr(Expr.Number expr,Scope scope){
+    public ElementType VisitNumberExpr(Expr.Number expr,Scope<Element> scope){
         return ElementType.NUMBER;
     }
-    public ElementType VisitStringExpr(Expr.String expr,Scope scope){
+    public ElementType VisitStringExpr(Expr.String expr,Scope<Element> scope){
         return ElementType.STRING;
     }
-    public ElementType VisitVariableExpr(Expr.Variable expr,Scope scope){
+    public ElementType VisitVariableExpr(Expr.Variable expr,Scope<Element> scope){
         if(!scope.HasBinding(expr.Id.Lexeme,true))throw new ExtendedException(expr.Line,expr.Offset,$"Variable `{expr.Id.Lexeme}` used but not declared");
         return scope.Get(expr.Id.Lexeme).Type;
     }

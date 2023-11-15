@@ -8,11 +8,17 @@ Constants cant change that value.
 
 namespace Frontend;
 
-public class Scope{
-    Scope? parent;
-    Dictionary<string,Element> elements = new Dictionary<string, Element>();
+/*
+Its convenient to have a generic type for the scope because in the case of the interpreter
+the variables are asscociated with elements, but in the case of the TypeChecker the variables
+are associated with its type.
+*/
+
+public class Scope<U>{
+    Scope<U>? parent;
+    Dictionary<string,U> elements = new Dictionary<string, U>();
     HashSet<string> constants = new HashSet<string>();
-    public Scope(Scope? _parent = null){
+    public Scope(Scope<U>? _parent = null){
         parent = _parent;
     }
     private bool HasParent { get => parent != null; }
@@ -30,16 +36,16 @@ public class Scope{
         return false;
     }
     //Associates varName with the given element.If exists is overwritted.
-    public void SetArgument(string varName, Element element){
+    public void SetArgument(string varName, U element){
         elements.Add(varName,element);
     }
-    public void SetConstant(string varName, Element element){
+    public void SetConstant(string varName, U element){
         SetArgument(varName,element);
         constants.Add(varName);
     }
     //Return the element associated with the given varName. The method HasBinding should be called
     //before calling get setting searchParent to true.
-    public Element Get(string varName){
+    public U Get(string varName){
         if(HasBinding(varName))return elements[varName];
         if(HasParent)return parent!.Get(varName);
         throw new Exception($"Tried to acces to inexsitent variable {varName}");

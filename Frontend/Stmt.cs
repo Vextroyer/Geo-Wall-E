@@ -3,13 +3,13 @@ Statements are instructions that modify the state of the program.
 */
 namespace Frontend;
 
-public interface IVisitorStmt<T>{
-    public T VisitPointStmt(Stmt.Point stmt,Scope scope);
-    public T VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt,Scope scope);
-    public T VisitPrintStmt(Stmt.Print stmt,Scope scope);
+public interface IVisitorStmt<T,U>{
+    public T VisitPointStmt(Stmt.Point stmt,Scope<U> scope);
+    public T VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt,Scope<U> scope);
+    public T VisitPrintStmt(Stmt.Print stmt,Scope<U> scope);
 }
 public interface IVisitableStmt{
-    public T Accept<T>(IVisitorStmt<T> visitor,Scope scope);
+    public T Accept<T,U>(IVisitorStmt<T,U> visitor,Scope<U> scope);
 }
 //Base class for statements.
 public abstract class Stmt : IVisitableStmt{
@@ -22,7 +22,7 @@ public abstract class Stmt : IVisitableStmt{
     }
 
     //Required to work in conjuction with the IVisitorStmt interface.
-    abstract public T Accept<T>(IVisitorStmt<T> visitor,Scope scope);
+    abstract public T Accept<T,U>(IVisitorStmt<T,U> visitor,Scope<U> scope);
     //Represents a `point` statement.
     public class Point : Stmt{
         public Token Id {get; private set;}//The name of the point will be used as identifier.
@@ -37,7 +37,7 @@ public abstract class Stmt : IVisitableStmt{
             Y = _y;
         }
 
-        public override T Accept<T>(IVisitorStmt<T> visitor,Scope scope)
+        public override T Accept<T,U>(IVisitorStmt<T,U> visitor,Scope<U> scope)
         {
             return visitor.VisitPointStmt(this,scope);
         }
@@ -52,7 +52,7 @@ public abstract class Stmt : IVisitableStmt{
             Rvalue = _expr;
         }
         
-        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
+        public override T Accept<T,U>(IVisitorStmt<T,U> visitor,Scope<U> scope)
         {
             return visitor.VisitConstantDeclarationStmt(this,scope);
         }
@@ -63,7 +63,7 @@ public abstract class Stmt : IVisitableStmt{
         public Print(int _line,int _offset,Expr _expr):base(_line,_offset){
             _Expr = _expr;
         }
-        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
+        public override T Accept<T,U>(IVisitorStmt<T,U> visitor,Scope<U> scope)
         {
             return visitor.VisitPrintStmt(this,scope);
         }
