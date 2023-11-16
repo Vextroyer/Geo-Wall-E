@@ -16,7 +16,21 @@ public class Scanner
     private static readonly Dictionary<string,TokenType> keywords = new Dictionary<string, TokenType>()
     {
         {"point",TokenType.POINT},
-        {"draw",TokenType.DRAW}
+        {"draw",TokenType.DRAW},
+        {"print",TokenType.PRINT},
+        //Colors
+        {"color",TokenType.COLOR},
+        {"black",TokenType.COLOR_BLACK},
+        {"blue",TokenType.COLOR_BLUE},
+        {"cyan",TokenType.COLOR_CYAN},
+        {"gray",TokenType.COLOR_GRAY},
+        {"green",TokenType.COLOR_GREEN},
+        {"magenta",TokenType.COLOR_MAGENTA},
+        {"red",TokenType.COLOR_RED},
+        {"white",TokenType.COLOR_WHITE},
+        {"yellow",TokenType.COLOR_YELLOW},
+        {"restore",TokenType.RESTORE}
+  
     };
 
     public Scanner(string? _source){
@@ -43,6 +57,7 @@ public class Scanner
             case '/': if(Match('/')) ScanComment(); break;
             case ',': AddToken(TokenType.COMMA);  break;
             case ';': AddToken(TokenType.SEMICOLON);  break;
+            case '=': AddToken(TokenType.EQUAL); break;
 
             //Ignore tabs and whitespaces
             case ' ': 

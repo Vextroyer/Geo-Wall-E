@@ -4,7 +4,6 @@ Try to read files that are in an unreadable directory.
 Check that file reading is being doing well.
 
 #2
-Check that random number generation is doing fine.
 Read maximum coordinates from a config file
 
 Add support for negative numbers.
@@ -27,3 +26,5 @@ El interprete falla al recuperar una variabe declarada en un scope anterior.
 
 The way of debugging the intepreter is throug debugging. There is no visual output yet.
 
+Hay que considerar los casos en los que las expresiones pueden devolver la expresion vacia. Este paso
+se puede hacer junto con la comprobacion de tipos despues del parsing.

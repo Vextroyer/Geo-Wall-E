@@ -1,0 +1,7 @@
+On this file some syntax rules are described for G#.
+
+Rules
+1- Constants cant be redeclared. Therefore any instruccion that associates identifiers to values(create variables) must be checked to enforce this rule.
+2- Constants cant be assigned an empty expression.
+3- A variable cant be declared twice on the same scope.
+4- Variables must be declared before being used.

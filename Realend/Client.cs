@@ -49,10 +49,11 @@ class Client{
                 Utils.PrintTokens(tokens);
                 Parser p = new Parser(tokens);
                 Program pro = p.Parse();
+                TypeChecker checker = new TypeChecker();
+                checker.Check(pro);
                 Utils.PrintAst(pro);
                 Interpreter interpreter = new Interpreter();
                 interpreter.Interpret(pro);
-                
             }
             catch(Frontend.ExtendedException e){
                 ReportError(e);

@@ -1,0 +1,40 @@
+Program = Stmt*;
+
+Stmt = PointStmt ';'; //Point statement
+    PointStmt = 'point' ('(' NUMBER ',' NUMBER ')')? ID STRING?;
+
+Stmt = ConstantDeclaration ';'; //Declaration of a constant. Read only variable.
+    ConstantDeclaration = ID '=' Expr;
+
+Stmt = 'print' Expr ';';//Print statement
+
+Stmt = ('color' COLOR) | 'restore' ';'; //Color statement
+
+//Set of the terminals that made the first word of the stmt production.
+First(stmt) = { 'point' , ID , 'print', 'color', 'restore'}
+
+Expr = VariableExpr;
+UnaryExpr = ( ('!' | '-') UnaryExpr ) | VariableExpr;
+VariableExpr = ID | PrimaryExpr;
+PrimaryExpr = NUMBER | STRING | GroupedExpr | EMPTY;
+GroupedExpr = '(' Expr ')';
+
+<!-- Stmt = 'draw' ID ';'; //Draw statement -->
+<!-- Expr = 'point' ('(' NUMBER ',' NUMBER ')') ; //Point expression -->
+
+ID : Represents any identifier.
+An identifier is a sequence of contiguos symbols that follows these two rules:
+    -Its first symbol is an underscore `_` or any letter, capitalized or not.
+    -Any other symbol is either an underscore, a letter , capitalized or not, or a decimal digit.
+An ID: _Sofia43
+Not an ID: 2Place
+
+STRING : Represents any string.
+An string is a sequence of characters where the first and the last character are double quotes `"`.
+
+NUMBER : Represents any number.
+A number is a nonempty sequence of digits followed optionally by a dot and another sequence of digits.
+
+EMPTY : Represents the empty expression.
+
+COLOR : Represents a color terminal.
