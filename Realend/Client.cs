@@ -36,19 +36,16 @@ class Client{
             string? path = Console.ReadLine();//The path to the file
             if(string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path))continue;//User just pressed enter or hit to many spaces.
             
-            string? source;
-            try{
-                source = GetSourceFromFile(path);
-            }catch(FileNotFoundException e){
-                ReportError(e.Message);
-                continue;
-            }
             //At this point on source its the content of the G# script to be executed.
-            Frontend.GSharpCompiler.Response compilerResponse = Frontend.GSharpCompiler.CompileFromSource(source);
+            Frontend.GSharpCompiler.Response compilerResponse = Frontend.GSharpCompiler.CompileFromFile(path);
             if(compilerResponse.HadError){
-                foreach(Frontend.GSharpCompiler.Error error in compilerResponse.Errors)
+                if(compilerResponse.HadErrorReadingFile)ReportError(compilerResponse.Errors.Last().Message);
+                else
                 {
-                    ReportError(error.Line,error.Offset,error.Message);
+                    foreach(Frontend.GSharpCompiler.Error error in compilerResponse.Errors)
+                    {
+                        ReportError(error.Line,error.Offset,error.Message);
+                    }
                 }
             }
         }
@@ -63,19 +60,5 @@ class Client{
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"{message} at line {line} , column {offset}");
         Console.ForegroundColor = ConsoleColor.White;
-    }
-
-    //Returns the contents of a file as an string. Its used to retrieve the content of a file. Throws an error if the file cant be oppened.
-    private static string? GetSourceFromFile(string path){
-        path = Path.GetFullPath(path);//Convert the path to absolute path, this is to support relative paths
-
-        //The file doesnt exist, this is an error.
-        if(!Path.Exists(path))throw new FileNotFoundException("Error accessing file. Check if exists and that this program can read that file.");
-
-        // byte[] bytes = File.ReadAllBytes(path);//Read the file content
-        // string source = System.Text.Encoding.Default.GetString(bytes);//Convert binary content on its textual representation
-        // return source;
-
-        return System.Text.Encoding.Default.GetString(File.ReadAllBytes(path));
     }
 }

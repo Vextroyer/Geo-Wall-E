@@ -37,4 +37,18 @@ static class Utils{
     public static int RandomCoordinate(){
         return (random.Next() % (2 * MaxPointCoordinate + 1)) - MaxPointCoordinate;
     }
+
+    //Returns the contents of a file as an string. Its used to retrieve the content of a file. Throws an error if the file cant be oppened.
+    public static string GetSourceFromFile(string path){
+        path = Path.GetFullPath(path);//Convert the path to absolute path, this is to support relative paths
+
+        //The file doesnt exist, this is an error.
+        if(!Path.Exists(path))throw new FileNotFoundException();
+
+        // byte[] bytes = File.ReadAllBytes(path);//Read the file content
+        // string source = System.Text.Encoding.Default.GetString(bytes);//Convert binary content on its textual representation
+        // return source;
+
+        return System.Text.Encoding.Default.GetString(File.ReadAllBytes(path));
+    }
 }

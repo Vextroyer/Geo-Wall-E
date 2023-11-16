@@ -9,8 +9,21 @@ namespace Frontend;
 
 public static class GSharpCompiler
 {
+    //Compile from a file containing the source code.
+    public static Response CompileFromFile(string path, Flags? flags = null){
+        string sourceCode = "";
+        List<Error> errors = new List<Error>();
+        List<IDrawable> drawables = new List<IDrawable>();
+        try{
+            sourceCode = Utils.GetSourceFromFile(path);
+        }catch(Exception e){
+            errors.Add(new Error(-1,-1,e.Message));
+            return new Response(errors,drawables,true);
+        }
+        return CompileFromSource(sourceCode,flags);
+    }
     //Compile from a string containing the source code.
-    public static Response CompileFromSource(string? source,Flags? flags = null)
+    public static Response CompileFromSource(string source,Flags? flags = null)
     {
         //Use default flags
         if(flags == null)flags = new Flags();
@@ -53,14 +66,16 @@ public static class GSharpCompiler
     public class Response
     {
         public bool HadError { get => errors.Count > 0; }
+        public bool HadErrorReadingFile { get; private set; } // If this is set to true the response will contain the message of the error.
         public List<Error> Errors { get => errors; }
         public List<IDrawable> Elements { get => elements; }
         List<Error> errors = new List<Error>();
         List<IDrawable> elements = new List<IDrawable>();//The elements produced by the code.
-        public Response(List<Error> _errors, List<IDrawable> _elements)
+        public Response(List<Error> _errors, List<IDrawable> _elements,bool hadErrorReadingFile = false)
         {
             errors = _errors;
             elements = _elements;
+            HadErrorReadingFile = hadErrorReadingFile;
         }
     }
     //Represents the errors.
