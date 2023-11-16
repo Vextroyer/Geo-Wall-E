@@ -13,5 +13,6 @@ public enum TokenType{
     STRING,//Represents an string
     NUMBER,//Represents number literals.
     POINT,//The 'point' keyword
-    EOF//Represents the end of file token.
+    EOF,//Represents the end of file token.
+    DRAW
 }

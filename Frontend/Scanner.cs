@@ -15,7 +15,8 @@ public class Scanner
 
     private static readonly Dictionary<string,TokenType> keywords = new Dictionary<string, TokenType>()
     {
-        {"point",TokenType.POINT}
+        {"point",TokenType.POINT},
+        {"draw",TokenType.DRAW}
     };
 
     public Scanner(string? _source){
@@ -49,6 +50,7 @@ public class Scanner
                 break;
 
             case '\n': OnNewLineFound(); break;
+            case '\r': break;
 
             default:
                 if(IsDigit(c)){
@@ -59,6 +61,7 @@ public class Scanner
                     ScanIdentifier();
                     break;
                 }
+                Console.WriteLine((int)c);
                 throw new ExtendedException(line,ComputeOffset,$"Unrecognized character");
         }
     }
