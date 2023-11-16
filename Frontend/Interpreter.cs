@@ -11,12 +11,15 @@ public class Interpreter : IVisitorStmt<object?,Element>, IVisitorExpr<Element,E
     //Store the colors to draw
     private ColorStack colorStack = new ColorStack();
 
+    //Stores the drawables
+    private List<IDrawable> drawables = new List<IDrawable>();//On execution of a draw statement drawables must be added to the list.
+
     //Interpret a program.
-    public object? Interpret (Program program){
+    public List<IDrawable> Interpret (Program program){
         foreach(Stmt stmt in program.Stmts){
             Interpret(stmt,globalScope);
         }
-        return null;
+        return drawables;
     }
     #region Interpret statements
     private object? Interpret (Stmt stmt,Scope<Element> scope){

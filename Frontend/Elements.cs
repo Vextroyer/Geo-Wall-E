@@ -3,6 +3,9 @@ On this class are defined the different objects that exist on a G# program execu
 */
 namespace Frontend;
 
+//Represents G# objects that can be drawed on screen. Not every object can be drawed.
+public interface IDrawable{}
+
 public enum ElementType{
     UNDEFINED,
     NUMBER,
@@ -44,7 +47,7 @@ public abstract class Element{
     }
 
     //Represents a point on a 2D rectangular coordinate system.
-    public class Point:Element{
+    public class Point:Element,IDrawable{
         Element.String name;
         Element.String comment;
         Element.Number x;
