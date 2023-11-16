@@ -43,6 +43,14 @@ public class Interpreter : IVisitorStmt<object?,Element>, IVisitorExpr<Element,E
         else colorStack.Push(stmt._Color);
         return null;
     }
+  
+   public object? VisitDrawStmt(Stmt.Draw draw, Scope<Element> scope)
+    {
+        scope.Get(draw.Id.Lexeme);
+     // Esto lleva arreglo futuro
+        return null;
+    }
+  
     #endregion Interpret statements
 
     #region Interpret expressions
@@ -63,4 +71,5 @@ public class Interpreter : IVisitorStmt<object?,Element>, IVisitorExpr<Element,E
         return scope.Get(expr.Id.Lexeme);
     }
     #endregion Interpret expressions
+
 }

@@ -24,6 +24,12 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
         if(stmt.IsRestore)return "restore";
         return $"color {stmt._Color}";
     }
+  
+    public string VisitDrawStmt(Stmt.Draw stmt, Scope<Element> scope)
+    {
+        return $"draw({stmt.Id})";
+    }
+  
     public string Print(Expr expr){
         return expr.Accept(this,null);
     }
@@ -39,4 +45,5 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
     public string VisitVariableExpr(Expr.Variable expr,Scope<Element> scope){
         return expr.Id.Lexeme;
     }
+    
 }

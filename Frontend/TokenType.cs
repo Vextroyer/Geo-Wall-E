@@ -8,6 +8,7 @@ public enum TokenType{
     //Grouping symbols.
     LEFT_PAREN,RIGHT_PAREN,
 
+
     //Operators.
     EQUAL,
 
@@ -28,6 +29,9 @@ public enum TokenType{
     
     //The 'point' keyword.
     POINT,
+  
+     //The `draw` keyword
+    DRAW,
 
     //The `print` keyword
     PRINT,
@@ -38,4 +42,5 @@ public enum TokenType{
     
     //Represents the end of file token.
     EOF
+     
 }
