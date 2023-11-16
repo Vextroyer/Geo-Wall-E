@@ -1,13 +1,15 @@
 /*
 The type checker receives an asbtract syntax tree and checks that it
 follows some rules.
+The type checker doesnt create new elements, it just uses the constants
+provided on the Element class to represent the objects.
 */
 
 namespace Frontend;
 
-public class TypeChecker : IVisitorStmt<object?,ElementType>, IVisitorExpr<ElementType,ElementType>
+public class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
 {
-    Scope<ElementType> globalScope = new Scope<ElementType>();
+    Scope<Element> globalScope = new Scope<Element>();
     //Analyze the semantic of the program to see if it is correct.
     public void Check(Program program)
     {
@@ -21,37 +23,44 @@ public class TypeChecker : IVisitorStmt<object?,ElementType>, IVisitorExpr<Eleme
         stmt.Accept(this, globalScope);
     }
     //Checking statements
-    public object? VisitPointStmt(Stmt.Point stmt,Scope<ElementType> scope){
+    public object? VisitPointStmt(Stmt.Point stmt,Scope<Element> scope){
         if(scope.IsConstant(stmt.Id.Lexeme))throw new ExtendedException(stmt.Line,stmt.Offset,$"Redeclaration of constant {stmt.Id.Lexeme}");//Rule 1
         if(scope.HasBinding(stmt.Id.Lexeme))throw new ExtendedException(stmt.Line,stmt.Offset,$"Point `{stmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
-        scope.SetArgument(stmt.Id.Lexeme,ElementType.POINT);
+        scope.SetArgument(stmt.Id.Lexeme,Element.POINT);
         return null;
     }
-    public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt,Scope<ElementType> scope){
+    public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt,Scope<Element> scope){
         if(scope.IsConstant(stmt.Id.Lexeme))throw new ExtendedException(stmt.Line,stmt.Offset,$"Redeclaration of constant {stmt.Id.Lexeme}");//Rule 1
-        ElementType rValueType = Check(stmt.Rvalue,scope);
-        scope.SetConstant(stmt.Id.Lexeme,rValueType);
+        Element rValue = Check(stmt.Rvalue,scope);
+        scope.SetConstant(stmt.Id.Lexeme,rValue);
         return null;
     }
-    public object? VisitPrintStmt(Stmt.Print stmt,Scope<ElementType> scope){
+    public object? VisitPrintStmt(Stmt.Print stmt,Scope<Element> scope){
         Check(stmt._Expr,scope);
         return null;
     }
-    public object? VisitColorStmt(Stmt.Color stmt,Scope<ElementType> scope){
+    public object? VisitColorStmt(Stmt.Color stmt,Scope<Element> scope){
         //A color statement doesnt invloves any checking.
         return null;
     }
+    public object? VisitDrawStmt(Stmt.Draw stmt,Scope<Element> scope)
+    {
+        Element element = Check(stmt._Expr,scope);
+        //element is of class Element, but its an instance of a subclass of Element, some of which implements the interface IDrawable. Rule # 5
+        if(!(element is IDrawable))throw new ExtendedException(stmt._Expr.Line,stmt._Expr.Offset,$"Element of type `{element.Type}` is not drawable");
+        return null;
+    }
     //Checking expressions
-    private ElementType Check(Expr expr,Scope<ElementType> scope){
+    private Element Check(Expr expr,Scope<Element> scope){
         return expr.Accept(this,scope);
     }
-    public ElementType VisitNumberExpr(Expr.Number expr,Scope<ElementType> scope){
-        return ElementType.NUMBER;
+    public Element VisitNumberExpr(Expr.Number expr,Scope<Element> scope){
+        return Element.NUMBER;
     }
-    public ElementType VisitStringExpr(Expr.String expr,Scope<ElementType> scope){
-        return ElementType.STRING;
+    public Element VisitStringExpr(Expr.String expr,Scope<Element> scope){
+        return Element.STRING;
     }
-    public ElementType VisitVariableExpr(Expr.Variable expr,Scope<ElementType> scope){
+    public Element VisitVariableExpr(Expr.Variable expr,Scope<Element> scope){
         if(!scope.HasBinding(expr.Id.Lexeme,true))throw new ExtendedException(expr.Line,expr.Offset,$"Variable `{expr.Id.Lexeme}` used but not declared");//Rule 4
         return scope.Get(expr.Id.Lexeme);
     }

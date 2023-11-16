@@ -27,7 +27,7 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
   
     public string VisitDrawStmt(Stmt.Draw stmt, Scope<Element> scope)
     {
-        return $"draw({stmt.Id})";
+        return $"draw({Print(stmt._Expr)})";
     }
   
     public string Print(Expr expr){

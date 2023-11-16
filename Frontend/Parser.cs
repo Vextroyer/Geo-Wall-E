@@ -57,10 +57,12 @@ public class Parser
     }
      private Stmt.Draw ParseDrawStmt()
     {
+        int line = Peek.Line;
+        int offset = Peek.Offset;
         Consume(TokenType.DRAW, "Expected `draw` keyword");
-        Token id = Consume(TokenType.ID,"Expected `ID` ");
+        Expr expr = ParseExpression();
 
-        return new Stmt.Draw(id);
+        return new Stmt.Draw(line,offset,expr);
 
     }
     private Stmt.Point ParsePointStmt(){

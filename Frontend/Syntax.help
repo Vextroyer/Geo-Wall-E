@@ -5,3 +5,4 @@ Rules
 2- Constants cant be assigned an empty expression.
 3- A variable cant be declared twice on the same scope.
 4- Variables must be declared before being used.
+5- Only drawable elements can be drawn.

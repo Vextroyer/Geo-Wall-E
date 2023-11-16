@@ -44,10 +44,11 @@ public class Interpreter : IVisitorStmt<object?,Element>, IVisitorExpr<Element,E
         return null;
     }
   
-   public object? VisitDrawStmt(Stmt.Draw draw, Scope<Element> scope)
+   public object? VisitDrawStmt(Stmt.Draw stmt, Scope<Element> scope)
     {
-        scope.Get(draw.Id.Lexeme);
-     // Esto lleva arreglo futuro
+        IDrawable drawableElement = (IDrawable) Evaluate(stmt._Expr,scope);
+        drawables.Add(drawableElement);
+        // Esto lleva arreglo futuro
         return null;
     }
   

@@ -18,6 +18,11 @@ public abstract class Element{
     //The type of the Element.
     public ElementType Type {get; private set;}
 
+    //Constant elements of the different types
+    public static Element.Number NUMBER = new Element.Number(0);
+    public static Element.String STRING = new Element.String("");
+    public static Element.Point POINT = new Element.Point(STRING,NUMBER,NUMBER,STRING);
+
     protected Element(ElementType type){
         Type = type;
     }
@@ -53,7 +58,7 @@ public abstract class Element{
         Element.Number x;
         Element.Number y;
 
-        public Point(Element.String _name,Element.Number _x,Element.Number _y,Element.String _comment):base(ElementType.STRING){
+        public Point(Element.String _name,Element.Number _x,Element.Number _y,Element.String _comment):base(ElementType.POINT){
             name = _name;
             comment = _comment;
             x = _x;

@@ -10,8 +10,10 @@ Stmt = 'print' Expr ';';//Print statement
 
 Stmt = ('color' COLOR) | 'restore' ';'; //Color statement
 
+Stmt = 'draw' Expr ';'; //Draw statement
+
 //Set of the terminals that made the first word of the stmt production.
-First(stmt) = { 'point' , ID , 'print', 'color', 'restore'}
+First(stmt) = { 'point' , ID , 'print', 'color', 'restore' , 'draw' }
 
 Expr = VariableExpr;
 UnaryExpr = ( ('!' | '-') UnaryExpr ) | VariableExpr;
@@ -19,7 +21,7 @@ VariableExpr = ID | PrimaryExpr;
 PrimaryExpr = NUMBER | STRING | GroupedExpr | EMPTY;
 GroupedExpr = '(' Expr ')';
 
-<!-- Stmt = 'draw' ID ';'; //Draw statement -->
+
 <!-- Expr = 'point' ('(' NUMBER ',' NUMBER ')') ; //Point expression -->
 
 ID : Represents any identifier.
