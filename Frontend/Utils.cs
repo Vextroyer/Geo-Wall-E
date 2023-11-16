@@ -6,30 +6,28 @@ namespace Frontend;
 
 static class Utils{
     //Used for printing the output of the Scanner
-    public static void PrintTokens(List<Token> tokens){
-        Console.WriteLine("{");
-        foreach(Token t in tokens)Console.WriteLine("\t" + t);
-        Console.WriteLine("}");
+    public static void PrintTokens(List<Token> tokens, TextWriter outputStream){
+        outputStream.WriteLine("{");
+        foreach(Token t in tokens)outputStream.WriteLine("\t" + t);
+        outputStream.WriteLine("}");
     }
     //Used for printing the output of the Parser
-    public static void PrintAst(Program program){
+    public static void PrintAst(Program program, TextWriter outputStream){
+        bool usingConsole = outputStream == Console.Out;
         AstPrinter printer = new AstPrinter();
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"The program has {program.Stmts.Count} statements.");
-        Console.ForegroundColor = ConsoleColor.White;
-
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("--START--");
-        Console.ForegroundColor = ConsoleColor.White;
+        if(usingConsole) Console.ForegroundColor = ConsoleColor.Yellow;
+        outputStream.WriteLine($"The program has {program.Stmts.Count} statements.");
+        outputStream.WriteLine("--START--");
+        if(usingConsole) Console.ForegroundColor = ConsoleColor.White;
 
         foreach(Stmt stmt in program.Stmts){
             Console.WriteLine(printer.Print(stmt));
         }
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
+        if(usingConsole)Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("--END--");
-        Console.ForegroundColor = ConsoleColor.White;
+        if(usingConsole)Console.ForegroundColor = ConsoleColor.White;
     }
 
     //Random point generation

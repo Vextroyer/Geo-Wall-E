@@ -44,22 +44,12 @@ class Client{
                 continue;
             }
             //At this point on source its the content of the G# script to be executed.
-            try{
-                List<Token> tokens = new Scanner(source).Scan();
-                Utils.PrintTokens(tokens);
-                Parser p = new Parser(tokens);
-                Program pro = p.Parse();
-                TypeChecker checker = new TypeChecker();
-                checker.Check(pro);
-                Utils.PrintAst(pro);
-                Interpreter interpreter = new Interpreter();
-                interpreter.Interpret(pro);
-            }
-            catch(Frontend.ExtendedException e){
-                ReportError(e);
-            }
-            catch(Exception e){
-                ReportError(e.Message);
+            Frontend.GSharpCompiler.Response compilerResponse = Frontend.GSharpCompiler.CompileFromSource(source);
+            if(compilerResponse.HadError){
+                foreach(Frontend.GSharpCompiler.Error error in compilerResponse.Errors)
+                {
+                    ReportError(error.Line,error.Offset,error.Message);
+                }
             }
         }
     }
@@ -69,9 +59,9 @@ class Client{
         Console.WriteLine(message);
         Console.ForegroundColor = ConsoleColor.White;
     }
-    private static void ReportError(Frontend.ExtendedException e){
+    private static void ReportError(int line,int offset,string message){
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"{e.Message} at line {e.Line} , column {e.Offset}");
+        Console.WriteLine($"{message} at line {line} , column {offset}");
         Console.ForegroundColor = ConsoleColor.White;
     }
 

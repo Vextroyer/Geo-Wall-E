@@ -14,6 +14,13 @@ class Interpreter : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
     //Stores the drawables
     private List<IDrawable> drawables = new List<IDrawable>();//On execution of a draw statement drawables must be added to the list.
 
+    //Stores the stream to put `print` output
+    private TextWriter outputStream;
+
+    public Interpreter(TextWriter _outputStream){
+        outputStream = _outputStream;
+    }
+
     //Interpret a program.
     public List<IDrawable> Interpret (Program program){
         foreach(Stmt stmt in program.Stmts){
@@ -35,7 +42,7 @@ class Interpreter : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
         return null;
     }
     public object? VisitPrintStmt(Stmt.Print stmt,Scope<Element> scope){
-        Console.WriteLine(Evaluate(stmt._Expr,scope));
+        outputStream.WriteLine(Evaluate(stmt._Expr,scope));
         return null;
     }
     public object? VisitColorStmt(Stmt.Color stmt,Scope<Element> scope){
