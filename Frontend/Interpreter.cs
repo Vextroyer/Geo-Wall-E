@@ -4,7 +4,7 @@ This class receives an AST an executes the stamentes it represents.
 
 namespace Frontend;
 
-public class Interpreter : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>{
+class Interpreter : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>{
     //Store the state of the program as a nested scope structure
     private Scope<Element> globalScope = new Scope<Element>();
 

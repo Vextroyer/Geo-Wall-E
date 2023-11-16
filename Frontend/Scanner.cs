@@ -4,7 +4,7 @@ The scanner receives a source code string and output a list of tokens.
 
 namespace Frontend;
 
-public class Scanner
+class Scanner
 {
     private List<Token> tokens = new List<Token>();//The tokens
     private string source;//Source code

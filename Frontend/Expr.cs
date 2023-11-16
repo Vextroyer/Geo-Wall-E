@@ -5,17 +5,17 @@ On this case expressions represent elements.
 
 namespace Frontend;
 
-public interface IVisitorExpr<T,U>{
+interface IVisitorExpr<T,U>{
     public T VisitNumberExpr(Expr.Number expr,Scope<U> scope);
     public T VisitStringExpr(Expr.String expr,Scope<U> scope);
     public T VisitVariableExpr(Expr.Variable expr,Scope<U> scope);
 }
-public interface IVisitableExpr{
+interface IVisitableExpr{
     public T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope);
 }
 
 //Base class for expressions.
-public abstract class Expr : IVisitableExpr{
+abstract class Expr : IVisitableExpr{
     public int Line {get; private set;}
     public int Offset {get; private set;}
     protected Expr(int _line,int _offset){

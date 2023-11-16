@@ -2,7 +2,7 @@
 Define exceptions to be used by the program.
 */
 namespace Frontend;
-public class ExtendedException : Exception{
+class ExtendedException : Exception{
     public int Line {get; private set;}
     public int Offset {get; private set;}
 

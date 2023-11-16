@@ -1,9 +1,10 @@
 /*
-This is the parser.
+This is the parser. It receives a token stream from the scanner and produces an abstract syntax tree.
+It uses recursive descent parsing to parse the different constructs.
 */
 namespace Frontend;
 
-public class Parser
+class Parser
 {
     List<Token> tokens;
     int current = 0;//Next unprocessed token.

@@ -4,7 +4,7 @@ Statements are instructions that modify the state of the program.
 namespace Frontend;
 
 
-public interface IVisitorStmt<T, U>
+interface IVisitorStmt<T, U>
 {
     public T VisitPointStmt(Stmt.Point stmt, Scope<U> scope);
     public T VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt, Scope<U> scope);
@@ -13,12 +13,12 @@ public interface IVisitorStmt<T, U>
     public T VisitDrawStmt(Stmt.Draw stmt, Scope<U> scope);
 
 }
-public interface IVisitableStmt
+interface IVisitableStmt
 {
     public T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope);
 }
 //Base class for statements.
-public abstract class Stmt : IVisitableStmt
+abstract class Stmt : IVisitableStmt
 {
     //For error printing
     public int Line { get; private set; }

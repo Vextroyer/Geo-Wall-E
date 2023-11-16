@@ -14,7 +14,7 @@ the variables are asscociated with elements, but in the case of the TypeChecker 
 are associated with its type.
 */
 
-public class Scope<U>{
+class Scope<U>{
     Scope<U>? parent;
     Dictionary<string,U> elements = new Dictionary<string, U>();
     HashSet<string> constants = new HashSet<string>();

@@ -4,7 +4,7 @@ Represents a token.
 
 namespace Frontend;
 
-public class Token{
+class Token{
     public TokenType Type {get; private set;}//The type of the token.
     public string Lexeme {get; private set;}//The piece of code who generated this token.
     public int Line {get; private set;}//The line on the code where the token was produced.

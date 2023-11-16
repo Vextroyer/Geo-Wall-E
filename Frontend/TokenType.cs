@@ -4,7 +4,7 @@ Represents the different kinds of tokens on G#.
 
 namespace Frontend;
 
-public enum TokenType{
+enum TokenType{
     //Grouping symbols.
     LEFT_PAREN,RIGHT_PAREN,
 

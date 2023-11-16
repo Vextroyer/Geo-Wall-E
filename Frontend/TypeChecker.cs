@@ -7,7 +7,7 @@ provided on the Element class to represent the objects.
 
 namespace Frontend;
 
-public class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
+class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
 {
     Scope<Element> globalScope = new Scope<Element>();
     //Analyze the semantic of the program to see if it is correct.
