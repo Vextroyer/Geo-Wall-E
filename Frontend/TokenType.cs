@@ -11,9 +11,6 @@ enum TokenType{
     //Operators.
     EQUAL,NOT,MINUS,CARET,STAR,SLASH,PERCENT,
 
-    //Represents a single line comment '//'.
-    COMMENT,
-
     //Control symbols.
     COMMA, SEMICOLON,
 
