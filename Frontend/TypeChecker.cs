@@ -75,4 +75,11 @@ class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
         if(rValue.Type != ElementType.NUMBER)throw new ExtendedException(unaryMinusExpr.Line,unaryMinusExpr.Offset,$"Applied `-` operator to a {rValue.Type} operand");
         return Element.NUMBER;
     }
+    public Element VisitBinaryPowerExpr(Expr.Binary.Power powerExpr, Scope<Element> scope){
+        Element operand = Check(powerExpr.Left,scope);//Check left operand
+        if(operand.Type != ElementType.NUMBER)throw new ExtendedException(powerExpr.Left.Line,powerExpr.Left.Offset,$"Left operand of {powerExpr.Operator.Lexeme} is {operand.Type} and must be NUMBER");
+        operand = Check(powerExpr.Right,scope);//Check right operand
+        if(operand.Type != ElementType.NUMBER)throw new ExtendedException(powerExpr.Right.Line,powerExpr.Right.Offset,$"Right operand of {powerExpr.Operator.Lexeme} is {operand.Type} and must be NUMBER");
+        return Element.NUMBER;
+    }
 }

@@ -11,6 +11,7 @@ interface IVisitorExpr<T,U>{
     public T VisitVariableExpr(Expr.Variable expr,Scope<U> scope);
     public T VisitUnaryNotExpr(Expr.Unary.Not expr,Scope<U> scope);
     public T VisitUnaryMinusExpr(Expr.Unary.Minus expr,Scope<U> scope);
+    public T VisitBinaryPowerExpr(Expr.Binary.Power expr,Scope<U> scope);
 }
 interface IVisitableExpr{
     public T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope);
@@ -93,6 +94,26 @@ abstract class Expr : IVisitableExpr{
             public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
             {
                 return visitor.VisitUnaryMinusExpr(this,scope);
+            }
+        }
+    }
+    //Base class for binary operators.
+    public abstract class Binary : Expr{
+        public Expr Left {get; private set;}
+        public Expr Right {get; private set;}
+        public Token Operator {get; private set;}
+        abstract public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope);
+        protected Binary(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset){
+            Left = left;
+            Right = right;
+            Operator = _operator;
+        }
+        //Represents the `^` operator for exponentiation.
+        public class Power : Binary{
+            public Power(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinaryPowerExpr(this,scope);
             }
         }
     }

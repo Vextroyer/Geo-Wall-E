@@ -157,7 +157,16 @@ class Parser
     
     #region Expression parsing
     private Expr ParseExpression(){
-        return ParseUnaryExpression();
+        return ParsePowerExpression();
+    }
+    private Expr ParsePowerExpression(){
+        Expr left = ParseUnaryExpression();
+        if(Peek.Type == TokenType.CARET){
+            Token operation = Advance();//Consume the caret
+            Expr right = ParsePowerExpression();
+            return new Expr.Binary.Power(left.Line,left.Offset,operation,left,right);
+        }
+        return left;
     }
     private Expr ParseUnaryExpression(){
         switch(Peek.Type){

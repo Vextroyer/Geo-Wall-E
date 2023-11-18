@@ -53,4 +53,8 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
     public string VisitUnaryMinusExpr(Expr.Unary.Minus expr, Scope<Element> scope){
         return $"-({Print(expr._Expr)})";
     }
+
+    public string VisitBinaryPowerExpr(Expr.Binary.Power expr,Scope<Element> scope){
+        return $"^({Print(expr.Left)},{Print(expr.Right)})";
+    }
 }

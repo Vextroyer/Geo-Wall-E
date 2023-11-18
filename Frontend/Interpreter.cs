@@ -102,6 +102,12 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         Element.Number rValue = (Element.Number) Evaluate(unaryMinus._Expr,scope);
         return -rValue;
     }
+
+    public Element VisitBinaryPowerExpr(Expr.Binary.Power powerExpr, Scope<Element> scope){
+        Element.Number left = (Element.Number) Evaluate(powerExpr.Left,scope);
+        Element.Number right = (Element.Number) Evaluate(powerExpr.Right,scope);
+        return left ^ right;
+    }
     #endregion Interpret expressions
 
     //Determine if the given element is true or false. Undefined and 0 are false, everything else is true.

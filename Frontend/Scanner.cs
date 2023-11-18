@@ -60,6 +60,7 @@ class Scanner
             case '=': AddToken(TokenType.EQUAL); break;
             case '!': AddToken(TokenType.NOT); break;
             case '-': AddToken(TokenType.MINUS); break;
+            case '^': AddToken(TokenType.CARET); break;
 
             //Ignore tabs and whitespaces
             case ' ': 

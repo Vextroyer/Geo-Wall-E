@@ -49,6 +49,9 @@ public abstract class Element{
         static public Element.Number operator -(Element.Number number){
             return new Element.Number(- number.value);
         }
+        static public Element.Number operator ^(Element.Number left,Element.Number right){
+            return new Element.Number((float) Math.Pow(left.value,right.value));
+        }
     }
 
     //Represents a string.
