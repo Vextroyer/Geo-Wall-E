@@ -58,6 +58,8 @@ class Scanner
             case ',': AddToken(TokenType.COMMA);  break;
             case ';': AddToken(TokenType.SEMICOLON);  break;
             case '=': AddToken(TokenType.EQUAL); break;
+            case '!': AddToken(TokenType.NOT); break;
+            case '-': AddToken(TokenType.MINUS); break;
 
             //Ignore tabs and whitespaces
             case ' ': 

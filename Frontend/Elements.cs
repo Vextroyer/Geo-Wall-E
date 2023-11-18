@@ -22,6 +22,9 @@ public abstract class Element{
     public static Element.Number NUMBER = new Element.Number(0);
     public static Element.String STRING = new Element.String("");
     public static Element.Point POINT = new Element.Point(STRING,NUMBER,NUMBER,STRING);
+    //Boolean values are represented with numbers
+    public static Element.Number TRUE = new Element.Number(1);
+    public static Element.Number FALSE = new Element.Number(0);
 
     protected Element(ElementType type){
         Type = type;
@@ -30,6 +33,12 @@ public abstract class Element{
     //Represents a real number.
     public class Number:Element{
         float value;
+        public float Value {
+            get
+            {
+                return value;
+            }
+        }
         public Number(float _value):base(ElementType.NUMBER){
             value = _value;
         }
@@ -37,11 +46,20 @@ public abstract class Element{
         {
             return value.ToString();
         }
+        static public Element.Number operator -(Element.Number number){
+            return new Element.Number(- number.value);
+        }
     }
 
     //Represents a string.
     public class String:Element{
         string value;
+        public string Value {
+            get
+            {
+                return value;
+            }
+        }
         public String(string _value):base(ElementType.STRING){
             value = _value;
         }

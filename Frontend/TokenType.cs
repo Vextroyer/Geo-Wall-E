@@ -8,9 +8,8 @@ enum TokenType{
     //Grouping symbols.
     LEFT_PAREN,RIGHT_PAREN,
 
-
     //Operators.
-    EQUAL,
+    EQUAL,NOT,MINUS,
 
     //Represents a single line comment '//'.
     COMMENT,

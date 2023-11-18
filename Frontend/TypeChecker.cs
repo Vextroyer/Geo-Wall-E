@@ -23,45 +23,55 @@ class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
         stmt.Accept(this, globalScope);
     }
     //Checking statements
-    public object? VisitPointStmt(Stmt.Point stmt,Scope<Element> scope){
-        if(scope.IsConstant(stmt.Id.Lexeme))throw new ExtendedException(stmt.Line,stmt.Offset,$"Redeclaration of constant {stmt.Id.Lexeme}");//Rule 1
-        if(scope.HasBinding(stmt.Id.Lexeme))throw new ExtendedException(stmt.Line,stmt.Offset,$"Point `{stmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
-        scope.SetArgument(stmt.Id.Lexeme,Element.POINT);
+    public object? VisitPointStmt(Stmt.Point pointStmt,Scope<Element> scope){
+        if(scope.IsConstant(pointStmt.Id.Lexeme))throw new ExtendedException(pointStmt.Line,pointStmt.Offset,$"Redeclaration of constant {pointStmt.Id.Lexeme}");//Rule 1
+        if(scope.HasBinding(pointStmt.Id.Lexeme))throw new ExtendedException(pointStmt.Line,pointStmt.Offset,$"Point `{pointStmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
+        scope.SetArgument(pointStmt.Id.Lexeme,Element.POINT);
         return null;
     }
-    public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt,Scope<Element> scope){
-        if(scope.IsConstant(stmt.Id.Lexeme))throw new ExtendedException(stmt.Line,stmt.Offset,$"Redeclaration of constant {stmt.Id.Lexeme}");//Rule 1
-        Element rValue = Check(stmt.Rvalue,scope);
-        scope.SetConstant(stmt.Id.Lexeme,rValue);
+    public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declStmt,Scope<Element> scope){
+        if(scope.IsConstant(declStmt.Id.Lexeme))throw new ExtendedException(declStmt.Line,declStmt.Offset,$"Redeclaration of constant {declStmt.Id.Lexeme}");//Rule 1
+        Element rValue = Check(declStmt.Rvalue,scope);
+        scope.SetConstant(declStmt.Id.Lexeme,rValue);
         return null;
     }
-    public object? VisitPrintStmt(Stmt.Print stmt,Scope<Element> scope){
-        Check(stmt._Expr,scope);
+    public object? VisitPrintStmt(Stmt.Print printStmt,Scope<Element> scope){
+        Check(printStmt._Expr,scope);
         return null;
     }
-    public object? VisitColorStmt(Stmt.Color stmt,Scope<Element> scope){
+    public object? VisitColorStmt(Stmt.Color colorStmt,Scope<Element> scope){
         //A color statement doesnt invloves any checking.
         return null;
     }
-    public object? VisitDrawStmt(Stmt.Draw stmt,Scope<Element> scope)
+    public object? VisitDrawStmt(Stmt.Draw drawStmt,Scope<Element> scope)
     {
-        Element element = Check(stmt._Expr,scope);
+        Element element = Check(drawStmt._Expr,scope);
         //element is of class Element, but its an instance of a subclass of Element, some of which implements the interface IDrawable. Rule # 5
-        if(!(element is IDrawable))throw new ExtendedException(stmt._Expr.Line,stmt._Expr.Offset,$"Element of type `{element.Type}` is not drawable");
+        if(!(element is IDrawable))throw new ExtendedException(drawStmt._Expr.Line,drawStmt._Expr.Offset,$"Element of type `{element.Type}` is not drawable");
         return null;
     }
     //Checking expressions
     private Element Check(Expr expr,Scope<Element> scope){
         return expr.Accept(this,scope);
     }
-    public Element VisitNumberExpr(Expr.Number expr,Scope<Element> scope){
+    public Element VisitNumberExpr(Expr.Number numberExpr,Scope<Element> scope){
         return Element.NUMBER;
     }
-    public Element VisitStringExpr(Expr.String expr,Scope<Element> scope){
+    public Element VisitStringExpr(Expr.String stringExpr,Scope<Element> scope){
         return Element.STRING;
     }
-    public Element VisitVariableExpr(Expr.Variable expr,Scope<Element> scope){
-        if(!scope.HasBinding(expr.Id.Lexeme,true))throw new ExtendedException(expr.Line,expr.Offset,$"Variable `{expr.Id.Lexeme}` used but not declared");//Rule 4
-        return scope.Get(expr.Id.Lexeme);
+    public Element VisitVariableExpr(Expr.Variable variableExpr,Scope<Element> scope){
+        if(!scope.HasBinding(variableExpr.Id.Lexeme,true))throw new ExtendedException(variableExpr.Line,variableExpr.Offset,$"Variable `{variableExpr.Id.Lexeme}` used but not declared");//Rule 4
+        return scope.Get(variableExpr.Id.Lexeme);
+    }
+    public Element VisitUnaryNotExpr(Expr.Unary.Not unaryNotExpr, Scope<Element> scope){
+        Check(unaryNotExpr._Expr,scope);//Check the right hand expr.
+        return Element.NUMBER;//Rule # 6
+    }
+    public Element VisitUnaryMinusExpr(Expr.Unary.Minus unaryMinusExpr, Scope<Element> scope){
+        //Check the right hand expr.
+        //Rule # 7
+        if(Check(unaryMinusExpr._Expr,scope) is not Element.Number)throw new ExtendedException(unaryMinusExpr.Line,unaryMinusExpr.Offset,$"Applied `-` operator to a non-number operand");
+        return Element.NUMBER;
     }
 }

@@ -46,4 +46,11 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
         return expr.Id.Lexeme;
     }
     
+    public string VisitUnaryNotExpr(Expr.Unary.Not expr, Scope<Element> scope){
+        return $"!({Print(expr._Expr)})";
+    }
+
+    public string VisitUnaryMinusExpr(Expr.Unary.Minus expr, Scope<Element> scope){
+        return $"-({Print(expr._Expr)})";
+    }
 }

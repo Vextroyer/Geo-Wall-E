@@ -157,7 +157,19 @@ class Parser
     
     #region Expression parsing
     private Expr ParseExpression(){
-        return ParseVariableExpression();
+        return ParseUnaryExpression();
+    }
+    private Expr ParseUnaryExpression(){
+        switch(Peek.Type){
+            case TokenType.NOT:
+                Advance();//Consume the operator
+                return new Expr.Unary.Not(Previous.Line,Previous.Offset,ParseUnaryExpression());
+            case TokenType.MINUS:
+                Advance();//Consume the operator
+                return new Expr.Unary.Minus(Previous.Line,Previous.Offset,ParseUnaryExpression());
+            default:
+                return ParseVariableExpression();
+        }
     }
     private Expr ParseVariableExpression(){
         if(Peek.Type == TokenType.ID){

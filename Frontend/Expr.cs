@@ -9,6 +9,8 @@ interface IVisitorExpr<T,U>{
     public T VisitNumberExpr(Expr.Number expr,Scope<U> scope);
     public T VisitStringExpr(Expr.String expr,Scope<U> scope);
     public T VisitVariableExpr(Expr.Variable expr,Scope<U> scope);
+    public T VisitUnaryNotExpr(Expr.Unary.Not expr,Scope<U> scope);
+    public T VisitUnaryMinusExpr(Expr.Unary.Minus expr,Scope<U> scope);
 }
 interface IVisitableExpr{
     public T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope);
@@ -65,6 +67,33 @@ abstract class Expr : IVisitableExpr{
         public override T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope)
         {
             return visitor.VisitVariableExpr(this,scope);
+        }
+    }
+    //Base class for unary operators.
+    public abstract class Unary : Expr
+    {
+        public Expr _Expr {get; private set;}
+        abstract public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope);
+        protected Unary(int line,int offset,Expr _expr):base(line,offset)
+        {
+            _Expr = _expr;
+        }
+        //Represents `!` operator.
+        public class Not : Unary{
+            public Not(int line,int offset,Expr _expr):base(line,offset,_expr){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitUnaryNotExpr(this,scope);
+            }
+        }
+        //Represents `-` operator
+        public class Minus : Unary
+        {
+            public Minus(int line,int offset,Expr _expr):base(line,offset,_expr){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitUnaryMinusExpr(this,scope);
+            }
         }
     }
 }
