@@ -76,10 +76,26 @@ class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
         return Element.NUMBER;
     }
     public Element VisitBinaryPowerExpr(Expr.Binary.Power powerExpr, Scope<Element> scope){
-        Element operand = Check(powerExpr.Left,scope);//Check left operand
-        if(operand.Type != ElementType.NUMBER)throw new ExtendedException(powerExpr.Left.Line,powerExpr.Left.Offset,$"Left operand of {powerExpr.Operator.Lexeme} is {operand.Type} and must be NUMBER");
-        operand = Check(powerExpr.Right,scope);//Check right operand
-        if(operand.Type != ElementType.NUMBER)throw new ExtendedException(powerExpr.Right.Line,powerExpr.Right.Offset,$"Right operand of {powerExpr.Operator.Lexeme} is {operand.Type} and must be NUMBER");
+        CheckNumberOperands(powerExpr,scope);
         return Element.NUMBER;
+    }
+    public Element VisitBinaryProductExpr(Expr.Binary.Product productExpr, Scope<Element> scope){
+        CheckNumberOperands(productExpr,scope);
+        return Element.NUMBER;
+    }
+    public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope<Element> scope){
+        CheckNumberOperands(divisionExpr,scope);
+        return Element.NUMBER;
+    }
+    public Element VisitBinaryModulusExpr(Expr.Binary.Modulus modulusExpr, Scope<Element> scope){
+        CheckNumberOperands(modulusExpr,scope);
+        return Element.NUMBER;
+    }
+
+    private void CheckNumberOperands(Expr.Binary binaryExpr, Scope<Element> scope){
+        Element operand = Check(binaryExpr.Left,scope);//Check left operand
+        if(operand.Type != ElementType.NUMBER)throw new ExtendedException(binaryExpr.Left.Line,binaryExpr.Left.Offset,$"Left operand of {binaryExpr.Operator.Lexeme} is {operand.Type} and must be NUMBER");
+        operand = Check(binaryExpr.Right,scope);//Check right operand
+        if(operand.Type != ElementType.NUMBER)throw new ExtendedException(binaryExpr.Right.Line,binaryExpr.Right.Offset,$"Right operand of {binaryExpr.Operator.Lexeme} is {operand.Type} and must be NUMBER");
     }
 }

@@ -157,7 +157,26 @@ class Parser
     
     #region Expression parsing
     private Expr ParseExpression(){
-        return ParsePowerExpression();
+        return ParseFactorExpression();
+    }
+    private Expr ParseFactorExpression(){
+        Expr left = ParsePowerExpression();
+        while(Peek.Type == TokenType.STAR || Peek.Type == TokenType.SLASH || Peek.Type == TokenType.PERCENT){
+            Token operation = Advance();
+            Expr right = ParsePowerExpression();
+            switch(operation.Type){
+                case TokenType.STAR:
+                    left = new Expr.Binary.Product(left.Line,left.Offset,operation,left,right);
+                    break;
+                case TokenType.SLASH:
+                    left = new Expr.Binary.Division(left.Line,left.Offset,operation,left,right);
+                    break;
+                case TokenType.PERCENT:
+                    left = new Expr.Binary.Modulus(left.Line,left.Offset,operation,left,right);
+                    break;
+            }
+        }
+        return left;
     }
     private Expr ParsePowerExpression(){
         Expr left = ParseUnaryExpression();

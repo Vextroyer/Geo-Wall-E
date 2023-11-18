@@ -9,7 +9,7 @@ enum TokenType{
     LEFT_PAREN,RIGHT_PAREN,
 
     //Operators.
-    EQUAL,NOT,MINUS,CARET,
+    EQUAL,NOT,MINUS,CARET,STAR,SLASH,PERCENT,
 
     //Represents a single line comment '//'.
     COMMENT,

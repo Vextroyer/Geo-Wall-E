@@ -55,6 +55,18 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
     }
 
     public string VisitBinaryPowerExpr(Expr.Binary.Power expr,Scope<Element> scope){
-        return $"^({Print(expr.Left)},{Print(expr.Right)})";
+        return PrintBinaryExpr(expr);
+    }
+    public string VisitBinaryProductExpr(Expr.Binary.Product expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
+    public string VisitBinaryDivisionExpr(Expr.Binary.Division expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
+    public string VisitBinaryModulusExpr(Expr.Binary.Modulus expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
+    private string PrintBinaryExpr(Expr.Binary expr){
+        return $"{expr.Operator.Lexeme}({Print(expr.Left)},{Print(expr.Right)})";
     }
 }

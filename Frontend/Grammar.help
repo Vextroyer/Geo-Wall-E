@@ -15,7 +15,8 @@ Stmt = 'draw' Expr ';'; //Draw statement
 //Set of the terminals that made the first word of the stmt production.
 First(stmt) = { 'point' , ID , 'print', 'color', 'restore' , 'draw' }
 
-Expr = Power;
+Expr = Factor;
+Factor = Power ( ('*' | '%' | '/') Power)*;
 Power = UnaryExpr ( '^' Power)* ;
 UnaryExpr = ( ('!' | '-') UnaryExpr ) | VariableExpr;
 VariableExpr = ID | PrimaryExpr;

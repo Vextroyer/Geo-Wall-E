@@ -8,4 +8,4 @@ Rules
 5- Only drawable elements can be drawn.
 6- Boolean operators return 1 if true and 0 if false.
 7- Unary minus operator can only be applied to numbers.
-8- Operands for `^` operator must be numbers.
+8- Operands for operators : `^` `*` `/` `%`  must be numbers.

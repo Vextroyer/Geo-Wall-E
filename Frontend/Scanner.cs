@@ -54,13 +54,18 @@ class Scanner
             case '"': ScanString(); break;
             case '(': AddToken(TokenType.LEFT_PAREN); break;
             case ')': AddToken(TokenType.RIGHT_PAREN); break; 
-            case '/': if(Match('/')) ScanComment(); break;
+            case '/': 
+                if(Match('/')) ScanComment();
+                else AddToken(TokenType.SLASH); 
+                break;
             case ',': AddToken(TokenType.COMMA);  break;
             case ';': AddToken(TokenType.SEMICOLON);  break;
             case '=': AddToken(TokenType.EQUAL); break;
             case '!': AddToken(TokenType.NOT); break;
             case '-': AddToken(TokenType.MINUS); break;
             case '^': AddToken(TokenType.CARET); break;
+            case '%': AddToken(TokenType.PERCENT); break;
+            case '*': AddToken(TokenType.STAR); break;
 
             //Ignore tabs and whitespaces
             case ' ': 

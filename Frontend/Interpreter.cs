@@ -108,6 +108,26 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         Element.Number right = (Element.Number) Evaluate(powerExpr.Right,scope);
         return left ^ right;
     }
+
+    public Element VisitBinaryProductExpr(Expr.Binary.Product productExpr, Scope<Element> scope){
+        Element.Number left = (Element.Number) Evaluate(productExpr.Left,scope);
+        Element.Number right = (Element.Number) Evaluate(productExpr.Right,scope);
+        return left * right;
+    }
+
+    public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope<Element> scope){
+        Element.Number left = (Element.Number) Evaluate(divisionExpr.Left,scope);
+        Element.Number right = (Element.Number) Evaluate(divisionExpr.Right,scope);
+        if(right.Value == 0.0f)throw new ExtendedException(divisionExpr.Line,divisionExpr.Operator.Offset,"Division by 0");
+        return left / right;
+    }
+
+    public Element VisitBinaryModulusExpr(Expr.Binary.Modulus modulusExpr, Scope<Element> scope){
+        Element.Number left = (Element.Number) Evaluate(modulusExpr.Left,scope);
+        Element.Number right = (Element.Number) Evaluate(modulusExpr.Right,scope);
+        if(right.Value == 0.0f)throw new ExtendedException(modulusExpr.Line,modulusExpr.Operator.Offset,"Division by 0");
+        return left % right;
+    }
     #endregion Interpret expressions
 
     //Determine if the given element is true or false. Undefined and 0 are false, everything else is true.
