@@ -71,7 +71,8 @@ class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
     public Element VisitUnaryMinusExpr(Expr.Unary.Minus unaryMinusExpr, Scope<Element> scope){
         //Check the right hand expr.
         //Rule # 7
-        if(Check(unaryMinusExpr._Expr,scope) is not Element.Number)throw new ExtendedException(unaryMinusExpr.Line,unaryMinusExpr.Offset,$"Applied `-` operator to a non-number operand");
+        Element rValue = Check(unaryMinusExpr._Expr,scope);
+        if(rValue.Type != ElementType.NUMBER)throw new ExtendedException(unaryMinusExpr.Line,unaryMinusExpr.Offset,$"Applied `-` operator to a {rValue.Type} operand");
         return Element.NUMBER;
     }
 }
