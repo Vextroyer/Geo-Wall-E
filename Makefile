@@ -1,4 +1,4 @@
 .Phony: dev
 
 dev:
-	dotnet run --project Realend
+	dotnet run --project CommandLineInterface

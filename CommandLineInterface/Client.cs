@@ -1,6 +1,5 @@
 ﻿/*
-The client application handles user requests on what programs to execute and
-displays the visual output.
+This is a CLI to the G# compiler.
 */
 namespace Realend;
 
