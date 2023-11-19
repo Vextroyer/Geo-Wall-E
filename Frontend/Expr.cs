@@ -15,6 +15,8 @@ interface IVisitorExpr<T,U>{
     public T VisitBinaryProductExpr(Expr.Binary.Product expr,Scope<U> scope);
     public T VisitBinaryDivisionExpr(Expr.Binary.Division expr,Scope<U> scope);
     public T VisitBinaryModulusExpr(Expr.Binary.Modulus expr,Scope<U> scope);
+    public T VisitBinarySumExpr(Expr.Binary.Sum expr,Scope<U> scope);
+    public T VisitBinaryDifferenceExpr(Expr.Binary.Difference expr,Scope<U> scope);
 }
 interface IVisitableExpr{
     public T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope);
@@ -141,6 +143,22 @@ abstract class Expr : IVisitableExpr{
             public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
             {
                 return visitor.VisitBinaryModulusExpr(this,scope);
+            }
+        }
+        //Represents the `+` operator for sum
+        public class Sum : Binary{
+            public Sum(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinarySumExpr(this,scope);
+            }
+        }
+        //Represents the `-` operator for difference
+        public class Difference : Binary{
+            public Difference(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinaryDifferenceExpr(this,scope);
             }
         }
     }

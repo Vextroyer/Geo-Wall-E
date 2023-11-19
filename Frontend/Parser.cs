@@ -157,7 +157,23 @@ class Parser
     
     #region Expression parsing
     private Expr ParseExpression(){
-        return ParseFactorExpression();
+        return ParseTermExpression();
+    }
+    private Expr ParseTermExpression(){
+        Expr left = ParseFactorExpression();
+        while(Peek.Type == TokenType.PLUS || Peek.Type == TokenType.MINUS){
+            Token operation = Advance();
+            Expr right = ParseFactorExpression();
+            switch(operation.Type){
+                case TokenType.PLUS:
+                    left = new Expr.Binary.Sum(left.Line,left.Offset,operation,left,right);
+                    break;
+                case TokenType.MINUS:
+                    left = new Expr.Binary.Difference(left.Line,left.Offset,operation,left,right);
+                    break;
+            }
+        }
+        return left;
     }
     private Expr ParseFactorExpression(){
         Expr left = ParsePowerExpression();

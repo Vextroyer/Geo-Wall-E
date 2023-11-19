@@ -66,6 +66,12 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
     public string VisitBinaryModulusExpr(Expr.Binary.Modulus expr,Scope<Element> scope){
         return PrintBinaryExpr(expr);
     }
+    public string VisitBinarySumExpr(Expr.Binary.Sum expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
+    public string VisitBinaryDifferenceExpr(Expr.Binary.Difference expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
     private string PrintBinaryExpr(Expr.Binary expr){
         return $"{expr.Operator.Lexeme}({Print(expr.Left)},{Print(expr.Right)})";
     }

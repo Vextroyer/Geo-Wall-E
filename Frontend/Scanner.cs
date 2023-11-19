@@ -66,6 +66,7 @@ class Scanner
             case '^': AddToken(TokenType.CARET); break;
             case '%': AddToken(TokenType.PERCENT); break;
             case '*': AddToken(TokenType.STAR); break;
+            case '+': AddToken(TokenType.PLUS); break;
 
             //Ignore tabs and whitespaces
             case ' ': 

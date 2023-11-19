@@ -14,3 +14,8 @@ print 2 ^ 4 % 5;
 print 5 / 3;
 print 5 / 3 * 3;
 print 5 / (3 * 3);
+print 2 * 3 + 5 - 12;
+print 1 - 3 - 2;
+print 1 - (3 - 2);
+print 2 ^ 2 + 15;
+print 2 ^ (2 + 15);

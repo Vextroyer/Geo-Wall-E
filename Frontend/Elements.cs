@@ -61,6 +61,12 @@ public abstract class Element{
         static public Element.Number operator %(Element.Number left,Element.Number right){
             return new Element.Number(left.value % right.value);
         }
+        static public Element.Number operator +(Element.Number left,Element.Number right){
+            return new Element.Number(left.value + right.value);
+        }
+        static public Element.Number operator -(Element.Number left,Element.Number right){
+            return new Element.Number(left.value - right.value);
+        }
     }
 
     //Represents a string.

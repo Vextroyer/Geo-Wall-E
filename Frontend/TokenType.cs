@@ -9,7 +9,7 @@ enum TokenType{
     LEFT_PAREN,RIGHT_PAREN,
 
     //Operators.
-    EQUAL,NOT,MINUS,CARET,STAR,SLASH,PERCENT,
+    EQUAL,NOT,MINUS,CARET,STAR,SLASH,PERCENT,PLUS,
 
     //Control symbols.
     COMMA, SEMICOLON,

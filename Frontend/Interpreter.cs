@@ -128,6 +128,18 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         if(right.Value == 0.0f)throw new ExtendedException(modulusExpr.Line,modulusExpr.Operator.Offset,"Division by 0");
         return left % right;
     }
+
+    public Element VisitBinarySumExpr(Expr.Binary.Sum sumExpr, Scope<Element> scope){
+        Element.Number left = (Element.Number) Evaluate(sumExpr.Left,scope);
+        Element.Number right = (Element.Number) Evaluate(sumExpr.Right,scope);
+        return left + right;
+    }
+
+    public Element VisitBinaryDifferenceExpr(Expr.Binary.Difference differenceExpr, Scope<Element> scope){
+        Element.Number left = (Element.Number) Evaluate(differenceExpr.Left,scope);
+        Element.Number right = (Element.Number) Evaluate(differenceExpr.Right,scope);
+        return left - right;
+    }
     #endregion Interpret expressions
 
     //Determine if the given element is true or false. Undefined and 0 are false, everything else is true.

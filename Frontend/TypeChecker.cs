@@ -91,7 +91,14 @@ class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
         CheckNumberOperands(modulusExpr,scope);
         return Element.NUMBER;
     }
-
+    public Element VisitBinarySumExpr(Expr.Binary.Sum sumExpr, Scope<Element> scope){
+        CheckNumberOperands(sumExpr,scope);
+        return Element.NUMBER;
+    }
+    public Element VisitBinaryDifferenceExpr(Expr.Binary.Difference differenceExpr, Scope<Element> scope){
+        CheckNumberOperands(differenceExpr,scope);
+        return Element.NUMBER;
+    }
     private void CheckNumberOperands(Expr.Binary binaryExpr, Scope<Element> scope){
         Element operand = Check(binaryExpr.Left,scope);//Check left operand
         if(operand.Type != ElementType.NUMBER)throw new ExtendedException(binaryExpr.Left.Line,binaryExpr.Left.Offset,$"Left operand of {binaryExpr.Operator.Lexeme} is {operand.Type} and must be NUMBER");
