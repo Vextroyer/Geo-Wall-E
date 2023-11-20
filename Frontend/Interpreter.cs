@@ -140,6 +140,57 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         Element.Number right = (Element.Number) Evaluate(differenceExpr.Right,scope);
         return left - right;
     }
+
+    public Element VisitBinaryLessExpr(Expr.Binary.Less lessExpr, Scope<Element> scope){
+        Element.Number left =(Element.Number) Evaluate(lessExpr.Left,scope);
+        Element.Number right =(Element.Number) Evaluate(lessExpr.Right,scope);
+        return left < right;
+    }
+
+    public Element VisitBinaryLessEqualExpr(Expr.Binary.LessEqual lessEqualExpr, Scope<Element> scope){
+        Element.Number left =(Element.Number) Evaluate(lessEqualExpr.Left,scope);
+        Element.Number right =(Element.Number) Evaluate(lessEqualExpr.Right,scope);
+        return left <= right;
+    }
+
+    public Element VisitBinaryGreaterExpr(Expr.Binary.Greater greaterExpr, Scope<Element> scope){
+        Element.Number left =(Element.Number) Evaluate(greaterExpr.Left,scope);
+        Element.Number right =(Element.Number) Evaluate(greaterExpr.Right,scope);
+        return left > right;
+    }
+
+    public Element VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual greaterEqualExpr, Scope<Element> scope){
+        Element.Number left =(Element.Number) Evaluate(greaterEqualExpr.Left,scope);
+        Element.Number right =(Element.Number) Evaluate(greaterEqualExpr.Right,scope);
+        return left >= right;
+    }
+
+    public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope<Element> scope){
+        Element left = Evaluate(equalEqualExpr.Left,scope);
+        Element right = Evaluate(equalEqualExpr.Right,scope);
+        return left.EqualTo(right);
+    }
+
+    public Element VisitBinaryNotEqualExpr(Expr.Binary.NotEqual notEqualExpr, Scope<Element> scope){
+        Element left = Evaluate(notEqualExpr.Left,scope);
+        Element right = Evaluate(notEqualExpr.Right,scope);
+        return left.NotEqualTo(right);
+    }
+
+    public Element VisitBinaryAndExpr(Expr.Binary.And andExpr, Scope<Element> scope){
+        if(IsTruthy(Evaluate(andExpr.Left,scope)) == Element.FALSE)return Element.FALSE;//Shortcircuit
+        return IsTruthy(Evaluate(andExpr.Right,scope));
+    }
+
+    public Element VisitBinaryOrExpr(Expr.Binary.Or orExpr, Scope<Element> scope){
+        if(IsTruthy(Evaluate(orExpr.Left,scope)) == Element.TRUE)return Element.TRUE;//Shortcircuit
+        return IsTruthy(Evaluate(orExpr.Right,scope));
+    }
+
+    public Element VisitConditionalExpr(Expr.Conditional conditionalExpr, Scope<Element> scope){
+        if( IsTruthy(Evaluate(conditionalExpr.Condition,scope)) == Element.TRUE ) return Evaluate(conditionalExpr.ThenBranchExpr,scope);
+        return Evaluate(conditionalExpr.ElseBranchExpr,scope);
+    }
     #endregion Interpret expressions
 
     //Determine if the given element is true or false. Undefined and 0 are false, everything else is true.

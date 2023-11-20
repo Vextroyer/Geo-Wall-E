@@ -72,7 +72,52 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
     public string VisitBinaryDifferenceExpr(Expr.Binary.Difference expr,Scope<Element> scope){
         return PrintBinaryExpr(expr);
     }
+
+    public string VisitBinaryLessExpr(Expr.Binary.Less expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryLessEqualExpr(Expr.Binary.LessEqual expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryGreaterExpr(Expr.Binary.Greater expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryNotEqualExpr(Expr.Binary.NotEqual expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+    
+    public string VisitBinaryAndExpr(Expr.Binary.And expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryOrExpr(Expr.Binary.Or expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
     private string PrintBinaryExpr(Expr.Binary expr){
         return $"{expr.Operator.Lexeme}({Print(expr.Left)},{Print(expr.Right)})";
+    }
+
+    public string VisitConditionalExpr(Expr.Conditional expr, Scope<Element> scope){
+        return $"if {Print(expr.Condition)}\nthen {Print(expr.ThenBranchExpr)}\nelse {Print(expr.ElseBranchExpr)}";
     }
 }

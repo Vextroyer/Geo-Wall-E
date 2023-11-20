@@ -99,10 +99,57 @@ class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
         CheckNumberOperands(differenceExpr,scope);
         return Element.NUMBER;
     }
+    public Element VisitBinaryLessExpr(Expr.Binary.Less lessExpr, Scope<Element> scope){
+        CheckNumberOperands(lessExpr,scope);
+        return Element.NUMBER;
+    }
+    public Element VisitBinaryLessEqualExpr(Expr.Binary.LessEqual lessEqualExpr, Scope<Element> scope){
+        CheckNumberOperands(lessEqualExpr,scope);
+        return Element.NUMBER;
+    }
+    public Element VisitBinaryGreaterExpr(Expr.Binary.Greater greaterExpr, Scope<Element> scope){
+        CheckNumberOperands(greaterExpr,scope);
+        return Element.NUMBER;
+    }
+    public Element VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual greaterEqualExpr, Scope<Element> scope){
+        CheckNumberOperands(greaterEqualExpr,scope);
+        return Element.NUMBER;
+    }
     private void CheckNumberOperands(Expr.Binary binaryExpr, Scope<Element> scope){
         Element operand = Check(binaryExpr.Left,scope);//Check left operand
-        if(operand.Type != ElementType.NUMBER)throw new ExtendedException(binaryExpr.Left.Line,binaryExpr.Left.Offset,$"Left operand of {binaryExpr.Operator.Lexeme} is {operand.Type} and must be NUMBER");
+        if(operand.Type != ElementType.NUMBER)throw new ExtendedException(binaryExpr.Left.Line,binaryExpr.Left.Offset,$"Left operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
         operand = Check(binaryExpr.Right,scope);//Check right operand
-        if(operand.Type != ElementType.NUMBER)throw new ExtendedException(binaryExpr.Right.Line,binaryExpr.Right.Offset,$"Right operand of {binaryExpr.Operator.Lexeme} is {operand.Type} and must be NUMBER");
+        if(operand.Type != ElementType.NUMBER)throw new ExtendedException(binaryExpr.Right.Line,binaryExpr.Right.Offset,$"Right operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
+    }
+    public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope<Element> scope){
+        Check(equalEqualExpr.Left,scope);
+        Check(equalEqualExpr.Right,scope);
+        //Equality doesnt present any semantic problems.
+        return Element.NUMBER;
+    }
+    public Element VisitBinaryNotEqualExpr(Expr.Binary.NotEqual notEqualExpr, Scope<Element> scope){
+        Check(notEqualExpr.Left,scope);
+        Check(notEqualExpr.Right,scope);
+        //Equality doesnt present any semantic problems.
+        return Element.NUMBER;
+    }
+    public Element VisitBinaryAndExpr(Expr.Binary.And andExpr, Scope<Element> scope){
+        Check(andExpr.Left,scope);
+        Check(andExpr.Right,scope);
+        //Logical and doesnt present any semantic problems.
+        return Element.NUMBER;
+    }
+    public Element VisitBinaryOrExpr(Expr.Binary.Or orExpr, Scope<Element> scope){
+        Check(orExpr.Left,scope);
+        Check(orExpr.Right,scope);
+        //Logical or doesnt present any semantic problems.
+        return Element.NUMBER;
+    }
+    public Element VisitConditionalExpr(Expr.Conditional conditionalExpr, Scope<Element> scope){
+        Check(conditionalExpr.Condition,scope);//Check condition
+        Element thenBranchElement = Check(conditionalExpr.ThenBranchExpr,scope);//Check if branch expression
+        Element elseBranchElement = Check(conditionalExpr.ElseBranchExpr,scope);//Check else branch expression
+        if(thenBranchElement.Type != elseBranchElement.Type)throw new ExtendedException(conditionalExpr.Line,conditionalExpr.Offset,$"Expected equal return types for `if-then-else` expression branches, but {thenBranchElement.Type} and {elseBranchElement.Type} were found.");
+        return thenBranchElement;
     }
 }

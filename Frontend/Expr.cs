@@ -17,6 +17,15 @@ interface IVisitorExpr<T,U>{
     public T VisitBinaryModulusExpr(Expr.Binary.Modulus expr,Scope<U> scope);
     public T VisitBinarySumExpr(Expr.Binary.Sum expr,Scope<U> scope);
     public T VisitBinaryDifferenceExpr(Expr.Binary.Difference expr,Scope<U> scope);
+    public T VisitBinaryLessExpr(Expr.Binary.Less expr,Scope<U> scope);
+    public T VisitBinaryLessEqualExpr(Expr.Binary.LessEqual expr,Scope<U> scope);
+    public T VisitBinaryGreaterExpr(Expr.Binary.Greater expr,Scope<U> scope);
+    public T VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual expr,Scope<U> scope);
+    public T VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual expr,Scope<U> scope);
+    public T VisitBinaryNotEqualExpr(Expr.Binary.NotEqual expr,Scope<U> scope);
+    public T VisitBinaryAndExpr(Expr.Binary.And expr,Scope<U> scope);
+    public T VisitBinaryOrExpr(Expr.Binary.Or expr,Scope<U> scope);
+    public T VisitConditionalExpr(Expr.Conditional expr,Scope<U> scope);
 }
 interface IVisitableExpr{
     public T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope);
@@ -160,6 +169,86 @@ abstract class Expr : IVisitableExpr{
             {
                 return visitor.VisitBinaryDifferenceExpr(this,scope);
             }
+        }
+        //Represents the `<` operator for less-than relation
+        public class Less : Binary{
+            public Less(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinaryLessExpr(this,scope);
+            }
+        }
+        //Represents the `<=` operator for less-than or equal relation
+        public class LessEqual : Binary{
+            public LessEqual(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinaryLessEqualExpr(this,scope);
+            }
+        }
+        //Represents the `>` operator for greater-than relation
+        public class Greater : Binary{
+            public Greater(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinaryGreaterExpr(this,scope);
+            }
+        }
+        //Represents the `>=` operator for greater-than or equal relation
+        public class GreaterEqual : Binary{
+            public GreaterEqual(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinaryGreaterEqualExpr(this,scope);
+            }
+        }
+        //Represents the `==` operator for greater-than relation
+        public class EqualEqual : Binary{
+            public EqualEqual(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinaryEqualEqualExpr(this,scope);
+            }
+        }
+        //Represents the `!=` operator for greater-than relation
+        public class NotEqual : Binary{
+            public NotEqual(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinaryNotEqualExpr(this,scope);
+            }
+        }
+        //Represents the `&` operator for logical and
+        public class And : Binary{
+            public And(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinaryAndExpr(this,scope);
+            }
+        }
+        //Represents the `|` operator for logical or
+        public class Or : Binary{
+            public Or(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitBinaryOrExpr(this,scope);
+            }
+        }
+    }
+    //Conditional operator if-then-else
+    public class Conditional : Expr
+    {
+        public Expr Condition {get; private set;}
+        public Expr ThenBranchExpr {get; private set;}
+        public Expr ElseBranchExpr {get; private set;}
+        public Conditional(int line,int offset,Expr condition,Expr thenBranchExpr,Expr elseBranchExpr):base(line,offset){
+            Condition = condition;
+            ThenBranchExpr = thenBranchExpr;
+            ElseBranchExpr = elseBranchExpr;
+        }
+        public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitConditionalExpr(this,scope);
         }
     }
 }

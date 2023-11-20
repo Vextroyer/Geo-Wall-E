@@ -15,7 +15,12 @@ Stmt = 'draw' Expr ';'; //Draw statement
 //Set of the terminals that made the first word of the stmt production.
 First(stmt) = { 'point' , ID , 'print', 'color', 'restore' , 'draw' }
 
-Expr = Term;
+Expr = Conditional;
+Conditional = ('if'  Expr  'then' Expr 'else' Expr) | Or;
+Or = And ('|' And)*;
+And = Equality ('&' Equality)*;
+Equality = Comparison ( ('==' | '!=') Comparison)?;
+Comparison = Term ( ('>' | '>=' | '<' | '<=') Term)?;
 Term = Factor ( ('+' | '-') Factor)*;
 Factor = Power ( ('*' | '%' | '/') Power)*;
 Power = UnaryExpr ( '^' Power)* ;

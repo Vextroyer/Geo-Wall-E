@@ -29,6 +29,12 @@ public abstract class Element{
     protected Element(ElementType type){
         Type = type;
     }
+    //Equality operator
+    public abstract Element.Number EqualTo(Element other);
+    public Element.Number NotEqualTo(Element other){
+        if(this.EqualTo(other) == Element.TRUE)return Element.FALSE;
+        return Element.TRUE;
+    }
 
     //Represents a real number.
     public class Number:Element{
@@ -45,6 +51,12 @@ public abstract class Element{
         public override string ToString()
         {
             return value.ToString();
+        }
+        public override Number EqualTo(Element other)
+        {
+            if(other.Type != this.Type)return Element.FALSE;
+            if(((Element.Number)other).value == this.value)return Element.TRUE;
+            return Element.FALSE;
         }
         static public Element.Number operator -(Element.Number number){
             return new Element.Number(- number.value);
@@ -67,6 +79,22 @@ public abstract class Element{
         static public Element.Number operator -(Element.Number left,Element.Number right){
             return new Element.Number(left.value - right.value);
         }
+        static public Element.Number operator <(Element.Number left,Element.Number right){
+            if(left.value < right.value)return Element.TRUE;
+            return Element.FALSE;
+        }
+        static public Element.Number operator <=(Element.Number left,Element.Number right){
+            if(left.value <= right.value)return Element.TRUE;
+            return Element.FALSE;
+        }
+        static public Element.Number operator >(Element.Number left,Element.Number right){
+            if(left.value > right.value)return Element.TRUE;
+            return Element.FALSE;
+        }
+        static public Element.Number operator >=(Element.Number left,Element.Number right){
+            if(left.value >= right.value)return Element.TRUE;
+            return Element.FALSE;
+        }
     }
 
     //Represents a string.
@@ -84,6 +112,12 @@ public abstract class Element{
         public override string ToString()
         {
             return value;
+        }
+        public override Number EqualTo(Element other)
+        {
+            if(other.Type != this.Type)return Element.FALSE;
+            if(((Element.String)other).value == this.value)return Element.TRUE;
+            return Element.FALSE;
         }
     }
 
@@ -104,6 +138,12 @@ public abstract class Element{
         public override string ToString()
         {
             return $"{name}({x},{y}){comment}";
+        }
+        public override Number EqualTo(Element other)
+        {
+            if(other.Type != this.Type)return Element.FALSE;
+            if(((Element.Point)other).x == this.x && ((Element.Point)other).y == this.y)return Element.TRUE;
+            return Element.FALSE;
         }
     }
 };

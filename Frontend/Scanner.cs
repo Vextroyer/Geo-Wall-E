@@ -18,6 +18,11 @@ class Scanner
         {"point",TokenType.POINT},
         {"draw",TokenType.DRAW},
         {"print",TokenType.PRINT},
+        {"if",TokenType.IF},
+        {"then",TokenType.THEN},
+        {"else",TokenType.ELSE},
+        {"and",TokenType.AND},
+        {"or",TokenType.OR},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},
@@ -60,8 +65,24 @@ class Scanner
                 break;
             case ',': AddToken(TokenType.COMMA);  break;
             case ';': AddToken(TokenType.SEMICOLON);  break;
-            case '=': AddToken(TokenType.EQUAL); break;
-            case '!': AddToken(TokenType.NOT); break;
+            case '=': 
+                if(Match('='))AddToken(TokenType.EQUAL_EQUAL);
+                else AddToken(TokenType.EQUAL); 
+                break;
+            case '!':
+                if(Match('=')) AddToken(TokenType.BANG_EQUAL);
+                else AddToken(TokenType.BANG); 
+                break;
+            case '<':
+                if(Match('=')) AddToken(TokenType.LESS_EQUAL);
+                else AddToken(TokenType.LESS);
+                break;
+            case '>':
+                if(Match('=')) AddToken(TokenType.GREATER_EQUAL);
+                else AddToken(TokenType.GREATER);
+                break;
+            case '&': AddToken(TokenType.AND); break;
+            case '|': AddToken(TokenType.OR); break;
             case '-': AddToken(TokenType.MINUS); break;
             case '^': AddToken(TokenType.CARET); break;
             case '%': AddToken(TokenType.PERCENT); break;
