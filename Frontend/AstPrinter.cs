@@ -27,7 +27,7 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
   
     public string VisitDrawStmt(Stmt.Draw stmt, Scope<Element> scope)
     {
-        return $"draw({stmt.Id})";
+        return $"draw({Print(stmt._Expr)})";
     }
   
     public string Print(Expr expr){
@@ -46,4 +46,78 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
         return expr.Id.Lexeme;
     }
     
+    public string VisitUnaryNotExpr(Expr.Unary.Not expr, Scope<Element> scope){
+        return $"!({Print(expr._Expr)})";
+    }
+
+    public string VisitUnaryMinusExpr(Expr.Unary.Minus expr, Scope<Element> scope){
+        return $"-({Print(expr._Expr)})";
+    }
+
+    public string VisitBinaryPowerExpr(Expr.Binary.Power expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
+    public string VisitBinaryProductExpr(Expr.Binary.Product expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
+    public string VisitBinaryDivisionExpr(Expr.Binary.Division expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
+    public string VisitBinaryModulusExpr(Expr.Binary.Modulus expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
+    public string VisitBinarySumExpr(Expr.Binary.Sum expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
+    public string VisitBinaryDifferenceExpr(Expr.Binary.Difference expr,Scope<Element> scope){
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryLessExpr(Expr.Binary.Less expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryLessEqualExpr(Expr.Binary.LessEqual expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryGreaterExpr(Expr.Binary.Greater expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryNotEqualExpr(Expr.Binary.NotEqual expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+    
+    public string VisitBinaryAndExpr(Expr.Binary.And expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    public string VisitBinaryOrExpr(Expr.Binary.Or expr, Scope<Element> scope)
+    {
+        return PrintBinaryExpr(expr);
+    }
+
+    private string PrintBinaryExpr(Expr.Binary expr){
+        return $"{expr.Operator.Lexeme}({Print(expr.Left)},{Print(expr.Right)})";
+    }
+
+    public string VisitConditionalExpr(Expr.Conditional expr, Scope<Element> scope){
+        return $"if {Print(expr.Condition)}\nthen {Print(expr.ThenBranchExpr)}\nelse {Print(expr.ElseBranchExpr)}";
+    }
 }

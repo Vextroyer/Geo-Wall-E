@@ -5,3 +5,9 @@ Rules
 2- Constants cant be assigned an empty expression.
 3- A variable cant be declared twice on the same scope.
 4- Variables must be declared before being used.
+5- Only drawable elements can be drawn.
+6- Boolean operators return 1 if true and 0 if false.
+7- Unary minus operator can only be applied to numbers.
+8- Operands for operators : `^` `*` `/` `%` `+` `-` `<` `<=` `>` `>=` must be numbers.
+9- Cannot apply more than once the relational operators `<` `<=` `>` `>=` `==` `!=`
+10- Both branches of an if-then-else expression must have the same return type.

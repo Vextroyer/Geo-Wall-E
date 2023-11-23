@@ -4,7 +4,7 @@ The scanner receives a source code string and output a list of tokens.
 
 namespace Frontend;
 
-public class Scanner
+class Scanner
 {
     private List<Token> tokens = new List<Token>();//The tokens
     private string source;//Source code
@@ -18,6 +18,11 @@ public class Scanner
         {"point",TokenType.POINT},
         {"draw",TokenType.DRAW},
         {"print",TokenType.PRINT},
+        {"if",TokenType.IF},
+        {"then",TokenType.THEN},
+        {"else",TokenType.ELSE},
+        {"and",TokenType.AND},
+        {"or",TokenType.OR},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},
@@ -54,10 +59,35 @@ public class Scanner
             case '"': ScanString(); break;
             case '(': AddToken(TokenType.LEFT_PAREN); break;
             case ')': AddToken(TokenType.RIGHT_PAREN); break; 
-            case '/': if(Match('/')) ScanComment(); break;
+            case '/': 
+                if(Match('/')) ScanComment();
+                else AddToken(TokenType.SLASH); 
+                break;
             case ',': AddToken(TokenType.COMMA);  break;
             case ';': AddToken(TokenType.SEMICOLON);  break;
-            case '=': AddToken(TokenType.EQUAL); break;
+            case '=': 
+                if(Match('='))AddToken(TokenType.EQUAL_EQUAL);
+                else AddToken(TokenType.EQUAL); 
+                break;
+            case '!':
+                if(Match('=')) AddToken(TokenType.BANG_EQUAL);
+                else AddToken(TokenType.BANG); 
+                break;
+            case '<':
+                if(Match('=')) AddToken(TokenType.LESS_EQUAL);
+                else AddToken(TokenType.LESS);
+                break;
+            case '>':
+                if(Match('=')) AddToken(TokenType.GREATER_EQUAL);
+                else AddToken(TokenType.GREATER);
+                break;
+            case '&': AddToken(TokenType.AND); break;
+            case '|': AddToken(TokenType.OR); break;
+            case '-': AddToken(TokenType.MINUS); break;
+            case '^': AddToken(TokenType.CARET); break;
+            case '%': AddToken(TokenType.PERCENT); break;
+            case '*': AddToken(TokenType.STAR); break;
+            case '+': AddToken(TokenType.PLUS); break;
 
             //Ignore tabs and whitespaces
             case ' ': 

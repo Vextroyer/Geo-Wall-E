@@ -1,9 +1,10 @@
 /*
-This is the parser.
+This is the parser. It receives a token stream from the scanner and produces an abstract syntax tree.
+It uses recursive descent parsing to parse the different constructs.
 */
 namespace Frontend;
 
-public class Parser
+class Parser
 {
     List<Token> tokens;
     int current = 0;//Next unprocessed token.
@@ -57,10 +58,12 @@ public class Parser
     }
      private Stmt.Draw ParseDrawStmt()
     {
+        int line = Peek.Line;
+        int offset = Peek.Offset;
         Consume(TokenType.DRAW, "Expected `draw` keyword");
-        Token id = Consume(TokenType.ID,"Expected `ID` ");
+        Expr expr = ParseExpression();
 
-        return new Stmt.Draw(id);
+        return new Stmt.Draw(line,offset,expr);
 
     }
     private Stmt.Point ParsePointStmt(){
@@ -154,11 +157,151 @@ public class Parser
     
     #region Expression parsing
     private Expr ParseExpression(){
-        return ParseVariableExpression();
+        return ParseConditionalExpression();
+    }
+    private Expr ParseConditionalExpression(){
+        if(Match(TokenType.IF)){
+            int line = Previous.Line;
+            int offset = Previous.Offset;
+            Expr condition = ParseExpression();
+            Consume(TokenType.THEN,"Expected `then` keyword");
+            Expr thenBranchExpr = ParseExpression();
+            Consume(TokenType.ELSE,"Expected `else` keyword");
+            Expr elseBranchExpr = ParseExpression();
+            return new Expr.Conditional(line,offset,condition,thenBranchExpr,elseBranchExpr);
+        }
+        return ParseOrExpression();
+    }
+    private Expr ParseOrExpression(){
+        Expr left = ParseAndExpression();
+        while(Match(TokenType.OR)){
+            Token operation = Previous;
+            Expr right = ParseAndExpression();
+            left = new Expr.Binary.Or(left.Line,left.Offset,operation,left,right);
+        }
+        return left;
+    }
+    private Expr ParseAndExpression(){
+        Expr left = ParseEqualityExpression();
+        while(Match(TokenType.AND)){
+            Token operation = Previous;
+            Expr right = ParseEqualityExpression();
+            left = new Expr.Binary.And(left.Line,left.Offset,operation,left,right);
+        }
+        return left;
+    }
+    private Expr ParseEqualityExpression(){
+        Expr left = ParseComparisonExpression();
+        
+        int counter = 0;
+        Token firstOperation = Peek;
+
+        while(Match(TokenType.EQUAL_EQUAL,TokenType.BANG_EQUAL)){
+            //Rule # 9
+            if(counter == 1)throw new ExtendedException(Previous.Line,Previous.Offset,$"Cannot use '{Previous.Lexeme}' after '{firstOperation.Lexeme}'. Consider using parenthesis and/or logical operators.");
+            Token operation = Previous;
+            Expr right = ParseComparisonExpression();
+            switch(operation.Type){
+                case TokenType.EQUAL_EQUAL:
+                    left = new Expr.Binary.EqualEqual(left.Line,left.Offset,operation,left,right);
+                    break;
+                case TokenType.BANG_EQUAL:
+                    left = new Expr.Binary.NotEqual(left.Line,left.Offset,operation,left,right);
+                    break;
+            }
+            ++counter;
+        }
+        return left;
+    }
+    private Expr ParseComparisonExpression(){
+        Expr left = ParseTermExpression();
+
+        int counter = 0;//How many comparisons are being done.
+        Token firstOperation = Peek;
+
+        //Multiple chained comparisons are not supported by the grammar. So report an error if more than one is found.
+        while(Match(TokenType.LESS,TokenType.LESS_EQUAL,TokenType.GREATER,TokenType.GREATER_EQUAL)){
+            //Rule # 9
+            if(counter == 1)throw new ExtendedException(Previous.Line,Previous.Offset,$"Cannot use '{Previous.Lexeme}' after '{firstOperation.Lexeme}'. Consider using parenthesis and/or logical operators.");
+            Token operation = Previous;
+            Expr right = ParseTermExpression();
+            switch(operation.Type){
+                case TokenType.LESS:
+                    left = new Expr.Binary.Less(left.Line,left.Offset,operation,left,right);
+                    break;
+                case TokenType.LESS_EQUAL:
+                    left = new Expr.Binary.LessEqual(left.Line,left.Offset,operation,left,right);
+                    break;
+                case TokenType.GREATER:
+                    left = new Expr.Binary.Greater(left.Line,left.Offset,operation,left,right);
+                    break;
+                case TokenType.GREATER_EQUAL:
+                    left = new Expr.Binary.GreaterEqual(left.Line,left.Offset,operation,left,right);
+                    break;
+            }
+            ++counter;
+        }
+        return left;
+    }
+    private Expr ParseTermExpression(){
+        Expr left = ParseFactorExpression();
+        while(Match(TokenType.PLUS,TokenType.MINUS)){
+            Token operation = Previous;
+            Expr right = ParseFactorExpression();
+            switch(operation.Type){
+                case TokenType.PLUS:
+                    left = new Expr.Binary.Sum(left.Line,left.Offset,operation,left,right);
+                    break;
+                case TokenType.MINUS:
+                    left = new Expr.Binary.Difference(left.Line,left.Offset,operation,left,right);
+                    break;
+            }
+        }
+        return left;
+    }
+    private Expr ParseFactorExpression(){
+        Expr left = ParsePowerExpression();
+        while(Match(TokenType.STAR ,TokenType.SLASH ,TokenType.PERCENT)){
+            Token operation = Previous;
+            Expr right = ParsePowerExpression();
+            switch(operation.Type){
+                case TokenType.STAR:
+                    left = new Expr.Binary.Product(left.Line,left.Offset,operation,left,right);
+                    break;
+                case TokenType.SLASH:
+                    left = new Expr.Binary.Division(left.Line,left.Offset,operation,left,right);
+                    break;
+                case TokenType.PERCENT:
+                    left = new Expr.Binary.Modulus(left.Line,left.Offset,operation,left,right);
+                    break;
+            }
+        }
+        return left;
+    }
+    private Expr ParsePowerExpression(){
+        Expr left = ParseUnaryExpression();
+        if(Match(TokenType.CARET)){
+            Token operation = Previous;
+            Expr right = ParsePowerExpression();
+            return new Expr.Binary.Power(left.Line,left.Offset,operation,left,right);
+        }
+        return left;
+    }
+    private Expr ParseUnaryExpression(){
+        switch(Peek.Type){
+            case TokenType.BANG:
+                Advance();//Consume the operator
+                return new Expr.Unary.Not(Previous.Line,Previous.Offset,ParseUnaryExpression());
+            case TokenType.MINUS:
+                Advance();//Consume the operator
+                return new Expr.Unary.Minus(Previous.Line,Previous.Offset,ParseUnaryExpression());
+            default:
+                return ParseVariableExpression();
+        }
     }
     private Expr ParseVariableExpression(){
-        if(Peek.Type == TokenType.ID){
-            Token id = Consume(TokenType.ID);
+        if(Match(TokenType.ID)){
+            Token id = Previous;
             return new Expr.Variable(id);
         }
         return ParsePrimaryExpression();
@@ -199,6 +342,17 @@ public class Parser
         if (Peek.Type == type) return Advance();
         //Heuristically report the location of the error as the end of the previous token.
         throw new ExtendedException(Previous.Line, Previous.Offset + Previous.Lexeme.Length, message);
+    }
+    //If the current token match any of the given tokens advance an return true, if not return false and keep current.
+    //It is a conditional advance.
+    private bool Match(params TokenType[] types){
+        foreach(TokenType type in types){
+            if(type == Peek.Type){
+                Advance();
+                return true;
+            }
+        }
+        return false;
     }
     #endregion
 }

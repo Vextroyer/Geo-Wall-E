@@ -4,16 +4,15 @@ Represents the different kinds of tokens on G#.
 
 namespace Frontend;
 
-public enum TokenType{
+enum TokenType{
     //Grouping symbols.
     LEFT_PAREN,RIGHT_PAREN,
 
-
     //Operators.
-    EQUAL,
+    EQUAL,BANG,MINUS,CARET,STAR,SLASH,PERCENT,PLUS,LESS,LESS_EQUAL,GREATER,GREATER_EQUAL,EQUAL_EQUAL,BANG_EQUAL,
 
-    //Represents a single line comment '//'.
-    COMMENT,
+    //If-then-else expression.
+    IF,THEN,ELSE,AND,OR,
 
     //Control symbols.
     COMMA, SEMICOLON,

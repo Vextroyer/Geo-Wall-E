@@ -1,3 +1,10 @@
 //Sample program to save functionalities to test.
 
 
+print !! 2;
+print ! 0;
+print !5;
+
+print 5;
+
+print -5;
