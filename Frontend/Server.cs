@@ -101,7 +101,7 @@ public static class GSharpCompiler
         //This flags determine wheter the compiler should print the tokens produced by the scanner and the ast produced by the parser.
         public bool PrintDebugInfo {get; set;}
         //This flag is for setting the stream to which the client application wants to redirect the output of the `print` statements and the debug info.
-        public TextWriter OutputStream {get; private set;}
+        public TextWriter OutputStream {get; set;}
         public Flags(){
             PrintDebugInfo = true; //Print debug info
             OutputStream = System.Console.Out; //Use the default console output stream.

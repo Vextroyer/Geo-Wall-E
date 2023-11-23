@@ -25,6 +25,7 @@ class Client{
         Frontend.GSharpCompiler.Flags flags = new GSharpCompiler.Flags();
         if(args.Contains("--noDebug"))flags.PrintDebugInfo = false;
         if(args.Contains("--runRepl"))RunREPL(flags);
+        else if(args.Contains("--runTest"))RunTest(flags);
         else RunFromFile(flags);//Default behaviour.
     }
     /*
@@ -53,7 +54,51 @@ class Client{
             HandleError(compilerResponse);
         }
     }
-    private static void HandleError(Frontend.GSharpCompiler.Response compilerResponse){
+    /*
+    This mode sends the `test.gs` file to the compiler and redirects its output to the `test.out` file, then compares the results
+    from `test.out` with the supplied results at `test.results` and outputs the results.
+    */
+    private static void RunTest(Frontend.GSharpCompiler.Flags flags){
+        flags.PrintDebugInfo = false;//You dont want debug info missing up with the results.
+        
+        //Paths are relative to the CommandLineInterface parent folder.        
+        string testGs = "CommandLineInterface/Testing/test.gs";//Source code
+        string testOut = "CommandLineInterface/Testing/test.out";//Computed results
+        string testResult = "CommandLineInterface/Testing/test.result";//Expected results
+
+        flags.OutputStream = File.CreateText(testOut);//Set test.out to be the output stream.
+
+        // Compile and run test.gs file, the output of print statements is written on test.out file
+        Frontend.GSharpCompiler.Response compilerResponse =  Frontend.GSharpCompiler.CompileFromFile(testGs,flags);
+        HandleError(compilerResponse);
+        //Flush the output stream
+        flags.OutputStream.Flush();
+
+        StreamReader expectedResultsFile = File.OpenText(testResult);
+        StreamReader resultsFile = File.OpenText(testOut);
+
+        int test = 1;
+        while(!expectedResultsFile.EndOfStream && !resultsFile.EndOfStream){
+            Console.Write($"T {test}:   ");
+            string result = resultsFile.ReadLine()!;
+            string expectedResult = expectedResultsFile.ReadLine()!;
+            if(result == expectedResult){
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("OK");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else{
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Expected \"{expectedResult}\" but found \"{result}\"");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            ++test;
+        }
+        if(expectedResultsFile.EndOfStream && resultsFile.EndOfStream)Console.WriteLine("Test finished.");
+        else Console.WriteLine("Number of tests does not concords with the number of results.");
+    }
+    //Returns true if the compiler detected any error.
+    private static bool HandleError(Frontend.GSharpCompiler.Response compilerResponse){
         if(compilerResponse.HadError){
             if(compilerResponse.HadErrorReadingFile)ReportError(compilerResponse.Errors.Last().Message);
             else
@@ -63,7 +108,9 @@ class Client{
                     ReportError(error.Line,error.Offset,error.Message);
                 }
             }
+            return true;
         }
+        return false;
     }
     private static void ReportError(string message){
         Console.ForegroundColor = ConsoleColor.Red;
