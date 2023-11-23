@@ -17,8 +17,8 @@ First(stmt) = { 'point' , ID , 'print', 'color', 'restore' , 'draw' }
 
 Expr = Conditional;
 Conditional = ('if'  Expr  'then' Expr 'else' Expr) | Or;
-Or = And ('|' And)*;
-And = Equality ('&' Equality)*;
+Or = And ( ( '|' | 'or') And)*;
+And = Equality ( ( '&' | 'and' )  Equality)*;
 Equality = Comparison ( ('==' | '!=') Comparison)?;
 Comparison = Term ( ('>' | '>=' | '<' | '<=') Term)?;
 Term = Factor ( ('+' | '-') Factor)*;
