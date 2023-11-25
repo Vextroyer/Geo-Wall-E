@@ -4,7 +4,7 @@ The scanner receives a source code string and output a list of tokens.
 
 namespace Frontend;
 
-class Scanner
+class Scanner : GSharpCompilerComponent
 {
     private List<Token> tokens = new List<Token>();//The tokens
     private string source;//Source code
@@ -37,12 +37,15 @@ class Scanner
         {"restore",TokenType.RESTORE}
   
     };
-
-    public Scanner(string? _source){
+    public Scanner(string? _source,int maxErrorCount,ICollection<GSharpCompiler.Error> errors):base(maxErrorCount,errors){
         if(_source == null)source = "";
         else source = _source;
     }
-
+    ///<summary>Abort by trowhing a <c>ScannerException</c> .</summary>
+    public override void Abort(){
+        throw new ScannerException();
+    }
+    
     public List<Token> Scan(){
         while(!IsAtEnd){
             start = current;
@@ -106,8 +109,12 @@ class Scanner
                     ScanIdentifier();
                     break;
                 }
-                Console.WriteLine((int)c);
-                throw new ExtendedException(line,ComputeOffset,$"Unrecognized character");
+                else if(c == '.'){
+                    ReportError(line,ComputeOffset,"Expected digit before `.`");
+                    break;
+                }
+                ReportError(line,ComputeOffset,"Unrecognized character");
+                break;
         }
     }
     //Scan a string literal, the previous character was a quote '"'
@@ -118,13 +125,12 @@ class Scanner
         int openingQuoteLine = line;//Store the position on the code of the opening quote for error reporting
         int openingQuoteOffset = ComputeOffset;
 
-        while(!IsAtEnd && Peek() != '"'){ 
+        while(!IsAtEnd && Peek != '"'){ 
             char c = Advance();
             if(c == '\n')OnNewLineFound();//This is for supporting multi-line strings
         }
 
-        if(IsAtEnd) throw new ExtendedException(openingQuoteLine,openingQuoteOffset,"A quote is missing");//A quote is missing
-
+        if(IsAtEnd) ReportError(line,ComputeOffset,"A quote is missing");
         Advance();//Consume the closing quote
 
         string value = source.Substring(start + 1,current - start - 2);//The string content without the enclosing quotes
@@ -135,12 +141,12 @@ class Scanner
     //Scan a comment.
     private void ScanComment(){
         //Discard tokens until a new line is found. The backslashes are already consumed.
-        while(!IsAtEnd && Peek() != '\n')Advance();
+        while(!IsAtEnd && Peek != '\n')Advance();
     }
 
     //Scan an identifier. Can be also a keyword.
     private void ScanIdentifier(){
-        while(IsAlphaNumeric(Peek()))Advance();//Consume every posible character (Maximal Munch principle)
+        while(IsAlphaNumeric(Peek))Advance();//Consume every posible character (Maximal Munch principle)
 
         string lexeme = source.Substring(start,current - start);
         TokenType type;
@@ -155,13 +161,20 @@ class Scanner
 
     //Scan a number literal
     private void ScanNumber(){
-        while(IsDigit(Peek()))Advance();//Consume the leading digits
+        while(IsDigit(Peek))Advance();//Consume the leading digits
         
-        //If there exist a dot an at least a digit after the dot its a real number.
-        if(Peek() == '.' && IsDigit(PeekNext())){
+        //If there exist a dot after a digit.
+        if(Peek == '.'){
             Advance();//Consume the '.'
-            while(IsDigit(Peek()))Advance();//Consume the trailing digits
+            
+            //If there is no digit after the dot then its an error
+            if(!IsDigit(Peek))ReportError(line,ComputeOffset,"Expected digit after `.`");
+
+            while(IsDigit(Peek))Advance();//Consume the trailing digits
         }
+
+        //If there exist an alphanumeric character after a digit, then this is misstyped identifier.
+        if(IsAlpha(Peek)) ReportError(line,ComputeOffset,"Identifiers can't start with numbers");
 
         AddToken(TokenType.NUMBER,float.Parse(source.Substring(start,current - start)));
     }
@@ -185,14 +198,19 @@ class Scanner
         return source[current - 1];
     }
     //Return the character at current position but do not move current. 
-    private char Peek(){
-        if(IsAtEnd)return '\0';//Guarantee that a call to this method does not throw an exception. 
-        return source[current];
+    private char Peek{
+        get{
+            if(IsAtEnd)return '\0';//Guarantee that a call to this method does not throw an exception. 
+            return source[current];
+        }
+        
     }
     //Return the character one position ahead of current but do not move current. This is called lookahead.
-    private char PeekNext(){
-        if(current + 1 >= source.Length)return '\0';//Guarantee that a call to this method does not throw an exception.
-        return source[current + 1];
+    private char PeekNext{
+        get{
+            if(current + 1 >= source.Length)return '\0';//Guarantee that a call to this method does not throw an exception.
+            return source[current + 1];
+        }
     }
     //Conditional advance, si el caracter actual coincide con el dado retorna verdadero y consume el caracter actual,
     //si no retorna falso y se mantiene el caracter actual

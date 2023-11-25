@@ -24,6 +24,7 @@ class Client{
     private static void SelectMode(string[] args){
         Frontend.GSharpCompiler.Flags flags = new GSharpCompiler.Flags();
         if(args.Contains("--noDebug"))flags.PrintDebugInfo = false;
+        if(args.Contains("--SetMaxErrorCount"))flags.MaxErrorCount = 5;//Use 5 errors by default.
         if(args.Contains("--runRepl"))RunREPL(flags);
         else if(args.Contains("--runTest"))RunTest(flags);
         else RunFromFile(flags);//Default behaviour.

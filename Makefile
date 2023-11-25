@@ -3,10 +3,10 @@
 .Phony: test
 
 test:
-	dotnet run --project CommandLineInterface --runTest
+	dotnet run --project CommandLineInterface --runTest --SetMaxErrorCount
 
 repl:
-	dotnet run --project CommandLineInterface --runRepl --noDebug
+	dotnet run --project CommandLineInterface --runRepl --noDebug --SetMaxErrorCount
 
 dev:
-	dotnet run --project CommandLineInterface
+	dotnet run --project CommandLineInterface --SetMaxErrorCount
