@@ -13,7 +13,7 @@ abstract class GSharpCompilerComponent : ICompileTimeErrorHandler{
         errors.Add(new GSharpCompiler.Error(line,offset,message));//Add the new error to the collection.
         if(enforceAbort || errors.Count >= MaxErrorCount)caller.Abort();//If enforceAbort is set to true or the limit of error is reached ,abort.
     }
-    public virtual void ReportError(int line,int offset,string message,bool enforceAbort = false){
+    public virtual void OnErrorFound(int line,int offset,string message,bool enforceAbort = false){
         HandleError(this,enforceAbort,this.MaxErrorCount,this.Errors,message,line,offset);
     }
     public abstract void Abort();

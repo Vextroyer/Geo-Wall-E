@@ -6,6 +6,7 @@ On this case expressions represent elements.
 namespace GSharpCompiler;
 
 interface IVisitorExpr<T,U>{
+    public T VisitEmptyExpr(Expr.Empty expr, Scope<U> scope);
     public T VisitNumberExpr(Expr.Number expr,Scope<U> scope);
     public T VisitStringExpr(Expr.String expr,Scope<U> scope);
     public T VisitVariableExpr(Expr.Variable expr,Scope<U> scope);
@@ -48,7 +49,7 @@ abstract class Expr : IVisitableExpr{
         public Empty():base(0,0){}
         public override T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope)
         {
-            throw new NotImplementedException();
+            return visitor.VisitEmptyExpr(this,scope);
         }
     }
     public static Empty EMPTY = new Empty();//This is the empty expression.

@@ -8,6 +8,10 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
         return stmt.Accept(this,null);
     }
 
+    public string VisitEmptyStmt(Stmt.Empty stmt,Scope<Element> scope){
+        return "EMPTY";
+    }
+
     public string VisitPointStmt(Stmt.Point stmt,Scope<Element> scope){
         return $"point({stmt.Id.Lexeme},{stmt.Comment},{stmt.X},{stmt.Y})";
     }
@@ -32,6 +36,10 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
   
     public string Print(Expr expr){
         return expr.Accept(this,null);
+    }
+
+    public string VisitEmptyExpr(Expr.Empty expr,Scope<Element> scope){
+        return "EMPTY";
     }
 
     public string VisitNumberExpr(Expr.Number expr,Scope<Element> scope){

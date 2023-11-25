@@ -26,6 +26,6 @@ interface ICompileTimeErrorHandler : IAbortable{
     public void HandleError(IAbortable caller,bool enforceAbort,int MaxErrorCount,ICollection<GSharpCompiler.Error> errors,string message,int line,int offset);
     
     ///<summary>Simplified call to <c>HandleError</c> method.</summary>
-    public void ReportError(int line,int offset,string message,bool enforceAbort = false);
+    public void OnErrorFound(int line,int offset,string message,bool enforceAbort = false);
 }
 

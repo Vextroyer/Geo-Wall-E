@@ -43,7 +43,7 @@ public static class Compiler
             if(errors.Count > 0)throw new ScannerException();
 
             //Parse the tokens into an abstract syntax tree and store the tree.
-            Program program = new Parser(tokens).Parse();
+            Program program = new Parser(tokens,flags.MaxErrorCount,errors).Parse();
 
             //Print parser output
             if(flags.PrintDebugInfo)Utils.PrintAst(program,flags.OutputStream);
@@ -64,9 +64,10 @@ public static class Compiler
         catch (ExtendedException e){
             errors.Add(new Error(e.Line,e.Offset,e.Message));
         }
-        catch (Exception)
+        catch (Exception e)
         {
             //Do something on unexpected exceptions catched.
+            Console.WriteLine(e);
         }
 
         return new Response(errors,elements);

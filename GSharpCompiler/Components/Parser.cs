@@ -4,15 +4,26 @@ It uses recursive descent parsing to parse the different constructs.
 */
 namespace GSharpCompiler;
 
-class Parser
+class Parser : GSharpCompilerComponent
 {
     List<Token> tokens;
     int current = 0;//Next unprocessed token.
 
-    public Parser(List<Token> _tokens)
+    public Parser(List<Token> _tokens,int maxErrorCount,ICollection<Error> errors):base(maxErrorCount,errors)
     {
         tokens = _tokens;
     }
+    public override void Abort()
+    {
+        throw new ParserException();
+    }
+    public override void OnErrorFound(int line, int offset, string message, bool enforceAbort = false)
+    {
+        base.OnErrorFound(line, offset, message, enforceAbort);
+        //If the execution doesnt stop enter recovery mode.
+        throw new RecoveryModeException();
+    }
+
 
     #region Statement parsing
     public Program Parse(){
@@ -25,15 +36,25 @@ class Parser
 
         while (!IsAtEnd)
         {
-            stmts.Add(ParseStmt());
+            try{
+                Stmt tmp = ParseStmt();
+                if(tmp != Stmt.EMPTY)stmts.Add(tmp);//Do not add empty statements to a program.
+            }
+            catch(RecoveryModeException){
+                //On recovery mode the parser discards tokens until a `;` is found. After this semicolon a statement should be found.
+                while(!IsAtEnd && Peek.Type != TokenType.SEMICOLON)Advance();
+            }
         }
 
         return new Program(stmts);
     }
 
     private Stmt ParseStmt(){
-        Stmt aux;
+        Stmt aux = null;
         switch(Peek.Type){
+            case TokenType.SEMICOLON:
+                aux = Stmt.EMPTY;
+                break;
             case TokenType.POINT:
                 aux = ParsePointStmt();
                 break;
@@ -51,10 +72,11 @@ class Parser
                 aux = ParseColorStmt();
                 break;
             default:
-                throw new ExtendedException(Peek.Line,Peek.Offset,"Not a statement");
+                OnErrorFound(Peek.Line,Peek.Offset,"Not a statement");
+                break;
         }
         Consume(TokenType.SEMICOLON,"Semicolon expected after statement");
-        return aux;
+        return aux!;
     }
      private Stmt.Draw ParseDrawStmt()
     {
@@ -62,6 +84,7 @@ class Parser
         int offset = Peek.Offset;
         Consume(TokenType.DRAW, "Expected `draw` keyword");
         Expr expr = ParseExpression();
+        ErrorIfEmpty(expr,line,offset,"Expected non-empty expression after `draw`");
 
         return new Stmt.Draw(line,offset,expr);
 
@@ -96,7 +119,7 @@ class Parser
         Token id = Consume(TokenType.ID,"Expected identifier");
         Consume(TokenType.EQUAL,"Expected `=`");
         Expr expr = ParseExpression();
-        if(expr == Expr.EMPTY)throw new ExtendedException(id.Line,id.Offset,$"Assigned empty expression to constant `{id.Lexeme}`");//Rule 2
+        ErrorIfEmpty(expr,id.Line,id.Offset,$"Assigned empty expression to constant `{id.Lexeme}`");//Rule 2
         return new Stmt.ConstantDeclaration(id,expr);
     }
     private Stmt.Print ParsePrintStmt(){
@@ -115,7 +138,7 @@ class Parser
             return new Stmt.Color(line,offset,Color.BLACK,true);
         }
         
-        Color color;        
+        Color color = Color.BLACK;        
         Consume(TokenType.COLOR);
         //If the `color` keyword is found , a built-in color must be provided.
         switch(Peek.Type){
@@ -147,7 +170,8 @@ class Parser
                 color = Color.YELLOW;
                 break;
             default:
-                throw new ExtendedException(Peek.Line,Peek.Offset,$"Expected built-in color");
+                OnErrorFound(Peek.Line,Peek.Offset,$"Expected built-in color");
+                break;
         }
 
         Advance();//Consume the token who holds the color.
@@ -164,10 +188,13 @@ class Parser
             int line = Previous.Line;
             int offset = Previous.Offset;
             Expr condition = ParseExpression();
+            ErrorIfEmpty(condition,line,offset,"Expected non-empty expression for condition");
             Consume(TokenType.THEN,"Expected `then` keyword");
             Expr thenBranchExpr = ParseExpression();
+            ErrorIfEmpty(thenBranchExpr,line,offset,"Expected non-empty expression after `then`");
             Consume(TokenType.ELSE,"Expected `else` keyword");
             Expr elseBranchExpr = ParseExpression();
+            ErrorIfEmpty(elseBranchExpr,line,offset,"Expected non-empty expression after `else`");
             return new Expr.Conditional(line,offset,condition,thenBranchExpr,elseBranchExpr);
         }
         return ParseOrExpression();
@@ -176,7 +203,9 @@ class Parser
         Expr left = ParseAndExpression();
         while(Match(TokenType.OR)){
             Token operation = Previous;
+            ErrorIfEmpty(left,operation.Line,operation.Offset,"Expected non-empty expression as left operand");
             Expr right = ParseAndExpression();
+            ErrorIfEmpty(right,operation.Line,operation.Offset,"Expected non-empty expression as right operand");
             left = new Expr.Binary.Or(left.Line,left.Offset,operation,left,right);
         }
         return left;
@@ -185,7 +214,9 @@ class Parser
         Expr left = ParseEqualityExpression();
         while(Match(TokenType.AND)){
             Token operation = Previous;
+            ErrorIfEmpty(left,operation.Line,operation.Offset,"Expected non-empty expression as left operand");
             Expr right = ParseEqualityExpression();
+            ErrorIfEmpty(right,operation.Line,operation.Offset,"Expected non-empty expression as right operand");
             left = new Expr.Binary.And(left.Line,left.Offset,operation,left,right);
         }
         return left;
@@ -198,9 +229,11 @@ class Parser
 
         while(Match(TokenType.EQUAL_EQUAL,TokenType.BANG_EQUAL)){
             //Rule # 9
-            if(counter == 1)throw new ExtendedException(Previous.Line,Previous.Offset,$"Cannot use '{Previous.Lexeme}' after '{firstOperation.Lexeme}'. Consider using parenthesis and/or logical operators.");
+            if(counter == 1)OnErrorFound(Previous.Line,Previous.Offset,$"Cannot use '{Previous.Lexeme}' after '{firstOperation.Lexeme}'. Consider using parenthesis and/or logical operators.");
             Token operation = Previous;
+            ErrorIfEmpty(left,operation.Line,operation.Offset,"Expected non-empty expression as left operand");
             Expr right = ParseComparisonExpression();
+            ErrorIfEmpty(right,operation.Line,operation.Offset,"Expected non-empty expression as right operand");
             switch(operation.Type){
                 case TokenType.EQUAL_EQUAL:
                     left = new Expr.Binary.EqualEqual(left.Line,left.Offset,operation,left,right);
@@ -222,9 +255,11 @@ class Parser
         //Multiple chained comparisons are not supported by the grammar. So report an error if more than one is found.
         while(Match(TokenType.LESS,TokenType.LESS_EQUAL,TokenType.GREATER,TokenType.GREATER_EQUAL)){
             //Rule # 9
-            if(counter == 1)throw new ExtendedException(Previous.Line,Previous.Offset,$"Cannot use '{Previous.Lexeme}' after '{firstOperation.Lexeme}'. Consider using parenthesis and/or logical operators.");
+            if(counter == 1)OnErrorFound(Previous.Line,Previous.Offset,$"Cannot use '{Previous.Lexeme}' after '{firstOperation.Lexeme}'. Consider using parenthesis and/or logical operators.");
             Token operation = Previous;
+            ErrorIfEmpty(left,operation.Line,operation.Offset,"Expected non-empty expression as left operand");
             Expr right = ParseTermExpression();
+            ErrorIfEmpty(right,operation.Line,operation.Offset,"Expected non-empty expression as right operand");
             switch(operation.Type){
                 case TokenType.LESS:
                     left = new Expr.Binary.Less(left.Line,left.Offset,operation,left,right);
@@ -247,7 +282,9 @@ class Parser
         Expr left = ParseFactorExpression();
         while(Match(TokenType.PLUS,TokenType.MINUS)){
             Token operation = Previous;
+            ErrorIfEmpty(left,operation.Line,operation.Offset,"Expected non-empty expression as left operand");
             Expr right = ParseFactorExpression();
+            ErrorIfEmpty(right,operation.Line,operation.Offset,"Expected non-empty expression as right operand");
             switch(operation.Type){
                 case TokenType.PLUS:
                     left = new Expr.Binary.Sum(left.Line,left.Offset,operation,left,right);
@@ -263,7 +300,9 @@ class Parser
         Expr left = ParsePowerExpression();
         while(Match(TokenType.STAR ,TokenType.SLASH ,TokenType.PERCENT)){
             Token operation = Previous;
+            ErrorIfEmpty(left,operation.Line,operation.Offset,"Expected non-empty expression as left operand");
             Expr right = ParsePowerExpression();
+            ErrorIfEmpty(right,operation.Line,operation.Offset,"Expected non-empty expression as right operand");
             switch(operation.Type){
                 case TokenType.STAR:
                     left = new Expr.Binary.Product(left.Line,left.Offset,operation,left,right);
@@ -282,19 +321,26 @@ class Parser
         Expr left = ParseUnaryExpression();
         if(Match(TokenType.CARET)){
             Token operation = Previous;
+            ErrorIfEmpty(left,operation.Line,operation.Offset,"Expected non-empty expression as left operand");
             Expr right = ParsePowerExpression();
+            ErrorIfEmpty(right,operation.Line,operation.Offset,"Expected non-empty expression as right operand");
             return new Expr.Binary.Power(left.Line,left.Offset,operation,left,right);
         }
         return left;
     }
     private Expr ParseUnaryExpression(){
+        Expr expr;
         switch(Peek.Type){
             case TokenType.BANG:
                 Advance();//Consume the operator
-                return new Expr.Unary.Not(Previous.Line,Previous.Offset,ParseUnaryExpression());
+                expr = ParseUnaryExpression();
+                ErrorIfEmpty(expr,Previous.Line,Previous.Offset,"Expected non-empty expression as operand");
+                return new Expr.Unary.Not(Previous.Line,Previous.Offset,expr);
             case TokenType.MINUS:
                 Advance();//Consume the operator
-                return new Expr.Unary.Minus(Previous.Line,Previous.Offset,ParseUnaryExpression());
+                expr = ParseUnaryExpression();
+                ErrorIfEmpty(expr,Previous.Line,Previous.Offset,"Expected non-empty expression as operand");
+                return new Expr.Unary.Minus(Previous.Line,Previous.Offset,expr);
             default:
                 return ParseVariableExpression();
         }
@@ -341,7 +387,9 @@ class Parser
     {
         if (Peek.Type == type) return Advance();
         //Heuristically report the location of the error as the end of the previous token.
-        throw new ExtendedException(Previous.Line, Previous.Offset + Previous.Lexeme.Length, message);
+        OnErrorFound(Previous.Line, Previous.Offset + Previous.Lexeme.Length, message);
+        //Unreachable code
+        return Peek;
     }
     //If the current token match any of the given tokens advance an return true, if not return false and keep current.
     //It is a conditional advance.
@@ -353,6 +401,10 @@ class Parser
             }
         }
         return false;
+    }
+    ///<summary>If <c>expr</c> is the EMPTY expression its detected as an error.</summary>
+    private void ErrorIfEmpty(Expr expr,int line,int offset,string message,bool enforceAbort = false){
+        if(expr == Expr.EMPTY) OnErrorFound(line,offset,message,enforceAbort);
     }
     #endregion
 }

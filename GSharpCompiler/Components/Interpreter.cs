@@ -38,6 +38,10 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         stmt.Accept(this, scope);
         return null;
     }
+    public object? VisitEmptyStmt(Stmt.Empty emptyStmt, Scope<Element> scope)
+    {
+        return null;
+    }
     public object? VisitPointStmt(Stmt.Point point, Scope<Element> scope)
     {
         scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), point.X, point.Y, point.Comment));
@@ -50,7 +54,8 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     }
     public object? VisitPrintStmt(Stmt.Print stmt, Scope<Element> scope)
     {
-        outputStream.WriteLine(Evaluate(stmt._Expr, scope));
+        if(stmt._Expr == Expr.EMPTY)outputStream.WriteLine();
+        else outputStream.WriteLine(Evaluate(stmt._Expr, scope));
         return null;
     }
     public object? VisitColorStmt(Stmt.Color stmt, Scope<Element> scope)
@@ -75,6 +80,10 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     public Element Evaluate(Expr expr, Scope<Element> scope)
     {
         return expr.Accept(this, scope);
+    }
+    
+    public Element VisitEmptyExpr(Expr.Empty expr,Scope<Element> scope){
+        return Element.UNDEFINED;
     }
 
     public Element VisitNumberExpr(Expr.Number expr, Scope<Element> scope)

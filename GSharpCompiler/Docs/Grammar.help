@@ -12,8 +12,10 @@ Stmt = ('color' COLOR) | 'restore' ';'; //Color statement
 
 Stmt = 'draw' Expr ';'; //Draw statement
 
+Stmt = ';'; //The empty statement
+
 //Set of the terminals that made the first word of the stmt production.
-First(stmt) = { 'point' , ID , 'print', 'color', 'restore' , 'draw' }
+First(stmt) = { ';' , 'point' , ID , 'print', 'color', 'restore' , 'draw' }
 
 Expr = Conditional;
 Conditional = ('if'  Expr  'then' Expr 'else' Expr) | Or;

@@ -6,6 +6,7 @@ namespace GSharpCompiler;
 
 interface IVisitorStmt<T, U>
 {
+    public T VisitEmptyStmt(Stmt.Empty stmt, Scope<U> scope);
     public T VisitPointStmt(Stmt.Point stmt, Scope<U> scope);
     public T VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt, Scope<U> scope);
     public T VisitPrintStmt(Stmt.Print stmt, Scope<U> scope);
@@ -30,6 +31,16 @@ abstract class Stmt : IVisitableStmt
     }
     //Required to work in conjuction with the IVisitorStmt interface.
     abstract public T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope);
+    ///<summary>Represents an empty statement.</summary>
+    public class Empty : Stmt{
+        public Empty():base(0,0){}
+        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitEmptyStmt(this, scope);
+        }
+    }
+    ///<summary>A constant representing the empty statement. Should be used instead of creating new empty statements.</summary>
+    static public Stmt.Empty EMPTY = new Stmt.Empty();
     //Represents a `point` statement.
     public class Point : Stmt
     {

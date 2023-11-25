@@ -110,10 +110,10 @@ class Scanner : GSharpCompilerComponent
                     break;
                 }
                 else if(c == '.'){
-                    ReportError(line,ComputeOffset,"Expected digit before `.`");
+                    OnErrorFound(line,ComputeOffset,"Expected digit before `.`");
                     break;
                 }
-                ReportError(line,ComputeOffset,"Unrecognized character");
+                OnErrorFound(line,ComputeOffset,"Unrecognized character");
                 break;
         }
     }
@@ -130,7 +130,7 @@ class Scanner : GSharpCompilerComponent
             if(c == '\n')OnNewLineFound();//This is for supporting multi-line strings
         }
 
-        if(IsAtEnd) ReportError(line,ComputeOffset,"A quote is missing");
+        if(IsAtEnd) OnErrorFound(line,ComputeOffset,"A quote is missing");
         Advance();//Consume the closing quote
 
         string value = source.Substring(start + 1,current - start - 2);//The string content without the enclosing quotes
@@ -168,13 +168,13 @@ class Scanner : GSharpCompilerComponent
             Advance();//Consume the '.'
             
             //If there is no digit after the dot then its an error
-            if(!IsDigit(Peek))ReportError(line,ComputeOffset,"Expected digit after `.`");
+            if(!IsDigit(Peek))OnErrorFound(line,ComputeOffset,"Expected digit after `.`");
 
             while(IsDigit(Peek))Advance();//Consume the trailing digits
         }
 
         //If there exist an alphanumeric character after a digit, then this is misstyped identifier.
-        if(IsAlpha(Peek)) ReportError(line,ComputeOffset,"Identifiers can't start with numbers");
+        if(IsAlpha(Peek)) OnErrorFound(line,ComputeOffset,"Identifiers can't start with numbers");
 
         AddToken(TokenType.NUMBER,float.Parse(source.Substring(start,current - start)));
     }

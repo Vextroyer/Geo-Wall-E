@@ -23,6 +23,7 @@ class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
         stmt.Accept(this, globalScope);
     }
     //Checking statements
+    public object? VisitEmptyStmt(Stmt.Empty emptyStmt, Scope<Element> scope) {return null;}
     public object? VisitPointStmt(Stmt.Point pointStmt,Scope<Element> scope){
         if(scope.IsConstant(pointStmt.Id.Lexeme))throw new ExtendedException(pointStmt.Line,pointStmt.Offset,$"Redeclaration of constant {pointStmt.Id.Lexeme}");//Rule 1
         if(scope.HasBinding(pointStmt.Id.Lexeme))throw new ExtendedException(pointStmt.Line,pointStmt.Offset,$"Point `{pointStmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
@@ -53,6 +54,9 @@ class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
     //Checking expressions
     private Element Check(Expr expr,Scope<Element> scope){
         return expr.Accept(this,scope);
+    }
+    public Element VisitEmptyExpr(Expr.Empty emptyExpr,Scope<Element> scope){
+        return Element.UNDEFINED;
     }
     public Element VisitNumberExpr(Expr.Number numberExpr,Scope<Element> scope){
         return Element.NUMBER;
