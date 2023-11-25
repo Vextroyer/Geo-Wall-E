@@ -1,12 +1,10 @@
 #1
-Run scripts with relative and absolute paths.
-Try to read files that are in an unreadable directory.
-Check that file reading is being doing well.
+Read test code and test result files from an user provided path.
+Instead of writting the output of the compiler to a file put it on memory and do the comparisons on memory.
 
 #2
 Read maximum coordinates from a config file
 
-Add support for negative numbers.
 
 Decision : Do i set point as an identifier or as a keyword.
 I built it progresively setting it as a keyword first.
@@ -15,16 +13,15 @@ How can i split my keywords from my code:
     Idea: Let the keywords be on a separate file. Let some program extract those keywords and generate a code from them and then
           passing that code to the Frontend code before compilation is done. This would be done as a precompilation step.
 
-Automate Samples testing.
+Implementar las medidas, measure.
+Implementar las secuencias.
+Implementar circle
+Implementar recta
+Implementar arco
+            segmento
+            semirrecta
 
-Para el interprete:
-Hacen falta tipos de datos para guardar numeros y para guardar angulos.
-Para los anuglos: si almacenarlos en radianes o en grados.
-
-El interprete puede fallar si se trata de recuperar una variable no declarada.
 El interprete falla al recuperar una variabe declarada en un scope anterior.
-
-The way of debugging the intepreter is throug debugging. There is no visual output yet.
 
 Hay que considerar los casos en los que las expresiones pueden devolver la expresion vacia. Este paso
 se puede hacer junto con la comprobacion de tipos despues del parsing.
