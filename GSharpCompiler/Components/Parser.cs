@@ -2,7 +2,7 @@
 This is the parser. It receives a token stream from the scanner and produces an abstract syntax tree.
 It uses recursive descent parsing to parse the different constructs.
 */
-namespace Frontend;
+namespace GSharpCompiler;
 
 class Parser
 {

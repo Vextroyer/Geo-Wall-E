@@ -2,7 +2,7 @@
 The scanner receives a source code string and output a list of tokens.
 */
 
-namespace Frontend;
+namespace GSharpCompiler;
 
 class Scanner : GSharpCompilerComponent
 {

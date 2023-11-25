@@ -5,9 +5,9 @@ by the specific drawing interface. If the compilation fails it return the errors
 at compile time.
 */
 
-namespace Frontend;
+namespace GSharpCompiler;
 
-public static class GSharpCompiler
+public static class Compiler
 {
     //Compile from a file containing the source code.
     public static Response CompileFromFile(string path, Flags? flags = null){
@@ -85,19 +85,6 @@ public static class GSharpCompiler
             errors = _errors;
             elements = _elements;
             HadErrorReadingFile = hadErrorReadingFile;
-        }
-    }
-    //Represents the errors.
-    public class Error
-    {
-        public int Line { get; private set; }
-        public int Offset { get; private set; }
-        public string Message { get; private set; }
-        public Error(int line, int offset, string message)
-        {
-            Line = line;
-            Offset = offset;
-            Message = message;
         }
     }
 

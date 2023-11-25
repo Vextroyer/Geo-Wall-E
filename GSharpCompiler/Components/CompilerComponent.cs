@@ -1,4 +1,4 @@
-namespace Frontend;
+namespace GSharpCompiler;
 
 ///<summary>Base class for compiler components. <example>The parser</example>.</summary>
 abstract class GSharpCompilerComponent : ICompileTimeErrorHandler{

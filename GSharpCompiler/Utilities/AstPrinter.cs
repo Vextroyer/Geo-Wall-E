@@ -1,7 +1,7 @@
 /*
 Return an string representation of an Abstract Syntax Tree(AST)
 */
-namespace Frontend;
+namespace GSharpCompiler;
 
 class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
     public string Print(Stmt stmt){

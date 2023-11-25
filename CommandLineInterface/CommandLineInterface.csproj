@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Frontend\Frontend.csproj" />
+    <ProjectReference Include="..\GSharpCompiler\GSharpCompiler.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

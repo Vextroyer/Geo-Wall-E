@@ -1,7 +1,7 @@
 /*
 On this class are defined the different objects that exist on a G# program execution.
 */
-namespace Frontend;
+namespace GSharpCompiler;
 
 //Represents G# objects that can be drawed on screen. Not every object can be drawed.
 public interface IDrawable{}

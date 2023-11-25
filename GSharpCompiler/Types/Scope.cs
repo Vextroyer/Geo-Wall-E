@@ -6,7 +6,7 @@ Arguments can change the value they are associated to.
 Constants cant change that value.
 */
 
-namespace Frontend;
+namespace GSharpCompiler;
 
 /*
 Its convenient to have a generic type for the scope because in the case of the interpreter

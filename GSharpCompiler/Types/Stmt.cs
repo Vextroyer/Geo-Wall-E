@@ -1,7 +1,7 @@
 /*
 Statements are instructions that modify the state of the program.
 */
-namespace Frontend;
+namespace GSharpCompiler;
 
 
 interface IVisitorStmt<T, U>
@@ -100,9 +100,9 @@ abstract class Stmt : IVisitableStmt
     //Color statement
     public class Color : Stmt
     {
-        public Frontend.Color _Color { get; private set; }
+        public GSharpCompiler.Color _Color { get; private set; }
         public bool IsRestore { get; private set; }
-        public Color(int line, int offset, Frontend.Color _color, bool _restore = false) : base(line, offset)
+        public Color(int line, int offset, GSharpCompiler.Color _color, bool _restore = false) : base(line, offset)
         {
             _Color = _color;
             IsRestore = _restore;

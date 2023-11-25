@@ -2,7 +2,7 @@
 This class receives an AST an executes the stamentes it represents.
 */
 
-namespace Frontend;
+namespace GSharpCompiler;
 
 class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Element>
 {

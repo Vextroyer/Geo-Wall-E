@@ -5,7 +5,7 @@ The type checker doesnt create new elements, it just uses the constants
 provided on the Element class to represent the objects.
 */
 
-namespace Frontend;
+namespace GSharpCompiler;
 
 class TypeChecker : IVisitorStmt<object?,Element>, IVisitorExpr<Element,Element>
 {

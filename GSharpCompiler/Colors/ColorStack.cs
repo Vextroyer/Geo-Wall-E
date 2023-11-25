@@ -2,7 +2,7 @@
 This data structure is a stack of colors.
 Its never empty,because it always has the black color at the bottom.
 */
-namespace Frontend;
+namespace GSharpCompiler;
 
 class ColorStack{
     //The stack behaviour is emulated using a list.

@@ -1,7 +1,7 @@
 /*
 This file contain the different colors that can be used to paint.
 */
-namespace Frontend;
+namespace GSharpCompiler;
 
 public enum Color{
     BLACK,

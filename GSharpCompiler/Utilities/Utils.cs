@@ -1,4 +1,4 @@
-namespace Frontend;
+namespace GSharpCompiler;
 ///<summary>Utility methods for namespace classes.</summary>
 static class Utils{
     ///<summary>Print the output of the Scanner.</summary>

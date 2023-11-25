@@ -3,7 +3,7 @@ Expressions are instructions that represents values.
 On this case expressions represent elements.
 */
 
-namespace Frontend;
+namespace GSharpCompiler;
 
 interface IVisitorExpr<T,U>{
     public T VisitNumberExpr(Expr.Number expr,Scope<U> scope);
