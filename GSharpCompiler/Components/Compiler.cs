@@ -52,7 +52,7 @@ public static class Compiler
             if(errors.Count > 0)throw new ParserException();
 
             //Check the semantic of the program.
-            new TypeChecker().Check(program);
+            new TypeChecker(flags.MaxErrorCount,errors).Check(program);
 
             //If errors where found stop the compilation process.
             if(errors.Count > 0)throw new TypeCheckerException();

@@ -13,10 +13,10 @@ abstract class RuntimeException : GSharpException{}
 class ScannerException : CompileTimeException{}
 ///<summary>Exception throwed by the parser to signal errors.</summary>
 class ParserException : CompileTimeException {}
-///<summary>Signals the parser that an error has occurred but the parsing should continue.</summary>
-class RecoveryModeException : ParserException {};
 ///<summary>Exception throwed by the type checker to signal errors.</summary>
 class TypeCheckerException : CompileTimeException{}
+///<summary>Signals the CompilerComponent that an error has occurred but the excecution should continue.</summary>
+class RecoveryModeException : CompileTimeException{}
 ///<summary>Exception throwed by the interpreter to signal errors.</summary>
 class InterpreterException : RuntimeException{}
 
