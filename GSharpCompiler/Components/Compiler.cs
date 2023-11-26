@@ -60,14 +60,17 @@ public static class Compiler
             //Interpret the program to produce drawable objects.
             elements = new Interpreter(flags.OutputStream).Interpret(program);
         }
-        catch (GSharpException){}
-        catch (ExtendedException e){
+        catch(CompileTimeException){
+            //Scanner,Parser,TypeChecker
+        }
+        catch(RuntimeException e){
             errors.Add(new Error(e.Line,e.Offset,e.Message));
         }
         catch (Exception e)
         {
-            //Do something on unexpected exceptions catched.
-            Console.WriteLine(e);
+            //Write exception to log.
+            errors.Add(new Error(0,0,"Unexpected error, check log and report to developers"));
+            Utils.AppendToLog(e);
         }
 
         return new Response(errors,elements);

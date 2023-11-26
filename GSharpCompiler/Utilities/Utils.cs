@@ -54,4 +54,8 @@ static class Utils{
 
         return System.Text.Encoding.Default.GetString(File.ReadAllBytes(path));
     }
+
+    public static void AppendToLog(Exception e){
+        File.AppendText("log").Write($"\n{e}\n");
+    }
 }

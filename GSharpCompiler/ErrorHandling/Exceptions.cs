@@ -1,11 +1,20 @@
 namespace GSharpCompiler;
 
 ///<summary>Base class for all compiler defined exceptions.</summary>
-abstract class GSharpException : System.Exception{}
+abstract class GSharpException : Exception{
+    public GSharpException(string message=""):base(message){}
+}
 ///<summary>Base class for compile-time exceptions.</summary>
 abstract class CompileTimeException : GSharpException{}
 ///<summary>Base class for runtime exceptions.</summary>
-abstract class RuntimeException : GSharpException{}
+class RuntimeException : GSharpException{
+    public int Line {get; private set;}
+    public int Offset { get; private set;}
+    public RuntimeException(int line,int offset,string message):base(message){
+        Line = line;
+        Offset=offset;
+    }
+}
 
 //Exceptions for each of the components of the compiler.
 
@@ -17,14 +26,3 @@ class ParserException : CompileTimeException {}
 class TypeCheckerException : CompileTimeException{}
 ///<summary>Signals the CompilerComponent that an error has occurred but the excecution should continue.</summary>
 class RecoveryModeException : CompileTimeException{}
-///<summary>Exception throwed by the interpreter to signal errors.</summary>
-class InterpreterException : RuntimeException{}
-
-class ExtendedException : System.Exception{
-    public int Line {get; private set;}
-    public int Offset { get; private set;}
-    public ExtendedException(int line,int offset,string message):base(message){
-        Line = line;
-        Offset=offset;
-    }
-}

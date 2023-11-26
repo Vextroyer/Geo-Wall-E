@@ -51,7 +51,7 @@ class TypeChecker :GSharpCompilerComponent, IVisitorStmt<object?,Element>, IVisi
     }
     public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declStmt,Scope<Element> scope){
         try{
-            if(scope.IsConstant(declStmt.Id.Lexeme))throw new ExtendedException(declStmt.Line,declStmt.Offset,$"Redeclaration of constant {declStmt.Id.Lexeme}");//Rule 1
+            if(scope.IsConstant(declStmt.Id.Lexeme))OnErrorFound(declStmt.Line,declStmt.Offset,$"Redeclaration of constant {declStmt.Id.Lexeme}");//Rule 1
             Element rValue = Check(declStmt.Rvalue,scope);
             scope.SetConstant(declStmt.Id.Lexeme,rValue);
         }

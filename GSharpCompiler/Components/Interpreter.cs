@@ -127,14 +127,14 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope<Element> scope){
         Element.Number left = (Element.Number) Evaluate(divisionExpr.Left,scope);
         Element.Number right = (Element.Number) Evaluate(divisionExpr.Right,scope);
-        if(right.Value == 0.0f)throw new ExtendedException(divisionExpr.Line,divisionExpr.Operator.Offset,"Division by 0");
+        if(right.Value == 0.0f)throw new RuntimeException(divisionExpr.Line,divisionExpr.Operator.Offset,"Division by 0");
         return left / right;
     }
 
     public Element VisitBinaryModulusExpr(Expr.Binary.Modulus modulusExpr, Scope<Element> scope){
         Element.Number left = (Element.Number) Evaluate(modulusExpr.Left,scope);
         Element.Number right = (Element.Number) Evaluate(modulusExpr.Right,scope);
-        if(right.Value == 0.0f)throw new ExtendedException(modulusExpr.Line,modulusExpr.Operator.Offset,"Division by 0");
+        if(right.Value == 0.0f)throw new RuntimeException(modulusExpr.Line,modulusExpr.Operator.Offset,"Division by 0");
         return left % right;
     }
 
