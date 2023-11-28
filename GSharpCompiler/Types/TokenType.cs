@@ -1,9 +1,5 @@
-/*
-Represents the different kinds of tokens on G#.
-*/
-
-namespace Frontend;
-
+namespace GSharpCompiler;
+///<summary>Represents the different kinds of tokens on G#.</summary>
 enum TokenType{
     //Grouping symbols.
     LEFT_PAREN,RIGHT_PAREN,
@@ -13,6 +9,9 @@ enum TokenType{
 
     //If-then-else expression.
     IF,THEN,ELSE,AND,OR,
+
+    //Let-In expression
+    LET,IN,
 
     //Control symbols.
     COMMA, SEMICOLON,

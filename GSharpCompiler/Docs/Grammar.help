@@ -1,4 +1,6 @@
-Program = Stmt*;
+Program = StmtList;//A program is a list of statements.
+
+StmtList = Stmt*; //A list of statements is zero or more statements.
 
 Stmt = PointStmt ';'; //Point statement
     PointStmt = 'point' ('(' NUMBER ',' NUMBER ')')? ID STRING?;
@@ -12,11 +14,14 @@ Stmt = ('color' COLOR) | 'restore' ';'; //Color statement
 
 Stmt = 'draw' Expr ';'; //Draw statement
 
-//Set of the terminals that made the first word of the stmt production.
-First(stmt) = { 'point' , ID , 'print', 'color', 'restore' , 'draw' }
+Stmt = ';'; //The empty statement
 
-Expr = Conditional;
-Conditional = ('if'  Expr  'then' Expr 'else' Expr) | Or;
+//Set of the terminals that made the first word of the stmt production.
+First(stmt) = { ';' , 'point' , ID , 'print', 'color', 'restore' , 'draw' }
+
+Expr = Conditional | Let-In | Or;
+Let-In = 'let' StmtList 'in' Expr);
+Conditional = 'if'  Expr  'then' Expr 'else' Expr;
 Or = And ( ( '|' | 'or') And)*;
 And = Equality ( ( '&' | 'and' )  Equality)*;
 Equality = Comparison ( ('==' | '!=') Comparison)?;

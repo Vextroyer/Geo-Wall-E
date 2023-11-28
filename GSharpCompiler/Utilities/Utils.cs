@@ -1,17 +1,19 @@
-/*
-Several utility methods and features.
-*/
-
-namespace Frontend;
-
+namespace GSharpCompiler;
+///<summary>Utility methods for namespace classes.</summary>
 static class Utils{
-    //Used for printing the output of the Scanner
+    ///<summary>Print the output of the Scanner.</summary>
+    ///<param name="tokens">The scanner output</param>
+    ///<param name="outputStream">A stream to print to.</param>
     public static void PrintTokens(List<Token> tokens, TextWriter outputStream){
+        outputStream.WriteLine("Scanner output : Begin");
         outputStream.WriteLine("{");
         foreach(Token t in tokens)outputStream.WriteLine("\t" + t);
         outputStream.WriteLine("}");
+        outputStream.WriteLine("Scanner output : End");
     }
-    //Used for printing the output of the Parser
+    ///<summary>Print the output of the Parser</summary>
+    ///<param name="program">The parser output.</param>
+    ///<param name="outputStream">A stream to print to.</param>
     public static void PrintAst(Program program, TextWriter outputStream){
         bool usingConsole = outputStream == Console.Out;
         AstPrinter printer = new AstPrinter();
@@ -33,12 +35,13 @@ static class Utils{
     //Random point generation
     private static Random random = new Random();//Stores a random for future usage.
     private static int MaxPointCoordinate = 1000;//Represents the maximum absolute value of point coordinates
-    //Generate an integer on the range [-MaxPointCoordinate,MaxPointCoordinate]
+    ///<summary>Generate an integer on the range [-MaxPointCoordinate,MaxPointCoordinate]</summary>
     public static int RandomCoordinate(){
         return (random.Next() % (2 * MaxPointCoordinate + 1)) - MaxPointCoordinate;
     }
 
-    //Returns the contents of a file as an string. Its used to retrieve the content of a file. Throws an error if the file cant be oppened.
+    ///<summary>Returns the contents of a file as an string. Its used to retrieve the content of a file. Throws an error if the file cant be oppened.</summary>
+    ///<param name="path">The path to the file.</summary>
     public static string GetSourceFromFile(string path){
         path = Path.GetFullPath(path);//Convert the path to absolute path, this is to support relative paths
 
@@ -50,5 +53,10 @@ static class Utils{
         // return source;
 
         return System.Text.Encoding.Default.GetString(File.ReadAllBytes(path));
+    }
+
+    public static void AppendToLog(Exception e){
+        string logMessage = $"\n{System.DateTime.Now}\n{e.Message}\n{e.StackTrace}\n";
+        File.AppendAllText("log",logMessage);
     }
 }

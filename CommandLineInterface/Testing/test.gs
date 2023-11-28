@@ -99,3 +99,87 @@ print if (true) then 5 else 6;
 print if (false) then 5 else 6;
 print 2 + (if (2 <= 3) then 5 ^ 3 else 24 / 14.3);
 print (if("Pedrito" == "Calvo") then 54 else 27 ^ (2 + 1) - 1) % 27;
+print let in 2;
+
+print let
+        a = 2;
+        b = 3;
+        c = 7;
+      in
+        a * c - b;
+
+print let ;;;;;;;;; in -27;
+
+print let
+        a = let 
+                b = if 2 + 3 < 5 then 1 else (2-3)^5;
+                c = let
+                        k = 3 + b * b;
+                    in
+                        k * k;
+            in
+                - b - c;
+      in
+        987 * a;
+
+
+print let
+        point p1 "Iam p1";
+        a = let
+                point p2 "Iam p2";
+                point p1 "Iam p1 inside let in";
+            in 5;
+      in a;  
+
+print if (let x = 2; in x * x) < 4 then "Oh no, its bugged" else "Woooo, it works";
+
+print let a = 1; b = 2; in a + b;
+
+print let var = 5; in 6;
+
+print let var = 5; in var;
+
+print 2 + (let var1 = 5; var2 = 7; in (var1 * var2) ^ 2 );
+
+print let a = "number"; b="two"; in a;
+
+print let a = 2; in a + (let b = 3; in b + (let c = 4; in c));
+
+print let moves = "e4xd5"; in if(moves == "e4xd5") then "Scandinavian defense" else "Cant figure it out";
+
+print let moves = "e3xd5"; in if(moves == "e4xd5") then "Scandinavian defense" else "Cant figure it out";
+
+print true | false | true;
+
+print let x = 12; in x == 9 | x == 10 | x == 11 | x == 12;
+
+print true & false & true;
+
+print let x = 12; in x == 9 & x == 10 & x == 11 & x == 12;
+
+print let a = 2; b = 4; c = "pedrito"; in (a == b) != c;
+
+print let a = 2; b = 4; c = "pedrito"; in a == (b != c);
+
+print   let
+            a = let
+                c = 4;
+            in c;
+            b = let
+                c = 5; // válido
+            in c;
+        in a + b;
+
+print 
+    let
+        a = let
+            b = 4;
+        in b;
+        b = let // Es válido porque está declarada luego del hijo que la usa
+            c = 5;
+        in c;
+    in a + b;
+
+print let a = 1; in let b = 2; in let c = 3; in let d = 4; in let e = 5; in a + b + c + d + e;
+
+print 4 ^ 3 ^ 2;

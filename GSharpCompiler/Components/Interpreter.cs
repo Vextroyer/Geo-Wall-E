@@ -2,7 +2,7 @@
 This class receives an AST an executes the stamentes it represents.
 */
 
-namespace Frontend;
+namespace GSharpCompiler;
 
 class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Element>
 {
@@ -26,16 +26,24 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     //Interpret a program.
     public List<IDrawable> Interpret(Program program)
     {
-        foreach (Stmt stmt in program.Stmts)
-        {
-            Interpret(stmt, globalScope);
-        }
+        Interpret(program.Stmts,globalScope);
         return drawables;
     }
     #region Interpret statements
     private object? Interpret(Stmt stmt, Scope<Element> scope)
     {
         stmt.Accept(this, scope);
+        return null;
+    }
+    public object? VisitStmtList(Stmt.StmtList stmtList, Scope<Element> scope){
+        foreach (Stmt stmt in stmtList)
+        {
+            Interpret(stmt, scope);
+        }
+        return null;
+    }
+    public object? VisitEmptyStmt(Stmt.Empty emptyStmt, Scope<Element> scope)
+    {
         return null;
     }
     public object? VisitPointStmt(Stmt.Point point, Scope<Element> scope)
@@ -50,7 +58,8 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     }
     public object? VisitPrintStmt(Stmt.Print stmt, Scope<Element> scope)
     {
-        outputStream.WriteLine(Evaluate(stmt._Expr, scope));
+        if(stmt._Expr == Expr.EMPTY)outputStream.WriteLine();
+        else outputStream.WriteLine(Evaluate(stmt._Expr, scope));
         return null;
     }
     public object? VisitColorStmt(Stmt.Color stmt, Scope<Element> scope)
@@ -75,6 +84,10 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     public Element Evaluate(Expr expr, Scope<Element> scope)
     {
         return expr.Accept(this, scope);
+    }
+    
+    public Element VisitEmptyExpr(Expr.Empty expr,Scope<Element> scope){
+        return Element.UNDEFINED;
     }
 
     public Element VisitNumberExpr(Expr.Number expr, Scope<Element> scope)
@@ -118,14 +131,14 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope<Element> scope){
         Element.Number left = (Element.Number) Evaluate(divisionExpr.Left,scope);
         Element.Number right = (Element.Number) Evaluate(divisionExpr.Right,scope);
-        if(right.Value == 0.0f)throw new ExtendedException(divisionExpr.Line,divisionExpr.Operator.Offset,"Division by 0");
+        if(right.Value == 0.0f)throw new RuntimeException(divisionExpr.Line,divisionExpr.Operator.Offset,"Division by 0");
         return left / right;
     }
 
     public Element VisitBinaryModulusExpr(Expr.Binary.Modulus modulusExpr, Scope<Element> scope){
         Element.Number left = (Element.Number) Evaluate(modulusExpr.Left,scope);
         Element.Number right = (Element.Number) Evaluate(modulusExpr.Right,scope);
-        if(right.Value == 0.0f)throw new ExtendedException(modulusExpr.Line,modulusExpr.Operator.Offset,"Division by 0");
+        if(right.Value == 0.0f)throw new RuntimeException(modulusExpr.Line,modulusExpr.Operator.Offset,"Division by 0");
         return left % right;
     }
 
@@ -190,6 +203,12 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     public Element VisitConditionalExpr(Expr.Conditional conditionalExpr, Scope<Element> scope){
         if( IsTruthy(Evaluate(conditionalExpr.Condition,scope)) == Element.TRUE ) return Evaluate(conditionalExpr.ThenBranchExpr,scope);
         return Evaluate(conditionalExpr.ElseBranchExpr,scope);
+    }
+
+    public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope<Element> scope){
+        Scope<Element> letInScope = new Scope<Element>(scope);
+        foreach(Stmt stmt in letInExpr.LetStmts)Interpret(stmt,letInScope);
+        return Evaluate(letInExpr.InExpr,letInScope);
     }
     #endregion Interpret expressions
 

@@ -3,9 +3,10 @@ Expressions are instructions that represents values.
 On this case expressions represent elements.
 */
 
-namespace Frontend;
+namespace GSharpCompiler;
 
 interface IVisitorExpr<T,U>{
+    public T VisitEmptyExpr(Expr.Empty expr, Scope<U> scope);
     public T VisitNumberExpr(Expr.Number expr,Scope<U> scope);
     public T VisitStringExpr(Expr.String expr,Scope<U> scope);
     public T VisitVariableExpr(Expr.Variable expr,Scope<U> scope);
@@ -26,6 +27,7 @@ interface IVisitorExpr<T,U>{
     public T VisitBinaryAndExpr(Expr.Binary.And expr,Scope<U> scope);
     public T VisitBinaryOrExpr(Expr.Binary.Or expr,Scope<U> scope);
     public T VisitConditionalExpr(Expr.Conditional expr,Scope<U> scope);
+    public T VisitLetInExpr(Expr.LetIn expr, Scope<U> scope);
 }
 interface IVisitableExpr{
     public T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope);
@@ -48,7 +50,7 @@ abstract class Expr : IVisitableExpr{
         public Empty():base(0,0){}
         public override T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope)
         {
-            throw new NotImplementedException();
+            return visitor.VisitEmptyExpr(this,scope);
         }
     }
     public static Empty EMPTY = new Empty();//This is the empty expression.
@@ -113,6 +115,49 @@ abstract class Expr : IVisitableExpr{
     }
     //Base class for binary operators.
     public abstract class Binary : Expr{
+        ///<summary>Determine the specialization of Expr.Binary to be created for the given operator.For example 
+        ///`GetTypeFromOperation(TokenType.PLUS);` returns Expr.Binary.Sum</summary>
+        ///<returns>A Type derived from Expr.Binary.</returns>
+        private static Type GetTypeFromOperation(TokenType operationType){
+            switch(operationType){
+                case TokenType.CARET:
+                    return typeof(Expr.Binary.Power);
+                case TokenType.STAR:
+                    return typeof(Expr.Binary.Product);
+                case TokenType.SLASH:
+                    return typeof(Expr.Binary.Division);
+                case TokenType.PERCENT:
+                    return typeof(Expr.Binary.Modulus);
+                case TokenType.PLUS:
+                    return typeof(Expr.Binary.Sum);
+                case TokenType.MINUS:
+                    return typeof(Expr.Binary.Difference);
+                case TokenType.LESS:
+                    return typeof(Expr.Binary.Less);
+                case TokenType.LESS_EQUAL:
+                    return typeof(Expr.Binary.LessEqual);
+                case TokenType.GREATER:
+                    return typeof(Expr.Binary.Greater);
+                case TokenType.GREATER_EQUAL:
+                    return typeof(Expr.Binary.GreaterEqual);
+                case TokenType.EQUAL_EQUAL:
+                    return typeof(Expr.Binary.EqualEqual);
+                case TokenType.BANG_EQUAL:
+                    return typeof(Expr.Binary.NotEqual);
+                case TokenType.AND:
+                    return typeof(Expr.Binary.And);
+                case TokenType.OR:
+                    return typeof(Expr.Binary.Or);
+                default: throw new ArgumentException($"No type matching operation of type {operationType}");
+            }
+        }
+        ///<summary>Build a binary expression according to the given operation.</summary>
+        public static Expr.Binary MakeBinaryExpr(int line,int offset,Token operation,Expr left,Expr right){
+            Type binaryExprType = GetTypeFromOperation(operation.Type);
+            //Create an object derived from Expr.Binary
+            Expr.Binary binaryExpr = (Activator.CreateInstance(binaryExprType,line,offset,operation,left,right) as Expr.Binary)!;
+            return binaryExpr;
+        }
         public Expr Left {get; private set;}
         public Expr Right {get; private set;}
         public Token Operator {get; private set;}
@@ -249,6 +294,21 @@ abstract class Expr : IVisitableExpr{
         public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
         {
             return visitor.VisitConditionalExpr(this,scope);
+        }
+    }
+    //Let-in expressions
+    public class LetIn : Expr{
+        ///<summary>The statements after the `let` keyword.</summary>
+        public Stmt.StmtList LetStmts {get; private set;}
+        ///<summary>The expression after the `in` keyword.</summary>
+        public Expr InExpr {get; private set;}
+        public LetIn(int line,int offset,Stmt.StmtList stmts,Expr expr):base(line,offset){
+            LetStmts = stmts;
+            InExpr = expr;
+        }
+        public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitLetInExpr(this,scope);
         }
     }
 }

@@ -1,11 +1,23 @@
 /*
 Return an string representation of an Abstract Syntax Tree(AST)
 */
-namespace Frontend;
+namespace GSharpCompiler;
 
 class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
     public string Print(Stmt stmt){
         return stmt.Accept(this,null);
+    }
+
+    public string VisitStmtList(Stmt.StmtList stmtList, Scope<Element> scope){
+        string result = "";
+        foreach(Stmt stmt in stmtList){
+            result += Print(stmt) + "\n";
+        }
+        return result;
+    }
+
+    public string VisitEmptyStmt(Stmt.Empty stmt,Scope<Element> scope){
+        return "EMPTY";
     }
 
     public string VisitPointStmt(Stmt.Point stmt,Scope<Element> scope){
@@ -32,6 +44,10 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
   
     public string Print(Expr expr){
         return expr.Accept(this,null);
+    }
+
+    public string VisitEmptyExpr(Expr.Empty expr,Scope<Element> scope){
+        return "EMPTY";
     }
 
     public string VisitNumberExpr(Expr.Number expr,Scope<Element> scope){
@@ -119,5 +135,9 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
 
     public string VisitConditionalExpr(Expr.Conditional expr, Scope<Element> scope){
         return $"if {Print(expr.Condition)}\nthen {Print(expr.ThenBranchExpr)}\nelse {Print(expr.ElseBranchExpr)}";
+    }
+
+    public string VisitLetInExpr(Expr.LetIn expr, Scope<Element> scope){
+        return $"let({Print(expr.LetStmts)})\nin({Print(expr.InExpr)})";
     }
 }

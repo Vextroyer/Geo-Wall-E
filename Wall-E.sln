@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "Frontend\Frontend.csproj", "{FD0FACF1-A138-470D-B6D8-966C65384B89}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandLineInterface", "CommandLineInterface\CommandLineInterface.csproj", "{C1FA057B-5202-4412-B653-74A277AD39E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSharpCompiler", "GSharpCompiler\GSharpCompiler.csproj", "{6E0C7EE7-8C56-4CC8-B22E-1A41C9FE377E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,13 +16,13 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FD0FACF1-A138-470D-B6D8-966C65384B89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FD0FACF1-A138-470D-B6D8-966C65384B89}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FD0FACF1-A138-470D-B6D8-966C65384B89}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FD0FACF1-A138-470D-B6D8-966C65384B89}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C1FA057B-5202-4412-B653-74A277AD39E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C1FA057B-5202-4412-B653-74A277AD39E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1FA057B-5202-4412-B653-74A277AD39E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1FA057B-5202-4412-B653-74A277AD39E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E0C7EE7-8C56-4CC8-B22E-1A41C9FE377E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E0C7EE7-8C56-4CC8-B22E-1A41C9FE377E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E0C7EE7-8C56-4CC8-B22E-1A41C9FE377E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E0C7EE7-8C56-4CC8-B22E-1A41C9FE377E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

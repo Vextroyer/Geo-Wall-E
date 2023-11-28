@@ -3,7 +3,7 @@ This is a CLI to the G# compiler.
 */
 namespace Realend;
 
-using Frontend;
+using GSharpCompiler;
 
 class Client{
     public static void Main(string[] args){
@@ -22,8 +22,9 @@ class Client{
     Provides support for different modes of using the application.
     */
     private static void SelectMode(string[] args){
-        Frontend.GSharpCompiler.Flags flags = new GSharpCompiler.Flags();
+        GSharpCompiler.Compiler.Flags flags = new GSharpCompiler.Compiler.Flags();
         if(args.Contains("--noDebug"))flags.PrintDebugInfo = false;
+        if(args.Contains("--SetMaxErrorCount"))flags.MaxErrorCount = 5;//Use 5 errors by default.
         if(args.Contains("--runRepl"))RunREPL(flags);
         else if(args.Contains("--runTest"))RunTest(flags);
         else RunFromFile(flags);//Default behaviour.
@@ -31,26 +32,26 @@ class Client{
     /*
     This mode establish a REPL session with the user.
     */
-    private static void RunREPL(Frontend.GSharpCompiler.Flags flags){
+    private static void RunREPL(Compiler.Flags flags){
         while(true){
             Console.Write("> ");
             string? source = Console.ReadLine();//The code inputed by the user.
             if(string.IsNullOrEmpty(source))continue;//User just pressed enter or hit to many spaces.
-            Frontend.GSharpCompiler.Response compilerResponse = Frontend.GSharpCompiler.CompileFromSource(source,flags);
+            Compiler.Response compilerResponse = Compiler.CompileFromSource(source,flags);
             HandleError(compilerResponse);
         }
     }
     /*
     This mode asks user to input a file and then executes the script on the file and shows the output.
     */
-    private static void RunFromFile(Frontend.GSharpCompiler.Flags flags){
+    private static void RunFromFile(Compiler.Flags flags){
         Console.WriteLine("Provide files to execute");
         while(true){
             Console.Write("> ");
             string? path = Console.ReadLine();//The path to the file
             if(string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path))continue;//User just pressed enter or hit to many spaces.
             
-            Frontend.GSharpCompiler.Response compilerResponse = Frontend.GSharpCompiler.CompileFromFile(path,flags);
+            Compiler.Response compilerResponse = Compiler.CompileFromFile(path,flags);
             HandleError(compilerResponse);
         }
     }
@@ -58,7 +59,7 @@ class Client{
     This mode sends the `test.gs` file to the compiler and redirects its output to the `test.out` file, then compares the results
     from `test.out` with the supplied results at `test.results` and outputs the results.
     */
-    private static void RunTest(Frontend.GSharpCompiler.Flags flags){
+    private static void RunTest(GSharpCompiler.Compiler.Flags flags){
         flags.PrintDebugInfo = false;//You dont want debug info missing up with the results.
         
         //Paths are relative to the CommandLineInterface parent folder.        
@@ -69,7 +70,7 @@ class Client{
         flags.OutputStream = File.CreateText(testOut);//Set test.out to be the output stream.
 
         // Compile and run test.gs file, the output of print statements is written on test.out file
-        Frontend.GSharpCompiler.Response compilerResponse =  Frontend.GSharpCompiler.CompileFromFile(testGs,flags);
+        Compiler.Response compilerResponse =  Compiler.CompileFromFile(testGs,flags);
         HandleError(compilerResponse);
         //Flush the output stream
         flags.OutputStream.Flush();
@@ -98,12 +99,12 @@ class Client{
         else Console.WriteLine("Number of tests does not concords with the number of results.");
     }
     //Returns true if the compiler detected any error.
-    private static bool HandleError(Frontend.GSharpCompiler.Response compilerResponse){
+    private static bool HandleError(Compiler.Response compilerResponse){
         if(compilerResponse.HadError){
             if(compilerResponse.HadErrorReadingFile)ReportError(compilerResponse.Errors.Last().Message);
             else
             {
-                foreach(Frontend.GSharpCompiler.Error error in compilerResponse.Errors)
+                foreach(Error error in compilerResponse.Errors)
                 {
                     ReportError(error.Line,error.Offset,error.Message);
                 }

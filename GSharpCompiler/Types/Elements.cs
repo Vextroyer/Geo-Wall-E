@@ -1,7 +1,7 @@
 /*
 On this class are defined the different objects that exist on a G# program execution.
 */
-namespace Frontend;
+namespace GSharpCompiler;
 
 //Represents G# objects that can be drawed on screen. Not every object can be drawed.
 public interface IDrawable{}
@@ -22,6 +22,8 @@ public abstract class Element{
     public static Element.Number NUMBER = new Element.Number(0);
     public static Element.String STRING = new Element.String("");
     public static Element.Point POINT = new Element.Point(STRING,NUMBER,NUMBER,STRING);
+    ///<summary>Represents the undefined type. Use this instead of declaring new Undefined objects.</summary>
+    public static Element.Undefined UNDEFINED = new Element.Undefined();
     //Boolean values are represented with numbers
     public static Element.Number TRUE = new Element.Number(1);
     public static Element.Number FALSE = new Element.Number(0);
@@ -34,6 +36,15 @@ public abstract class Element{
     public Element.Number NotEqualTo(Element other){
         if(this.EqualTo(other) == Element.TRUE)return Element.FALSE;
         return Element.TRUE;
+    }
+    ///<summary>Represents the undefined type.</summary>
+    public class Undefined:Element{
+        public Undefined():base(ElementType.UNDEFINED){}
+        public override Number EqualTo(Element other)
+        {
+            if(other.Type == this.Type)return TRUE;
+            return FALSE;
+        }
     }
 
     //Represents a real number.

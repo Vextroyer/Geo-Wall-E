@@ -1,17 +1,18 @@
 /*
 Statements are instructions that modify the state of the program.
 */
-namespace Frontend;
-
+namespace GSharpCompiler;
+using System.Collections;
 
 interface IVisitorStmt<T, U>
 {
+    public T VisitEmptyStmt(Stmt.Empty stmt, Scope<U> scope);
     public T VisitPointStmt(Stmt.Point stmt, Scope<U> scope);
     public T VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt, Scope<U> scope);
     public T VisitPrintStmt(Stmt.Print stmt, Scope<U> scope);
     public T VisitColorStmt(Stmt.Color stmt, Scope<U> scope);
     public T VisitDrawStmt(Stmt.Draw stmt, Scope<U> scope);
-
+    public T VisitStmtList(Stmt.StmtList stmt, Scope<U> scope);
 }
 interface IVisitableStmt
 {
@@ -30,6 +31,16 @@ abstract class Stmt : IVisitableStmt
     }
     //Required to work in conjuction with the IVisitorStmt interface.
     abstract public T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope);
+    ///<summary>Represents an empty statement.</summary>
+    public class Empty : Stmt{
+        public Empty():base(0,0){}
+        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitEmptyStmt(this, scope);
+        }
+    }
+    ///<summary>A constant representing the empty statement. Should be used instead of creating new empty statements.</summary>
+    static public Stmt.Empty EMPTY = new Stmt.Empty();
     //Represents a `point` statement.
     public class Point : Stmt
     {
@@ -100,9 +111,9 @@ abstract class Stmt : IVisitableStmt
     //Color statement
     public class Color : Stmt
     {
-        public Frontend.Color _Color { get; private set; }
+        public GSharpCompiler.Color _Color { get; private set; }
         public bool IsRestore { get; private set; }
-        public Color(int line, int offset, Frontend.Color _color, bool _restore = false) : base(line, offset)
+        public Color(int line, int offset, GSharpCompiler.Color _color, bool _restore = false) : base(line, offset)
         {
             _Color = _color;
             IsRestore = _restore;
@@ -111,6 +122,48 @@ abstract class Stmt : IVisitableStmt
         public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
         {
             return visitor.VisitColorStmt(this, scope);
+        }
+    }
+
+    ///<summary>Represents a list of statements. Its a special kind of statement.</summary>
+    public class StmtList : Stmt , ICollection<Stmt>{
+        ///<summary>The statements that made the statement list.</summary>
+        private List<Stmt> stmts;
+        public StmtList(int line,int offset):base(line,offset){
+            this.stmts = new List<Stmt>();
+        }
+        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitStmtList(this,scope);
+        }
+        ///<summary>Provide access to the subyacent list enumerator.</summary>
+        public IEnumerator<Stmt> GetEnumerator(){
+            return stmts.GetEnumerator();
+        }
+        IEnumerator IEnumerable.GetEnumerator(){
+            return GetEnumerator();
+        }
+        ///<summary>Get the number of statements contained on the list.</summary>
+        public int Count {get => stmts.Count;}
+        ///<summary>Add the supplied statement to the list.</summary>
+        public void Add(Stmt stmt){
+            stmts.Add(stmt);
+        }
+        ///<summary>Removes all statements from the list.</summary>
+        public void Clear(){
+            stmts.Clear();
+        }
+        ///<summary>Determines wheter a statement is in the list.</summary>
+        ///<returns><c>True</c> if <c>stmt</c> is on the list, otherwise false.</returns>
+        public bool Contains(Stmt stmt){
+            return stmts.Contains(stmt);
+        }
+        public bool Remove(Stmt stmt){
+            return stmts.Remove(stmt);
+        }
+        public bool IsReadOnly {get => false;}
+        public void CopyTo(Stmt[] stmt,int arrayIndex){
+            stmts.CopyTo(stmt,arrayIndex);
         }
     }
 }
