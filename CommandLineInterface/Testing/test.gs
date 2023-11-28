@@ -181,3 +181,5 @@ print
     in a + b;
 
 print let a = 1; in let b = 2; in let c = 3; in let d = 4; in let e = 5; in a + b + c + d + e;
+
+print 4 ^ 3 ^ 2;
