@@ -56,6 +56,7 @@ static class Utils{
     }
 
     public static void AppendToLog(Exception e){
-        File.AppendText("log").Write($"\n{e}\n");
+        string logMessage = $"\n{System.DateTime.Now}\n{e.Message}\n{e.StackTrace}\n";
+        File.AppendAllText("log",logMessage);
     }
 }
