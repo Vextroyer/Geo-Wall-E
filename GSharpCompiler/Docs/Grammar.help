@@ -1,4 +1,6 @@
-Program = Stmt*;
+Program = StmtList;//A program is a list of statements.
+
+StmtList = Stmt*; //A list of statements is zero or more statements.
 
 Stmt = PointStmt ';'; //Point statement
     PointStmt = 'point' ('(' NUMBER ',' NUMBER ')')? ID STRING?;

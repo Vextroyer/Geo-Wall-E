@@ -8,6 +8,14 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
         return stmt.Accept(this,null);
     }
 
+    public string VisitStmtList(Stmt.StmtList stmtList, Scope<Element> scope){
+        string result = "";
+        foreach(Stmt stmt in stmtList){
+            result += Print(stmt) + "\n";
+        }
+        return result;
+    }
+
     public string VisitEmptyStmt(Stmt.Empty stmt,Scope<Element> scope){
         return "EMPTY";
     }

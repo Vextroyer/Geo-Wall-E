@@ -24,19 +24,23 @@ class TypeChecker :GSharpCompilerComponent, IVisitorStmt<object?,Element>, IVisi
     //Analyze the semantic of the program to see if it is correct.
     public void Check(Program program)
     {
-        foreach (Stmt stmt in program.Stmts)
-        {
-            try{
-                Check(stmt);
-            }
-            catch(RecoveryModeException){}//An entire statement has been discarded. This could be caused by a conditional expression, or an undeclared variable.
-        }
+        Check(program.Stmts);
     }
     private void Check(Stmt stmt)
     {
         stmt.Accept(this, globalScope);
     }
     //Checking statements
+    public object? VisitStmtList(Stmt.StmtList stmtList, Scope<Element> scope){
+        foreach (Stmt stmt in stmtList)
+        {
+            try{
+                Check(stmt);
+            }
+            catch(RecoveryModeException){}//An entire statement has been discarded. This could be caused by a conditional expression, or an undeclared variable.
+        }
+        return null;
+    }
     public object? VisitEmptyStmt(Stmt.Empty emptyStmt, Scope<Element> scope) {return null;}
     public object? VisitPointStmt(Stmt.Point pointStmt,Scope<Element> scope){
         try{   

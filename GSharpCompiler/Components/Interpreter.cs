@@ -26,16 +26,20 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     //Interpret a program.
     public List<IDrawable> Interpret(Program program)
     {
-        foreach (Stmt stmt in program.Stmts)
-        {
-            Interpret(stmt, globalScope);
-        }
+        Interpret(program.Stmts,globalScope);
         return drawables;
     }
     #region Interpret statements
     private object? Interpret(Stmt stmt, Scope<Element> scope)
     {
         stmt.Accept(this, scope);
+        return null;
+    }
+    public object? VisitStmtList(Stmt.StmtList stmtList, Scope<Element> scope){
+        foreach (Stmt stmt in stmtList)
+        {
+            Interpret(stmt, scope);
+        }
         return null;
     }
     public object? VisitEmptyStmt(Stmt.Empty emptyStmt, Scope<Element> scope)

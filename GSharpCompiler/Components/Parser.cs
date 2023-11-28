@@ -32,7 +32,7 @@ class Parser : GSharpCompilerComponent
     //Recursive descent parsing methods based on the grammar defined on Grammar file.
     private Program ParseProgram()
     {
-        List<Stmt> stmts = new List<Stmt>();
+        Stmt.StmtList stmts = new Stmt.StmtList(Peek.Line,Peek.Offset);
 
         while (!IsAtEnd)
         {
