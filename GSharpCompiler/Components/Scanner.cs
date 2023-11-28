@@ -132,7 +132,7 @@ class Scanner : GSharpCompilerComponent
             if(c == '\n')OnNewLineFound();//This is for supporting multi-line strings
         }
 
-        if(IsAtEnd) OnErrorFound(line,ComputeOffset,"A quote is missing");
+        if(IsAtEnd) OnErrorFound(openingQuoteLine,openingQuoteOffset,"Opening quote whitout enclosing quote found",true);
         Advance();//Consume the closing quote
 
         string value = source.Substring(start + 1,current - start - 2);//The string content without the enclosing quotes
