@@ -32,23 +32,23 @@ class Parser : GSharpCompilerComponent
     //Recursive descent parsing methods based on the grammar defined on Grammar file.
     private Program ParseProgram()
     {
+        return new Program(ParseStmtList());
+    }
+    private Stmt.StmtList ParseStmtList(TokenType stopAtThisType=TokenType.EOF){
         Stmt.StmtList stmts = new Stmt.StmtList(Peek.Line,Peek.Offset);
-
-        while (!IsAtEnd)
-        {
+        while(!IsAtEnd && Peek.Type != stopAtThisType){
             try{
                 Stmt tmp = ParseStmt();
                 if(tmp != Stmt.EMPTY)stmts.Add(tmp);//Do not add empty statements to a program.
-            }
-            catch(RecoveryModeException){
+            }catch(RecoveryModeException){
                 //On recovery mode the parser discards tokens until a `;` is found. After this semicolon a statement should be found.
-                while(!IsAtEnd && Peek.Type != TokenType.SEMICOLON)Advance();
+                //However, inside of a let-in statement list, the discard can be done until the `in` keyword is found.
+                while(!IsAtEnd && Peek.Type != TokenType.SEMICOLON && Peek.Type != stopAtThisType)Advance();
             }
         }
-
-        return new Program(stmts);
+        if(Peek.Type != stopAtThisType)OnErrorFound(Previous.Line,Previous.Offset,$"Unexpected EOF encountered, could not reach token of type {stopAtThisType}",true);
+        return stmts;
     }
-
     private Stmt ParseStmt(){
         Stmt aux = null;
         switch(Peek.Type){
@@ -181,23 +181,38 @@ class Parser : GSharpCompilerComponent
     
     #region Expression parsing
     private Expr ParseExpression(){
-        return ParseConditionalExpression();
+        switch(Peek.Type){
+            case TokenType.LET:
+                return ParseLetInExpression();
+            case TokenType.IF:
+                return ParseConditionalExpression();
+            default :
+                return ParseOrExpression();
+        }
+    }
+    private Expr ParseLetInExpression(){
+        Consume(TokenType.LET);
+        int line = Previous.Line;
+        int offset = Previous.Offset;
+        Stmt.StmtList stmts = ParseStmtList(TokenType.IN);
+        Consume(TokenType.IN);
+        Expr expr = ParseExpression();
+        ErrorIfEmpty(expr,line,offset,"Expected non-empty expression after `in` keyword");
+        return new Expr.LetIn(line,offset,stmts,expr);
     }
     private Expr ParseConditionalExpression(){
-        if(Match(TokenType.IF)){
-            int line = Previous.Line;
-            int offset = Previous.Offset;
-            Expr condition = ParseExpression();
-            ErrorIfEmpty(condition,line,offset,"Expected non-empty expression for condition");
-            Consume(TokenType.THEN,"Expected `then` keyword");
-            Expr thenBranchExpr = ParseExpression();
-            ErrorIfEmpty(thenBranchExpr,line,offset,"Expected non-empty expression after `then`");
-            Consume(TokenType.ELSE,"Expected `else` keyword");
-            Expr elseBranchExpr = ParseExpression();
-            ErrorIfEmpty(elseBranchExpr,line,offset,"Expected non-empty expression after `else`");
-            return new Expr.Conditional(line,offset,condition,thenBranchExpr,elseBranchExpr);
-        }
-        return ParseOrExpression();
+        Consume(TokenType.IF);
+        int line = Previous.Line;
+        int offset = Previous.Offset;
+        Expr condition = ParseExpression();
+        ErrorIfEmpty(condition,line,offset,"Expected non-empty expression for condition");
+        Consume(TokenType.THEN,"Expected `then` keyword");
+        Expr thenBranchExpr = ParseExpression();
+        ErrorIfEmpty(thenBranchExpr,line,offset,"Expected non-empty expression after `then`");
+        Consume(TokenType.ELSE,"Expected `else` keyword");
+        Expr elseBranchExpr = ParseExpression();
+        ErrorIfEmpty(elseBranchExpr,line,offset,"Expected non-empty expression after `else`");
+        return new Expr.Conditional(line,offset,condition,thenBranchExpr,elseBranchExpr);
     }
     private Expr ParseOrExpression(){
         Expr left = ParseAndExpression();

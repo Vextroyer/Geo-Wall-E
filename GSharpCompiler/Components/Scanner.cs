@@ -23,6 +23,8 @@ class Scanner : GSharpCompilerComponent
         {"else",TokenType.ELSE},
         {"and",TokenType.AND},
         {"or",TokenType.OR},
+        {"let",TokenType.LET},
+        {"in",TokenType.IN},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},

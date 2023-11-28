@@ -204,6 +204,12 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         if( IsTruthy(Evaluate(conditionalExpr.Condition,scope)) == Element.TRUE ) return Evaluate(conditionalExpr.ThenBranchExpr,scope);
         return Evaluate(conditionalExpr.ElseBranchExpr,scope);
     }
+
+    public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope<Element> scope){
+        Scope<Element> letInScope = new Scope<Element>(scope);
+        foreach(Stmt stmt in letInExpr.LetStmts)Interpret(stmt,letInScope);
+        return Evaluate(letInExpr.InExpr,letInScope);
+    }
     #endregion Interpret expressions
 
     //Determine if the given element is true or false. Undefined and 0 are false, everything else is true.

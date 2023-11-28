@@ -10,6 +10,9 @@ enum TokenType{
     //If-then-else expression.
     IF,THEN,ELSE,AND,OR,
 
+    //Let-In expression
+    LET,IN,
+
     //Control symbols.
     COMMA, SEMICOLON,
 

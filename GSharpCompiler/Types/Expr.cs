@@ -27,6 +27,7 @@ interface IVisitorExpr<T,U>{
     public T VisitBinaryAndExpr(Expr.Binary.And expr,Scope<U> scope);
     public T VisitBinaryOrExpr(Expr.Binary.Or expr,Scope<U> scope);
     public T VisitConditionalExpr(Expr.Conditional expr,Scope<U> scope);
+    public T VisitLetInExpr(Expr.LetIn expr, Scope<U> scope);
 }
 interface IVisitableExpr{
     public T Accept<T,U>(IVisitorExpr<T,U> visitor,Scope<U> scope);
@@ -250,6 +251,21 @@ abstract class Expr : IVisitableExpr{
         public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
         {
             return visitor.VisitConditionalExpr(this,scope);
+        }
+    }
+    //Let-in expressions
+    public class LetIn : Expr{
+        ///<summary>The statements after the `let` keyword.</summary>
+        public Stmt.StmtList LetStmts {get; private set;}
+        ///<summary>The expression after the `in` keyword.</summary>
+        public Expr InExpr {get; private set;}
+        public LetIn(int line,int offset,Stmt.StmtList stmts,Expr expr):base(line,offset){
+            LetStmts = stmts;
+            InExpr = expr;
+        }
+        public override T Accept<T, U>(IVisitorExpr<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitLetInExpr(this,scope);
         }
     }
 }

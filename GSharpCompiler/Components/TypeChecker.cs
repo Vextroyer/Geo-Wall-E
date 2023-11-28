@@ -24,18 +24,18 @@ class TypeChecker :GSharpCompilerComponent, IVisitorStmt<object?,Element>, IVisi
     //Analyze the semantic of the program to see if it is correct.
     public void Check(Program program)
     {
-        Check(program.Stmts);
+        Check(program.Stmts,globalScope);
     }
-    private void Check(Stmt stmt)
+    private void Check(Stmt stmt, Scope<Element> scope)
     {
-        stmt.Accept(this, globalScope);
+        stmt.Accept(this, scope);
     }
     //Checking statements
     public object? VisitStmtList(Stmt.StmtList stmtList, Scope<Element> scope){
         foreach (Stmt stmt in stmtList)
         {
             try{
-                Check(stmt);
+                Check(stmt,scope);
             }
             catch(RecoveryModeException){}//An entire statement has been discarded. This could be caused by a conditional expression, or an undeclared variable.
         }
@@ -199,5 +199,11 @@ class TypeChecker :GSharpCompilerComponent, IVisitorStmt<object?,Element>, IVisi
         if(thenBranchElement.Type != elseBranchElement.Type)OnErrorFound(conditionalExpr.Line,conditionalExpr.Offset,$"Expected equal return types for `if-then-else` expression branches, but {thenBranchElement.Type} and {elseBranchElement.Type} were found.");
         //This error can't be recovered here, it will be recovered on a lower node of the syntax tree.
         return thenBranchElement;
+    }
+    public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope<Element> scope){
+        Scope<Element> letInScope = new Scope<Element>(scope);
+        foreach(Stmt stmt in letInExpr.LetStmts)Check(stmt,letInScope);
+        Element inExprElement = Check(letInExpr.InExpr,letInScope);
+        return inExprElement;
     }
 }

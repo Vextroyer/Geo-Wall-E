@@ -19,8 +19,9 @@ Stmt = ';'; //The empty statement
 //Set of the terminals that made the first word of the stmt production.
 First(stmt) = { ';' , 'point' , ID , 'print', 'color', 'restore' , 'draw' }
 
-Expr = Conditional;
-Conditional = ('if'  Expr  'then' Expr 'else' Expr) | Or;
+Expr = Conditional | Let-In | Or;
+Let-In = 'let' StmtList 'in' Expr);
+Conditional = 'if'  Expr  'then' Expr 'else' Expr;
 Or = And ( ( '|' | 'or') And)*;
 And = Equality ( ( '&' | 'and' )  Equality)*;
 Equality = Comparison ( ('==' | '!=') Comparison)?;

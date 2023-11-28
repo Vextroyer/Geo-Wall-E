@@ -136,4 +136,8 @@ class AstPrinter : IVisitorStmt<string,Element>, IVisitorExpr<string,Element>{
     public string VisitConditionalExpr(Expr.Conditional expr, Scope<Element> scope){
         return $"if {Print(expr.Condition)}\nthen {Print(expr.ThenBranchExpr)}\nelse {Print(expr.ElseBranchExpr)}";
     }
+
+    public string VisitLetInExpr(Expr.LetIn expr, Scope<Element> scope){
+        return $"let({Print(expr.LetStmts)})\nin({Print(expr.InExpr)})";
+    }
 }
