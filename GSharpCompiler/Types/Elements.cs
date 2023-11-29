@@ -210,7 +210,7 @@ public abstract class Element
 
         public Color Color { get; private set; }
 
-        public Lines(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.POINT)
+        public Lines(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.LINE)
         {
             name = _name;
             comment = _comment;
