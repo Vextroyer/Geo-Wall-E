@@ -89,6 +89,21 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?, Element>, IVi
         }
         return null;
     }
+    public object? VisitRayStmt(Stmt.Ray rayStmt, Scope<Element> scope)
+    {
+        try
+        {
+            if (scope.IsConstant(rayStmt.Id.Lexeme)) OnErrorFound(rayStmt.Line, rayStmt.Offset, $"Redeclaration of constant {rayStmt.Id.Lexeme}");//Rule 1
+            if (scope.HasBinding(rayStmt.Id.Lexeme)) OnErrorFound(rayStmt.Line, rayStmt.Offset, $"Ray `{rayStmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
+
+            scope.SetArgument(rayStmt.Id.Lexeme, Element.RAY);
+        }
+        catch (RecoveryModeException)
+        {
+            //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+        }
+        return null;
+    }
 
     public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declStmt, Scope<Element> scope)
     {

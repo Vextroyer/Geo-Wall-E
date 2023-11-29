@@ -17,7 +17,8 @@ public enum ElementType
     STRING,
     POINT,
     LINE,
-    SEGMENT
+    SEGMENT,
+    RAY
 }
 
 //Base class for all elements that exist during runtime.
@@ -32,6 +33,7 @@ public abstract class Element
     public static Element.Point POINT = new Element.Point(STRING, NUMBER, NUMBER, STRING, Color.BLACK);
     public static Element.Lines LINES = new Element.Lines(STRING, POINT, POINT, STRING, Color.BLACK);
     public static Element.Segment SEGMENT = new Element.Segment(STRING, POINT, POINT, STRING, Color.BLACK);
+    public static Element.Ray RAY = new Element.Ray(STRING, POINT, POINT, STRING, Color.BLACK);
     ///<summary>Represents the undefined type. Use this instead of declaring new Undefined objects.</summary>
     public static Element.Undefined UNDEFINED = new Element.Undefined();
     //Boolean values are represented with numbers
@@ -257,6 +259,35 @@ public abstract class Element
         {
             if (other.Type != this.Type) return Element.FALSE;
             if (((Element.Segment)other).p1 == this.p1 && ((Element.Segment)other).p2 == this.p2) return Element.TRUE;
+            return Element.FALSE;
+        }
+    }
+    public class Ray : Element, IDrawable
+    {
+        public Element.String name;
+        public Element.String comment;
+        public Element.Point p1;
+        public Element.Point p2;
+
+        public Color Color { get; private set; }
+
+        public Ray(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.RAY)
+        {
+            name = _name;
+            comment = _comment;
+            p1 = _p1;
+            p2 = _p2;
+            Color = color;
+        }
+
+        public override string ToString()
+        {
+            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){comment}";
+        }
+        public override Number EqualTo(Element other)
+        {
+            if (other.Type != this.Type) return Element.FALSE;
+            if (((Element.Ray)other).p1 == this.p1 && ((Element.Ray)other).p2 == this.p2) return Element.TRUE;
             return Element.FALSE;
         }
     }

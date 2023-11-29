@@ -72,6 +72,9 @@ class Parser : GSharpCompilerComponent
             case TokenType.SEGMENT:
                 aux = ParseSegmentStmt();
                 break;
+            case TokenType.RAY:
+                aux = ParseRayStmt();
+                break;
             case TokenType.ID:
                 aux = ParseConstantDeclaration();
                 break;
@@ -166,12 +169,6 @@ class Parser : GSharpCompilerComponent
         int _offset = Peek.Offset;
         Consume(TokenType.SEGMENT, "Expected `segment` keyword");
 
-
-        //Expr p1 = new Expr.Variable();
-        //Element.Point p2 = new Element.Point();
-
-        //A parenthesis after a point keyword means a constructor with the points.
-
         Consume(TokenType.LEFT_PAREN);
         // p1 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as first parameter").Literal!;
         Expr p1 = ParseExpression();
@@ -188,6 +185,29 @@ class Parser : GSharpCompilerComponent
         if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
 
         return new Stmt.Segment(_line, _offset, id, p1, p2, new Element.String(comment));
+    }
+    private Stmt.Ray ParseRayStmt()
+    {
+        int _line = Peek.Line;
+        int _offset = Peek.Offset;
+        Consume(TokenType.RAY, "Expected `segment` keyword");
+
+        Consume(TokenType.LEFT_PAREN);
+        // p1 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as first parameter").Literal!;
+        Expr p1 = ParseExpression();
+        Consume(TokenType.COMMA, "Expected comma `,`");
+        Expr p2 = ParseExpression();
+        //p2 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as second parameter").Literal!;
+        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+
+
+        Token id = Consume(TokenType.ID, "Expected identifier");
+
+        //If the current token is an string then its a comment on the line.
+        string comment = "";
+        if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
+
+        return new Stmt.Ray(_line, _offset, id, p1, p2, new Element.String(comment));
     }
     private Stmt.ConstantDeclaration ParseConstantDeclaration()
     {

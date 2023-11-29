@@ -27,6 +27,7 @@ class Scanner : GSharpCompilerComponent
         {"in",TokenType.IN},
         {"line",TokenType.LINE},
         {"segment",TokenType.SEGMENT},
+        {"ray",TokenType.RAY},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},

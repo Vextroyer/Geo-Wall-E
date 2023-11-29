@@ -61,6 +61,11 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         scope.SetArgument(segment.Id.Lexeme, new Element.Segment(new Element.String(segment.Id.Lexeme),(Element.Point)Evaluate(segment.P1,scope) , (Element.Point)(Evaluate(segment.P2,scope)),segment.Comment,colorStack.Top));
         return null;
     }
+     public object? VisitRayStmt(Stmt.Ray ray, Scope<Element> scope)
+    {
+        scope.SetArgument(ray.Id.Lexeme, new Element.Ray(new Element.String(ray.Id.Lexeme),(Element.Point)Evaluate(ray.P1,scope) , (Element.Point)(Evaluate(ray.P2,scope)),ray.Comment,colorStack.Top));
+        return null;
+    }
 
     public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declaration, Scope<Element> scope)
     {
