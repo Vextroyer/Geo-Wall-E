@@ -51,6 +51,11 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), point.X, point.Y, point.Comment,colorStack.Top));
         return null;
     }
+      public object? VisitLinesStmt(Stmt.Lines lines, Scope<Element> scope)
+    {
+        scope.SetArgument(lines.Id.Lexeme, new Element.Lines(new Element.String(lines.Id.Lexeme),(Element.Point)Evaluate(lines.P1,scope) , (Element.Point)(Evaluate(lines.P2,scope)),lines.Comment,colorStack.Top));
+        return null;
+    }
     public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declaration, Scope<Element> scope)
     {
         scope.SetConstant(declaration.Id.Lexeme, Evaluate(declaration.Rvalue, scope));

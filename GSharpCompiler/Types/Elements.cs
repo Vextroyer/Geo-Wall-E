@@ -15,7 +15,8 @@ public enum ElementType
     UNDEFINED,
     NUMBER,
     STRING,
-    POINT
+    POINT,
+    LINE
 }
 
 //Base class for all elements that exist during runtime.
@@ -28,6 +29,8 @@ public abstract class Element
     public static Element.Number NUMBER = new Element.Number(0);
     public static Element.String STRING = new Element.String("");
     public static Element.Point POINT = new Element.Point(STRING, NUMBER, NUMBER, STRING, Color.BLACK);
+
+    public static Element.Lines LINES = new Element.Lines(STRING, POINT, POINT, STRING, Color.BLACK);
     ///<summary>Represents the undefined type. Use this instead of declaring new Undefined objects.</summary>
     public static Element.Undefined UNDEFINED = new Element.Undefined();
     //Boolean values are represented with numbers
@@ -142,7 +145,7 @@ public abstract class Element
                 return value;
             }
         }
-        public String(string _value) : base(ElementType.STRING)
+        public String(string _value = "") : base(ElementType.STRING)
         {
             value = _value;
         }
@@ -162,7 +165,7 @@ public abstract class Element
     public class Point : Element, IDrawable
     {
         public Element.String name;
-        public  Element.String comment;
+        public Element.String comment;
         public Element.Number x;
         public Element.Number y;
 
@@ -176,6 +179,15 @@ public abstract class Element
             y = _y;
             Color = color;
         }
+        public Point() : base(ElementType.POINT)
+        {
+            name = new String();
+            comment = new String();
+            x = new Element.Number(Utils.RandomCoordinate());
+            y = new Element.Number(Utils.RandomCoordinate());
+            Color = Color.BLACK;
+
+        }
 
         public override string ToString()
         {
@@ -185,6 +197,36 @@ public abstract class Element
         {
             if (other.Type != this.Type) return Element.FALSE;
             if (((Element.Point)other).x == this.x && ((Element.Point)other).y == this.y) return Element.TRUE;
+            return Element.FALSE;
+        }
+    }
+
+    public class Lines : Element, IDrawable
+    {
+        public Element.String name;
+        public Element.String comment;
+        public Element.Point p1;
+        public Element.Point p2;
+
+        public Color Color { get; private set; }
+
+        public Lines(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.POINT)
+        {
+            name = _name;
+            comment = _comment;
+            p1 = _p1;
+            p2 = _p2;
+            Color = color;
+        }
+
+         public override string ToString()
+         {
+             return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){comment}";
+         }
+        public override Number EqualTo(Element other)
+        {
+            if (other.Type != this.Type) return Element.FALSE;
+            if (((Element.Lines)other).p1 == this.p1 && ((Element.Lines)other).p2 == this.p2) return Element.TRUE;
             return Element.FALSE;
         }
     }

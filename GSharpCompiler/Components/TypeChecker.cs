@@ -53,6 +53,20 @@ class TypeChecker :GSharpCompilerComponent, IVisitorStmt<object?,Element>, IVisi
         }
         return null;
     }
+
+        public object? VisitLinesStmt(Stmt.Lines linesStmt,Scope<Element> scope){
+        try{   
+            if(scope.IsConstant(linesStmt.Id.Lexeme))OnErrorFound(linesStmt.Line,linesStmt.Offset,$"Redeclaration of constant {linesStmt.Id.Lexeme}");//Rule 1
+            if(scope.HasBinding(linesStmt.Id.Lexeme))OnErrorFound(linesStmt.Line,linesStmt.Offset,$"Line `{linesStmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
+    
+            scope.SetArgument(linesStmt.Id.Lexeme,Element.LINES);
+        }
+        catch(RecoveryModeException){
+            //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+        }
+        return null;
+    }
+
     public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declStmt,Scope<Element> scope){
         try{
             if(scope.IsConstant(declStmt.Id.Lexeme))OnErrorFound(declStmt.Line,declStmt.Offset,$"Redeclaration of constant {declStmt.Id.Lexeme}");//Rule 1
@@ -168,6 +182,19 @@ class TypeChecker :GSharpCompilerComponent, IVisitorStmt<object?,Element>, IVisi
         //On error recovery mode assume that the operands are numbers and continue, this works because the return type of the methods
         //that use this method is always a number.
     }
+   // private void CheckLineDeclaration(Expr.Variable id, Scope<Element> scope){
+   //     try{
+   //         Element operand = Check(id,scope);//Check left operand
+   //         if(operand.Type != ElementType.POINT)OnErrorFound(binaryExpr.Left.Line,binaryExpr.Left.Offset,$"Left operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
+   //     }catch(RecoveryModeException){}
+   //     try{
+   //         Element operand = Check(binaryExpr.Right,scope);//Check right operand
+   //         if(operand.Type != ElementType.NUMBER)OnErrorFound(binaryExpr.Right.Line,binaryExpr.Right.Offset,$"Right operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
+   //     }catch(RecoveryModeException){}
+   //     //On error recovery mode assume that the operands are numbers and continue, this works because the return type of the methods
+   //     //that use this method is always a number.
+   // }
+    
     public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope<Element> scope){
         Check(equalEqualExpr.Left,scope);
         Check(equalEqualExpr.Right,scope);

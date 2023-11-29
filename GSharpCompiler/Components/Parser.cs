@@ -9,7 +9,7 @@ class Parser : GSharpCompilerComponent
     List<Token> tokens;
     int current = 0;//Next unprocessed token.
 
-    public Parser(List<Token> _tokens,int maxErrorCount,ICollection<Error> errors):base(maxErrorCount,errors)
+    public Parser(List<Token> _tokens, int maxErrorCount, ICollection<Error> errors) : base(maxErrorCount, errors)
     {
         tokens = _tokens;
     }
@@ -26,7 +26,8 @@ class Parser : GSharpCompilerComponent
 
 
     #region Statement parsing
-    public Program Parse(){
+    public Program Parse()
+    {
         return ParseProgram();
     }
     //Recursive descent parsing methods based on the grammar defined on Grammar file.
@@ -34,29 +35,39 @@ class Parser : GSharpCompilerComponent
     {
         return new Program(ParseStmtList());
     }
-    private Stmt.StmtList ParseStmtList(TokenType stopAtThisType=TokenType.EOF){
-        Stmt.StmtList stmts = new Stmt.StmtList(Peek.Line,Peek.Offset);
-        while(!IsAtEnd && Peek.Type != stopAtThisType){
-            try{
+    private Stmt.StmtList ParseStmtList(TokenType stopAtThisType = TokenType.EOF)
+    {
+        Stmt.StmtList stmts = new Stmt.StmtList(Peek.Line, Peek.Offset);
+        while (!IsAtEnd && Peek.Type != stopAtThisType)
+        {
+            try
+            {
                 Stmt tmp = ParseStmt();
-                if(tmp != Stmt.EMPTY)stmts.Add(tmp);//Do not add empty statements to a program.
-            }catch(RecoveryModeException){
+                if (tmp != Stmt.EMPTY) stmts.Add(tmp);//Do not add empty statements to a program.
+            }
+            catch (RecoveryModeException)
+            {
                 //On recovery mode the parser discards tokens until a `;` is found. After this semicolon a statement should be found.
                 //However, inside of a let-in statement list, the discard can be done until the `in` keyword is found.
-                while(!IsAtEnd && Peek.Type != TokenType.SEMICOLON && Peek.Type != stopAtThisType)Advance();
+                while (!IsAtEnd && Peek.Type != TokenType.SEMICOLON && Peek.Type != stopAtThisType) Advance();
             }
         }
-        if(Peek.Type != stopAtThisType)OnErrorFound(Previous.Line,Previous.Offset,$"Unexpected EOF encountered, could not reach token of type {stopAtThisType}",true);
+        if (Peek.Type != stopAtThisType) OnErrorFound(Previous.Line, Previous.Offset, $"Unexpected EOF encountered, could not reach token of type {stopAtThisType}", true);
         return stmts;
     }
-    private Stmt ParseStmt(){
+    private Stmt ParseStmt()
+    {
         Stmt aux = null;
-        switch(Peek.Type){
+        switch (Peek.Type)
+        {
             case TokenType.SEMICOLON:
                 aux = Stmt.EMPTY;
                 break;
             case TokenType.POINT:
                 aux = ParsePointStmt();
+                break;
+            case TokenType.LINE:
+                aux = ParseLinesStmt();
                 break;
             case TokenType.ID:
                 aux = ParseConstantDeclaration();
@@ -65,34 +76,35 @@ class Parser : GSharpCompilerComponent
                 aux = ParsePrintStmt();
                 break;
             case TokenType.DRAW:
-                 aux=ParseDrawStmt();
+                aux = ParseDrawStmt();
                 break;
             case TokenType.COLOR:
             case TokenType.RESTORE:
                 aux = ParseColorStmt();
                 break;
             default:
-                OnErrorFound(Peek.Line,Peek.Offset,"Not a statement");
+                OnErrorFound(Peek.Line, Peek.Offset, "Not a statement");
                 break;
         }
-        Consume(TokenType.SEMICOLON,"Semicolon expected after statement");
+        Consume(TokenType.SEMICOLON, "Semicolon expected after statement");
         return aux!;
     }
-     private Stmt.Draw ParseDrawStmt()
+    private Stmt.Draw ParseDrawStmt()
     {
         int line = Peek.Line;
         int offset = Peek.Offset;
         Consume(TokenType.DRAW, "Expected `draw` keyword");
         Expr expr = ParseExpression();
-        ErrorIfEmpty(expr,line,offset,"Expected non-empty expression after `draw`");
+        ErrorIfEmpty(expr, line, offset, "Expected non-empty expression after `draw`");
 
-        return new Stmt.Draw(line,offset,expr);
+        return new Stmt.Draw(line, offset, expr);
 
     }
-    private Stmt.Point ParsePointStmt(){
+    private Stmt.Point ParsePointStmt()
+    {
         int _line = Peek.Line;
         int _offset = Peek.Offset;
-        Consume(TokenType.POINT,"Expected `point` keyword");
+        Consume(TokenType.POINT, "Expected `point` keyword");
 
         //Since parsing phase points get their coordinates.
         float x = Utils.RandomCoordinate();
@@ -113,35 +125,70 @@ class Parser : GSharpCompilerComponent
         string comment = "";
         if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
 
-        return new Stmt.Point(_line,_offset,id,new Element.Number(x),new Element.Number(y),new Element.String(comment));
+        return new Stmt.Point(_line, _offset, id, new Element.Number(x), new Element.Number(y), new Element.String(comment));
     }
-    private Stmt.ConstantDeclaration ParseConstantDeclaration(){
-        Token id = Consume(TokenType.ID,"Expected identifier");
-        Consume(TokenType.EQUAL,"Expected `=`");
+
+    private Stmt.Lines ParseLinesStmt()
+    {
+        int _line = Peek.Line;
+        int _offset = Peek.Offset;
+        Consume(TokenType.LINE, "Expected `line` keyword");
+
+
+        //Expr p1 = new Expr.Variable();
+        //Element.Point p2 = new Element.Point();
+
+        //A parenthesis after a point keyword means a constructor with the points.
+        
+            Consume(TokenType.LEFT_PAREN);
+            // p1 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as first parameter").Literal!;
+           Expr p1 = ParseExpression();
+            Consume(TokenType.COMMA, "Expected comma `,`");
+           Expr p2 = ParseExpression();
+            //p2 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as second parameter").Literal!;
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+        
+
+        Token id = Consume(TokenType.ID, "Expected identifier");
+
+        //If the current token is an string then its a comment on the line.
+        string comment = "";
+        if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
+
+        return new Stmt.Lines(_line, _offset, id, p1, p2, new Element.String(comment));
+    }
+    private Stmt.ConstantDeclaration ParseConstantDeclaration()
+    {
+        Token id = Consume(TokenType.ID, "Expected identifier");
+        Consume(TokenType.EQUAL, "Expected `=`");
         Expr expr = ParseExpression();
-        ErrorIfEmpty(expr,id.Line,id.Offset,$"Assigned empty expression to constant `{id.Lexeme}`");//Rule 2
-        return new Stmt.ConstantDeclaration(id,expr);
+        ErrorIfEmpty(expr, id.Line, id.Offset, $"Assigned empty expression to constant `{id.Lexeme}`");//Rule 2
+        return new Stmt.ConstantDeclaration(id, expr);
     }
-    private Stmt.Print ParsePrintStmt(){
+    private Stmt.Print ParsePrintStmt()
+    {
         int _line = Peek.Line;
         int _offset = Peek.Offset;
         Consume(TokenType.PRINT);
-        return new Stmt.Print(_line,_offset,ParseExpression());
+        return new Stmt.Print(_line, _offset, ParseExpression());
     }
-    private Stmt.Color ParseColorStmt(){
+    private Stmt.Color ParseColorStmt()
+    {
         int line = Peek.Line;
         int offset = Peek.Offset;
-        
+
         //If the keyword `restore` is found the color doesnt matter
-        if(Peek.Type == TokenType.RESTORE){
+        if (Peek.Type == TokenType.RESTORE)
+        {
             Consume(TokenType.RESTORE);
-            return new Stmt.Color(line,offset,Color.BLACK,true);
+            return new Stmt.Color(line, offset, Color.BLACK, true);
         }
-        
-        Color color = Color.BLACK;        
+
+        Color color = Color.BLACK;
         Consume(TokenType.COLOR);
         //If the `color` keyword is found , a built-in color must be provided.
-        switch(Peek.Type){
+        switch (Peek.Type)
+        {
             case TokenType.COLOR_BLACK:
                 color = Color.BLACK;
                 break;
@@ -170,121 +217,138 @@ class Parser : GSharpCompilerComponent
                 color = Color.YELLOW;
                 break;
             default:
-                OnErrorFound(Peek.Line,Peek.Offset,$"Expected built-in color");
+                OnErrorFound(Peek.Line, Peek.Offset, $"Expected built-in color");
                 break;
         }
 
         Advance();//Consume the token who holds the color.
-        return new Stmt.Color(line,offset,color);
+        return new Stmt.Color(line, offset, color);
     }
     #endregion Statement parsing
-    
+
     #region Expression parsing
-    private Expr ParseExpression(){
-        switch(Peek.Type){
+    private Expr ParseExpression()
+    {
+        switch (Peek.Type)
+        {
             case TokenType.LET:
                 return ParseLetInExpression();
             case TokenType.IF:
                 return ParseConditionalExpression();
-            default :
+            default:
                 return ParseOrExpression();
         }
     }
-    private Expr ParseLetInExpression(){
+    private Expr ParseLetInExpression()
+    {
         Consume(TokenType.LET);
         int line = Previous.Line;
         int offset = Previous.Offset;
         Stmt.StmtList stmts = ParseStmtList(TokenType.IN);
         Consume(TokenType.IN);
         Expr expr = ParseExpression();
-        ErrorIfEmpty(expr,line,offset,"Expected non-empty expression after `in` keyword");
-        return new Expr.LetIn(line,offset,stmts,expr);
+        ErrorIfEmpty(expr, line, offset, "Expected non-empty expression after `in` keyword");
+        return new Expr.LetIn(line, offset, stmts, expr);
     }
-    private Expr ParseConditionalExpression(){
+    private Expr ParseConditionalExpression()
+    {
         Consume(TokenType.IF);
         int line = Previous.Line;
         int offset = Previous.Offset;
         Expr condition = ParseExpression();
-        ErrorIfEmpty(condition,line,offset,"Expected non-empty expression for condition");
-        Consume(TokenType.THEN,"Expected `then` keyword");
+        ErrorIfEmpty(condition, line, offset, "Expected non-empty expression for condition");
+        Consume(TokenType.THEN, "Expected `then` keyword");
         Expr thenBranchExpr = ParseExpression();
-        ErrorIfEmpty(thenBranchExpr,line,offset,"Expected non-empty expression after `then`");
-        Consume(TokenType.ELSE,"Expected `else` keyword");
+        ErrorIfEmpty(thenBranchExpr, line, offset, "Expected non-empty expression after `then`");
+        Consume(TokenType.ELSE, "Expected `else` keyword");
         Expr elseBranchExpr = ParseExpression();
-        ErrorIfEmpty(elseBranchExpr,line,offset,"Expected non-empty expression after `else`");
-        return new Expr.Conditional(line,offset,condition,thenBranchExpr,elseBranchExpr);
+        ErrorIfEmpty(elseBranchExpr, line, offset, "Expected non-empty expression after `else`");
+        return new Expr.Conditional(line, offset, condition, thenBranchExpr, elseBranchExpr);
     }
-    private Expr ParseOrExpression(){
+    private Expr ParseOrExpression()
+    {
         Func<Expr> parseHigherPrecedence = () => ParseAndExpression();
-        return ParseAssociativeBinaryOperator(parseHigherPrecedence,parseHigherPrecedence,0,TokenType.OR);
+        return ParseAssociativeBinaryOperator(parseHigherPrecedence, parseHigherPrecedence, 0, TokenType.OR);
     }
-    private Expr ParseAndExpression(){
+    private Expr ParseAndExpression()
+    {
         Func<Expr> parseHigherPrecedence = () => ParseEqualityExpression();
-        return ParseAssociativeBinaryOperator(parseHigherPrecedence,parseHigherPrecedence,0,TokenType.AND);
+        return ParseAssociativeBinaryOperator(parseHigherPrecedence, parseHigherPrecedence, 0, TokenType.AND);
     }
-    private Expr ParseEqualityExpression(){
+    private Expr ParseEqualityExpression()
+    {
         Func<Expr> parseHigherPrecedence = () => ParseComparisonExpression();
-        return ParseAssociativeBinaryOperator(parseHigherPrecedence,parseHigherPrecedence,1,TokenType.EQUAL_EQUAL,TokenType.BANG_EQUAL);
+        return ParseAssociativeBinaryOperator(parseHigherPrecedence, parseHigherPrecedence, 1, TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL);
     }
-    private Expr ParseComparisonExpression(){
+    private Expr ParseComparisonExpression()
+    {
         Func<Expr> parseHigherPrecedence = () => ParseTermExpression();
-        return ParseAssociativeBinaryOperator(parseHigherPrecedence,parseHigherPrecedence,1,TokenType.LESS,TokenType.LESS_EQUAL,TokenType.GREATER,TokenType.GREATER_EQUAL);
+        return ParseAssociativeBinaryOperator(parseHigherPrecedence, parseHigherPrecedence, 1, TokenType.LESS, TokenType.LESS_EQUAL, TokenType.GREATER, TokenType.GREATER_EQUAL);
     }
-    private Expr ParseTermExpression(){
+    private Expr ParseTermExpression()
+    {
         Func<Expr> parseHigherPrecedence = () => ParseFactorExpression();
-        return ParseAssociativeBinaryOperator(parseHigherPrecedence,parseHigherPrecedence,0,TokenType.PLUS,TokenType.MINUS);
+        return ParseAssociativeBinaryOperator(parseHigherPrecedence, parseHigherPrecedence, 0, TokenType.PLUS, TokenType.MINUS);
     }
-    private Expr ParseFactorExpression(){
+    private Expr ParseFactorExpression()
+    {
         Func<Expr> parseHigherPrecedence = () => ParsePowerExpression();
-        return ParseAssociativeBinaryOperator(parseHigherPrecedence,parseHigherPrecedence,0,TokenType.STAR,TokenType.SLASH,TokenType.PERCENT);
+        return ParseAssociativeBinaryOperator(parseHigherPrecedence, parseHigherPrecedence, 0, TokenType.STAR, TokenType.SLASH, TokenType.PERCENT);
     }
-    private Expr ParsePowerExpression(){
+    private Expr ParsePowerExpression()
+    {
         Func<Expr> parseLeft = () => ParseUnaryExpression();
         Func<Expr> parseRight = () => ParsePowerExpression();//Right associativity, use recursion.
-        return ParseAssociativeBinaryOperator(parseLeft,parseRight,0,TokenType.CARET);
+        return ParseAssociativeBinaryOperator(parseLeft, parseRight, 0, TokenType.CARET);
     }
-    private Expr ParseUnaryExpression(){
+    private Expr ParseUnaryExpression()
+    {
         Expr expr;
-        switch(Peek.Type){
+        switch (Peek.Type)
+        {
             case TokenType.BANG:
                 Advance();//Consume the operator
                 expr = ParseUnaryExpression();
-                ErrorIfEmpty(expr,Previous.Line,Previous.Offset,"Expected non-empty expression as operand");
-                return new Expr.Unary.Not(Previous.Line,Previous.Offset,expr);
+                ErrorIfEmpty(expr, Previous.Line, Previous.Offset, "Expected non-empty expression as operand");
+                return new Expr.Unary.Not(Previous.Line, Previous.Offset, expr);
             case TokenType.MINUS:
                 Advance();//Consume the operator
                 expr = ParseUnaryExpression();
-                ErrorIfEmpty(expr,Previous.Line,Previous.Offset,"Expected non-empty expression as operand");
-                return new Expr.Unary.Minus(Previous.Line,Previous.Offset,expr);
+                ErrorIfEmpty(expr, Previous.Line, Previous.Offset, "Expected non-empty expression as operand");
+                return new Expr.Unary.Minus(Previous.Line, Previous.Offset, expr);
             default:
                 return ParseVariableExpression();
         }
     }
-    private Expr ParseVariableExpression(){
-        if(Match(TokenType.ID)){
+    private Expr ParseVariableExpression()
+    {
+        if (Match(TokenType.ID))
+        {
             Token id = Previous;
             return new Expr.Variable(id);
         }
         return ParsePrimaryExpression();
     }
-    private Expr ParsePrimaryExpression(){
-        switch(Peek.Type){
+    private Expr ParsePrimaryExpression()
+    {
+        switch (Peek.Type)
+        {
             case TokenType.NUMBER:
-                return new Expr.Number(Peek.Line,Peek.Offset,(float) Advance().Literal!);
+                return new Expr.Number(Peek.Line, Peek.Offset, (float)Advance().Literal!);
             case TokenType.STRING:
-                return new Expr.String(Peek.Line,Peek.Offset,(string) Advance().Literal!);
+                return new Expr.String(Peek.Line, Peek.Offset, (string)Advance().Literal!);
             case TokenType.LEFT_PAREN://Grouping expressions
                 Consume(TokenType.LEFT_PAREN);
                 Expr expr = ParseExpression();
-                Consume(TokenType.RIGHT_PAREN,"Expected `)`");
+                Consume(TokenType.RIGHT_PAREN, "Expected `)`");
                 return expr;
-            default :  return Expr.EMPTY;//The empty expression
+            default: return Expr.EMPTY;//The empty expression
         }
     }
     #endregion Expression parsing
 
     #region  Auxiliary Methods
-      
+
     private bool IsAtEnd { get => Peek.Type == TokenType.EOF; }
 
     //Return the current token without moving current,which without consuming its.
@@ -308,9 +372,12 @@ class Parser : GSharpCompilerComponent
     }
     //If the current token match any of the given tokens advance an return true, if not return false and keep current.
     //It is a conditional advance.
-    private bool Match(params TokenType[] types){
-        foreach(TokenType type in types){
-            if(type == Peek.Type){
+    private bool Match(params TokenType[] types)
+    {
+        foreach (TokenType type in types)
+        {
+            if (type == Peek.Type)
+            {
                 Advance();
                 return true;
             }
@@ -318,22 +385,25 @@ class Parser : GSharpCompilerComponent
         return false;
     }
     ///<summary>If <c>expr</c> is the EMPTY expression its detected as an error.</summary>
-    private void ErrorIfEmpty(Expr expr,int line,int offset,string message,bool enforceAbort = false){
-        if(expr == Expr.EMPTY) OnErrorFound(line,offset,message,enforceAbort);
+    private void ErrorIfEmpty(Expr expr, int line, int offset, string message, bool enforceAbort = false)
+    {
+        if (expr == Expr.EMPTY) OnErrorFound(line, offset, message, enforceAbort);
     }
     ///<summary>Common behaviour for parsing associative binary operators. A negative loopLimit greater than zero limits the number of times the operator can be associated, applied contiguosly.</summary>
-    private Expr ParseAssociativeBinaryOperator(Func<Expr> parseLeft,Func<Expr> parseRight,int loopLimit,params TokenType[] types){
+    private Expr ParseAssociativeBinaryOperator(Func<Expr> parseLeft, Func<Expr> parseRight, int loopLimit, params TokenType[] types)
+    {
         Expr left = parseLeft();
         int loopCount = 0;
         Token firstOperation = Peek;
-        while(Match(types)){
+        while (Match(types))
+        {
             //Rule #9
-            if(loopLimit > 0 && loopCount == loopLimit)OnErrorFound(Previous.Line,Previous.Offset,$"Cannot use '{Previous.Lexeme}' after '{firstOperation.Lexeme}'. Consider using parenthesis and/or logical operators.");
+            if (loopLimit > 0 && loopCount == loopLimit) OnErrorFound(Previous.Line, Previous.Offset, $"Cannot use '{Previous.Lexeme}' after '{firstOperation.Lexeme}'. Consider using parenthesis and/or logical operators.");
             Token operation = Previous;
-            ErrorIfEmpty(left,operation.Line,operation.Offset,"Expected non-empty expression as left operand");
+            ErrorIfEmpty(left, operation.Line, operation.Offset, "Expected non-empty expression as left operand");
             Expr right = parseRight();//If the operation is right associative then the parseRight method will recursively call this method somehow.
-            ErrorIfEmpty(right,operation.Line,operation.Offset,"Expected non-empty expression as right operand");
-            left = Expr.Binary.MakeBinaryExpr(left.Line,left.Offset,operation,left,right);
+            ErrorIfEmpty(right, operation.Line, operation.Offset, "Expected non-empty expression as right operand");
+            left = Expr.Binary.MakeBinaryExpr(left.Line, left.Offset, operation, left, right);
             ++loopCount;
         }
         return left;

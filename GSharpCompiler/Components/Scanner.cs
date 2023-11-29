@@ -25,6 +25,7 @@ class Scanner : GSharpCompilerComponent
         {"or",TokenType.OR},
         {"let",TokenType.LET},
         {"in",TokenType.IN},
+        {"line",TokenType.LINE},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},
