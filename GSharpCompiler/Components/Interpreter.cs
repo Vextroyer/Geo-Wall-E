@@ -67,9 +67,9 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         return null;
     }
 
-    public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declaration, Scope<Element> scope)
+    public object? VisitConstantDeclarationStmt(Stmt.Declaration.Constant declaration, Scope<Element> scope)
     {
-        scope.SetConstant(declaration.Id.Lexeme, Evaluate(declaration.Rvalue, scope));
+        scope.SetConstant(declaration.Id.Lexeme, Evaluate(declaration.RValue, scope));
         return null;
     }
     public object? VisitPrintStmt(Stmt.Print stmt, Scope<Element> scope)

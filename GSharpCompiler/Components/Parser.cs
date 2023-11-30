@@ -209,13 +209,13 @@ class Parser : GSharpCompilerComponent
 
         return new Stmt.Ray(_line, _offset, id, p1, p2, new Element.String(comment));
     }
-    private Stmt.ConstantDeclaration ParseConstantDeclaration()
+    private Stmt.Declaration.Constant ParseConstantDeclaration()
     {
         Token id = Consume(TokenType.ID, "Expected identifier");
         Consume(TokenType.EQUAL, "Expected `=`");
         Expr expr = ParseExpression();
         ErrorIfEmpty(expr, id.Line, id.Offset, $"Assigned empty expression to constant `{id.Lexeme}`");//Rule 2
-        return new Stmt.ConstantDeclaration(id, expr);
+        return new Stmt.Declaration.Constant(id, expr);
     }
     private Stmt.Print ParsePrintStmt()
     {

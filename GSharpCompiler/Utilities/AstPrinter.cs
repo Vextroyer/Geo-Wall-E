@@ -44,9 +44,9 @@ class AstPrinter : IVisitorStmt<string, Element>, IVisitorExpr<string, Element>
         //return $"line({stmt.Id.Lexeme},{stmt.Comment},{VisitVariableExpr((Expr.Variable)stmt.P1,scope)},{VisitVariableExpr((Expr.Variable)stmt.P2,scope)})";
         return $"segment({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{Print(stmt.P2)})";
     }
-    public string VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt, Scope<Element> scope)
+    public string VisitConstantDeclarationStmt(Stmt.Declaration.Constant stmt, Scope<Element> scope)
     {
-        return $"{stmt.Id.Lexeme} = {Print(stmt.Rvalue)}";
+        return $"{stmt.Id.Lexeme} = {Print(stmt.RValue)}";
     }
 
     public string VisitPrintStmt(Stmt.Print stmt, Scope<Element> scope)

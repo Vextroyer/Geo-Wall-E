@@ -105,12 +105,12 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?, Element>, IVi
         return null;
     }
 
-    public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declStmt, Scope<Element> scope)
+    public object? VisitConstantDeclarationStmt(Stmt.Declaration.Constant declStmt, Scope<Element> scope)
     {
         try
         {
             if (scope.IsConstant(declStmt.Id.Lexeme)) OnErrorFound(declStmt.Line, declStmt.Offset, $"Redeclaration of constant {declStmt.Id.Lexeme}");//Rule 1
-            Element rValue = Check(declStmt.Rvalue, scope);
+            Element rValue = Check(declStmt.RValue, scope);
             scope.SetConstant(declStmt.Id.Lexeme, rValue);
         }
         catch (RecoveryModeException)

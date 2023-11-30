@@ -8,7 +8,7 @@ interface IVisitorStmt<T, U>
 {
     public T VisitEmptyStmt(Stmt.Empty stmt, Scope<U> scope);
     public T VisitPointStmt(Stmt.Point stmt, Scope<U> scope);
-    public T VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt, Scope<U> scope);
+    public T VisitConstantDeclarationStmt(Stmt.Declaration.Constant stmt, Scope<U> scope);
     public T VisitPrintStmt(Stmt.Print stmt, Scope<U> scope);
     public T VisitColorStmt(Stmt.Color stmt, Scope<U> scope);
     public T VisitDrawStmt(Stmt.Draw stmt, Scope<U> scope);
@@ -131,21 +131,27 @@ abstract class Stmt : IVisitableStmt
             return visitor.VisitRayStmt(this, scope);
         }
     }
-    //Represents declaration of constants. A constant is a variable whose value cant be modified.
-    public class ConstantDeclaration : Stmt
-    {
-        public Token Id { get; private set; }
-        public Expr Rvalue { get; private set; }
-
-        public ConstantDeclaration(Token _id, Expr _expr) : base(_id.Line, _id.Offset)
-        {
-            Id = _id;
-            Rvalue = _expr;
+    ///<summary>Base class for declarations. A declaration associates an identifier with an Element, for example Number or Function.</summary>
+    public abstract class Declaration : Stmt{
+        ///<summary>The Identifier which will be binded to the Element.</summary>
+        public Token Id {get; protected set;}
+        protected Declaration(Token identifier):base(identifier.Line,identifier.Offset){
+            Id = identifier;
         }
 
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
-        {
-            return visitor.VisitConstantDeclarationStmt(this, scope);
+        abstract public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope);
+
+        ///<summary>Represents declaration of constants.</summary>
+        public class Constant : Declaration{
+            ///<summary>Expression to be associated to the identifier.</summary>
+            public Expr RValue {get; private set;}
+            public Constant(Token identifier, Expr rvalue):base(identifier){
+                RValue = rvalue;
+            }
+            public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+            {
+                return visitor.VisitConstantDeclarationStmt(this, scope);
+            }
         }
     }
 
