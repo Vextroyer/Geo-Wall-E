@@ -93,6 +93,11 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         return null;
     }
 
+    public object? VisitEvalStmt(Stmt.Eval stmt, Scope<Element> scope){
+        Evaluate(stmt.Expr,scope);
+        return null;
+    }
+
     #endregion Interpret statements
 
     #region Interpret expressions

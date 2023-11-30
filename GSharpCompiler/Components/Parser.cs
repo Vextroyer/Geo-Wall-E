@@ -88,6 +88,9 @@ class Parser : GSharpCompilerComponent
             case TokenType.RESTORE:
                 aux = ParseColorStmt();
                 break;
+            case TokenType.EVAL:
+                aux = ParseEvalStmt();
+                break;
             default:
                 OnErrorFound(Peek.Line, Peek.Offset, "Not a statement");
                 break;
@@ -275,6 +278,13 @@ class Parser : GSharpCompilerComponent
 
         Advance();//Consume the token who holds the color.
         return new Stmt.Color(line, offset, color);
+    }
+    private Stmt.Eval ParseEvalStmt(){
+        Consume(TokenType.EVAL);
+        int line = Previous.Line;
+        int offset = Previous.Offset;
+        Expr expr = ParseExpression();
+        return new Stmt.Eval(line,offset,expr);
     }
     #endregion Statement parsing
 

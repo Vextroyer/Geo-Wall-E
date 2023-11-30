@@ -49,6 +49,10 @@ class AstPrinter : IVisitorStmt<string, Element>, IVisitorExpr<string, Element>
         return $"{stmt.Id.Lexeme} = {Print(stmt.RValue)}";
     }
 
+    public string VisitEvalStmt(Stmt.Eval stmt, Scope<Element> scope){
+        return $"eval {Print(stmt.Expr)}";
+    }
+
     public string VisitPrintStmt(Stmt.Print stmt, Scope<Element> scope)
     {
         return $"print({Print(stmt._Expr)})";

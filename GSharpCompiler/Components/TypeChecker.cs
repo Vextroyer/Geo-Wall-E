@@ -140,6 +140,10 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?, Element>, IVi
         catch (RecoveryModeException) { }
         return null;
     }
+    public object? VisitEvalStmt(Stmt.Eval evalStmt, Scope<Element> scope){
+        Check(evalStmt.Expr,scope);//Check the semantic of the expression.
+        return null;        
+    }
     //Checking expressions
     private Element Check(Expr expr, Scope<Element> scope)
     {

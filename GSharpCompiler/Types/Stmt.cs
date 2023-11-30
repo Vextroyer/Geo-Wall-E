@@ -16,6 +16,7 @@ interface IVisitorStmt<T, U>
     public T VisitLinesStmt(Stmt.Lines stmt, Scope<U> scope);
     public T VisitSegmentStmt(Stmt.Segment stmt, Scope<U> scope);
     public T VisitRayStmt(Stmt.Ray stmt, Scope<U> scope);
+    public T VisitEvalStmt(Stmt.Eval stmt, Scope<U> scope);
 }
 interface IVisitableStmt
 {
@@ -148,7 +149,18 @@ abstract class Stmt : IVisitableStmt
             return visitor.VisitDrawStmt(this, scope);
         }
     }
-
+    ///<summary>An Eval statement allow evaluating an expression as a top level statement.</summary>
+    public class Eval : Stmt{
+        ///<summary>The expression to be evaluated.</summary>
+        public Expr Expr{get; private set;}
+        public Eval(int line,int offset,Expr expr):base(line,offset){
+            Expr = expr;
+        }
+        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitEvalStmt(this, scope);
+        }
+    }
     //Print statement
     public class Print : Stmt
     {

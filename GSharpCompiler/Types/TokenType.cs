@@ -19,6 +19,9 @@ enum TokenType{
     //Represents an identifier.
     ID,
 
+    //The `eval` keyword
+    EVAL,
+
     //Represents an string.
     STRING,
 
