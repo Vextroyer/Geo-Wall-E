@@ -48,9 +48,25 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     }
     public object? VisitPointStmt(Stmt.Point point, Scope<Element> scope)
     {
-        scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), point.X, point.Y, point.Comment));
+        scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), point.X, point.Y, point.Comment,colorStack.Top));
         return null;
     }
+      public object? VisitLinesStmt(Stmt.Lines lines, Scope<Element> scope)
+    {
+        scope.SetArgument(lines.Id.Lexeme, new Element.Lines(new Element.String(lines.Id.Lexeme),(Element.Point)Evaluate(lines.P1,scope) , (Element.Point)(Evaluate(lines.P2,scope)),lines.Comment,colorStack.Top));
+        return null;
+    }
+     public object? VisitSegmentStmt(Stmt.Segment segment, Scope<Element> scope)
+    {
+        scope.SetArgument(segment.Id.Lexeme, new Element.Segment(new Element.String(segment.Id.Lexeme),(Element.Point)Evaluate(segment.P1,scope) , (Element.Point)(Evaluate(segment.P2,scope)),segment.Comment,colorStack.Top));
+        return null;
+    }
+     public object? VisitRayStmt(Stmt.Ray ray, Scope<Element> scope)
+    {
+        scope.SetArgument(ray.Id.Lexeme, new Element.Ray(new Element.String(ray.Id.Lexeme),(Element.Point)Evaluate(ray.P1,scope) , (Element.Point)(Evaluate(ray.P2,scope)),ray.Comment,colorStack.Top));
+        return null;
+    }
+
     public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declaration, Scope<Element> scope)
     {
         scope.SetConstant(declaration.Id.Lexeme, Evaluate(declaration.Rvalue, scope));

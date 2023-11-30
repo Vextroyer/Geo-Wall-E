@@ -34,6 +34,15 @@ enum TokenType{
     //The `print` keyword
     PRINT,
 
+    //The `LINE` keyword
+    LINE,
+
+    //The `SEGMENT` keyword
+    SEGMENT,
+
+    //The `RAY` keyword
+    RAY,
+
     //Colors
     COLOR,COLOR_BLACK,COLOR_BLUE,COLOR_CYAN,COLOR_GRAY,COLOR_GREEN,
     COLOR_RED,COLOR_MAGENTA,COLOR_WHITE,COLOR_YELLOW,RESTORE,

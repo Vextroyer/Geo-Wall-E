@@ -13,6 +13,9 @@ interface IVisitorStmt<T, U>
     public T VisitColorStmt(Stmt.Color stmt, Scope<U> scope);
     public T VisitDrawStmt(Stmt.Draw stmt, Scope<U> scope);
     public T VisitStmtList(Stmt.StmtList stmt, Scope<U> scope);
+    public T VisitLinesStmt(Stmt.Lines stmt, Scope<U> scope);
+    public T VisitSegmentStmt(Stmt.Segment stmt, Scope<U> scope);
+    public T VisitRayStmt(Stmt.Ray stmt, Scope<U> scope);
 }
 interface IVisitableStmt
 {
@@ -32,8 +35,9 @@ abstract class Stmt : IVisitableStmt
     //Required to work in conjuction with the IVisitorStmt interface.
     abstract public T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope);
     ///<summary>Represents an empty statement.</summary>
-    public class Empty : Stmt{
-        public Empty():base(0,0){}
+    public class Empty : Stmt
+    {
+        public Empty() : base(0, 0) { }
         public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
         {
             return visitor.VisitEmptyStmt(this, scope);
@@ -41,6 +45,7 @@ abstract class Stmt : IVisitableStmt
     }
     ///<summary>A constant representing the empty statement. Should be used instead of creating new empty statements.</summary>
     static public Stmt.Empty EMPTY = new Stmt.Empty();
+
     //Represents a `point` statement.
     public class Point : Stmt
     {
@@ -60,6 +65,70 @@ abstract class Stmt : IVisitableStmt
         public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
         {
             return visitor.VisitPointStmt(this, scope);
+        }
+    }
+
+    //Represents a `Lines` statement.
+    public class Lines : Stmt
+    {
+        public Token Id { get; private set; }//The name of the point will be used as identifier.
+        public Element.String Comment { get; private set; }//A comment associated to the line.
+
+        public Expr P1 { get; private set; }//first point
+        public Expr P2 { get; private set; }//second 
+        public Lines(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset)
+        {
+            Id = _id;
+            P1 = _p1;
+            P2 = _p2;
+            Comment = _comment;
+        }
+
+        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitLinesStmt(this, scope);
+        }
+    }
+    //Represents a `Segment` statement.
+    public class Segment : Stmt
+    {
+        public Token Id { get; private set; }//The name of the point will be used as identifier.
+        public Element.String Comment { get; private set; }//A comment associated to the line.
+
+        public Expr P1 { get; private set; }//first point
+        public Expr P2 { get; private set; }//second 
+        public Segment(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset)
+        {
+            Id = _id;
+            P1 = _p1;
+            P2 = _p2;
+            Comment = _comment;
+        }
+
+        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitSegmentStmt(this, scope);
+        }
+    }
+    //Represents a `Ray` statement.
+    public class Ray : Stmt
+    {
+        public Token Id { get; private set; }//The name of the point will be used as identifier.
+        public Element.String Comment { get; private set; }//A comment associated to the line.
+
+        public Expr P1 { get; private set; }//first point
+        public Expr P2 { get; private set; }//second 
+        public Ray(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset)
+        {
+            Id = _id;
+            P1 = _p1;
+            P2 = _p2;
+            Comment = _comment;
+        }
+
+        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitRayStmt(this, scope);
         }
     }
     //Represents declaration of constants. A constant is a variable whose value cant be modified.
@@ -84,7 +153,7 @@ abstract class Stmt : IVisitableStmt
     {
         public Expr _Expr { get; private set; }
 
-        public Draw(int line,int offset, Expr _expr):base(line,offset)
+        public Draw(int line, int offset, Expr _expr) : base(line, offset)
         {
             _Expr = _expr;
         }
@@ -126,44 +195,53 @@ abstract class Stmt : IVisitableStmt
     }
 
     ///<summary>Represents a list of statements. Its a special kind of statement.</summary>
-    public class StmtList : Stmt , ICollection<Stmt>{
+    public class StmtList : Stmt, ICollection<Stmt>
+    {
         ///<summary>The statements that made the statement list.</summary>
         private List<Stmt> stmts;
-        public StmtList(int line,int offset):base(line,offset){
+        public StmtList(int line, int offset) : base(line, offset)
+        {
             this.stmts = new List<Stmt>();
         }
         public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
         {
-            return visitor.VisitStmtList(this,scope);
+            return visitor.VisitStmtList(this, scope);
         }
         ///<summary>Provide access to the subyacent list enumerator.</summary>
-        public IEnumerator<Stmt> GetEnumerator(){
+        public IEnumerator<Stmt> GetEnumerator()
+        {
             return stmts.GetEnumerator();
         }
-        IEnumerator IEnumerable.GetEnumerator(){
+        IEnumerator IEnumerable.GetEnumerator()
+        {
             return GetEnumerator();
         }
         ///<summary>Get the number of statements contained on the list.</summary>
-        public int Count {get => stmts.Count;}
+        public int Count { get => stmts.Count; }
         ///<summary>Add the supplied statement to the list.</summary>
-        public void Add(Stmt stmt){
+        public void Add(Stmt stmt)
+        {
             stmts.Add(stmt);
         }
         ///<summary>Removes all statements from the list.</summary>
-        public void Clear(){
+        public void Clear()
+        {
             stmts.Clear();
         }
         ///<summary>Determines wheter a statement is in the list.</summary>
         ///<returns><c>True</c> if <c>stmt</c> is on the list, otherwise false.</returns>
-        public bool Contains(Stmt stmt){
+        public bool Contains(Stmt stmt)
+        {
             return stmts.Contains(stmt);
         }
-        public bool Remove(Stmt stmt){
+        public bool Remove(Stmt stmt)
+        {
             return stmts.Remove(stmt);
         }
-        public bool IsReadOnly {get => false;}
-        public void CopyTo(Stmt[] stmt,int arrayIndex){
-            stmts.CopyTo(stmt,arrayIndex);
+        public bool IsReadOnly { get => false; }
+        public void CopyTo(Stmt[] stmt, int arrayIndex)
+        {
+            stmts.CopyTo(stmt, arrayIndex);
         }
     }
 }
