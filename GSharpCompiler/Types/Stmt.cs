@@ -71,8 +71,8 @@ abstract class Stmt : IVisitableStmt
     //Represents a `Lines` statement.
     public class Lines : Stmt
     {
-        public Token Id { get; private set; }//The name of the point will be used as identifier.
-        public Element.String Comment { get; private set; }//A comment associated to the line.
+        public Token Id { get; protected set; }//The name of the point will be used as identifier.
+        public Element.String Comment { get; protected set; }//A comment associated to the line.
 
         public Expr P1 { get; private set; }//first point
         public Expr P2 { get; private set; }//second 
@@ -90,41 +90,20 @@ abstract class Stmt : IVisitableStmt
         }
     }
     //Represents a `Segment` statement.
-    public class Segment : Stmt
+    public class Segment : Lines
     {
-        public Token Id { get; private set; }//The name of the point will be used as identifier.
-        public Element.String Comment { get; private set; }//A comment associated to the line.
-
-        public Expr P1 { get; private set; }//first point
-        public Expr P2 { get; private set; }//second 
-        public Segment(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset)
-        {
-            Id = _id;
-            P1 = _p1;
-            P2 = _p2;
-            Comment = _comment;
-        }
-
+        public Segment(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment):base(_line,_offset,_id,_p1,_p2,_comment)
+        {}
         public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
         {
             return visitor.VisitSegmentStmt(this, scope);
         }
     }
     //Represents a `Ray` statement.
-    public class Ray : Stmt
+    public class Ray : Lines
     {
-        public Token Id { get; private set; }//The name of the point will be used as identifier.
-        public Element.String Comment { get; private set; }//A comment associated to the line.
-
-        public Expr P1 { get; private set; }//first point
-        public Expr P2 { get; private set; }//second 
-        public Ray(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset)
-        {
-            Id = _id;
-            P1 = _p1;
-            P2 = _p2;
-            Comment = _comment;
-        }
+        public Ray(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset,_id,_p1,_p2,_comment)
+        {}
 
         public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
         {

@@ -65,7 +65,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?, Element>, IVi
         {
             if (scope.IsConstant(linesStmt.Id.Lexeme)) OnErrorFound(linesStmt.Line, linesStmt.Offset, $"Redeclaration of constant {linesStmt.Id.Lexeme}");//Rule 1
             if (scope.HasBinding(linesStmt.Id.Lexeme)) OnErrorFound(linesStmt.Line, linesStmt.Offset, $"Line `{linesStmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
-
+            CheckLineDeclaration(linesStmt,scope);//Check that expressions contained in the line Stmt are points
             scope.SetArgument(linesStmt.Id.Lexeme, Element.LINES);
         }
         catch (RecoveryModeException)
@@ -80,7 +80,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?, Element>, IVi
         {
             if (scope.IsConstant(segmentStmt.Id.Lexeme)) OnErrorFound(segmentStmt.Line, segmentStmt.Offset, $"Redeclaration of constant {segmentStmt.Id.Lexeme}");//Rule 1
             if (scope.HasBinding(segmentStmt.Id.Lexeme)) OnErrorFound(segmentStmt.Line, segmentStmt.Offset, $"Segment `{segmentStmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
-
+            CheckLineDeclaration(segmentStmt,scope);//Check that expressions contained in the line Stmt are points
             scope.SetArgument(segmentStmt.Id.Lexeme, Element.SEGMENT);
         }
         catch (RecoveryModeException)
@@ -95,7 +95,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?, Element>, IVi
         {
             if (scope.IsConstant(rayStmt.Id.Lexeme)) OnErrorFound(rayStmt.Line, rayStmt.Offset, $"Redeclaration of constant {rayStmt.Id.Lexeme}");//Rule 1
             if (scope.HasBinding(rayStmt.Id.Lexeme)) OnErrorFound(rayStmt.Line, rayStmt.Offset, $"Ray `{rayStmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
-
+            CheckLineDeclaration(rayStmt,scope);//Check that expressions contained in the line Stmt are points
             scope.SetArgument(rayStmt.Id.Lexeme, Element.RAY);
         }
         catch (RecoveryModeException)
@@ -250,18 +250,20 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?, Element>, IVi
         //On error recovery mode assume that the operands are numbers and continue, this works because the return type of the methods
         //that use this method is always a number.
     }
-    // private void CheckLineDeclaration(Expr.Variable id, Scope<Element> scope){
-    //     try{
-    //         Element operand = Check(id,scope);//Check left operand
-    //         if(operand.Type != ElementType.POINT)OnErrorFound(binaryExpr.Left.Line,binaryExpr.Left.Offset,$"Left operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
-    //     }catch(RecoveryModeException){}
-    //     try{
-    //         Element operand = Check(binaryExpr.Right,scope);//Check right operand
-    //         if(operand.Type != ElementType.NUMBER)OnErrorFound(binaryExpr.Right.Line,binaryExpr.Right.Offset,$"Right operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
-    //     }catch(RecoveryModeException){}
-    //     //On error recovery mode assume that the operands are numbers and continue, this works because the return type of the methods
-    //     //that use this method is always a number.
-    // }
+    private void CheckLineDeclaration(Stmt.Lines lineStmt, Scope<Element> scope){
+        //Both expressions must be points in order to build the line
+        try{
+            Element parameter = Check(lineStmt.P1,scope);
+            if(parameter.Type != ElementType.POINT)OnErrorFound(lineStmt.Line,lineStmt.Offset,$"Expected `POINT` as first parameter but {parameter.Type} was found");
+        }
+        catch(RecoveryModeException){}
+        try{
+            Element parameter = Check(lineStmt.P2,scope);
+            if(parameter.Type != ElementType.POINT)OnErrorFound(lineStmt.Line,lineStmt.Offset,$"Expected `POINT` as second parameter but {parameter.Type} was found");
+        }catch(RecoveryModeException){}
+        //On error recovery mode assume that the parameters are points and continue, this works because the return type of the methods
+        //that use this method a well defined type.
+    }
 
     public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope<Element> scope)
     {
