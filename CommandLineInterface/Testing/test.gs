@@ -183,3 +183,32 @@ print
 print let a = 1; in let b = 2; in let c = 3; in let d = 4; in let e = 5; in a + b + c + d + e;
 
 print 4 ^ 3 ^ 2;
+
+print if 2 > 3 then "llego aqui" else "llego alla";
+
+print let
+        a = 2;
+        b = 3;
+        c = 12;
+        d = -1;
+        e = if (a * c + d) ^ 2 > 3 and d + c > a - b then c ^ 3 else c ^ (1 / 3);
+      in e;
+
+print let
+        a = 2;
+        b = 3;
+        c = 12;
+        d = -1;
+        e = if (a * c + d) ^ 2 > 3 and d + c > a - b then c ^ 3 else c ^ (1 / 3);
+        f = if a then if b then c else d else if e then 4 else 5; 
+      in f;
+print 2 > 3;
+print 2 < 3;
+print 2 >= 3;
+print 2 <= 3;
+print 2 == 3;
+print 2 != 3;
+print 2 == 2;
+print 2 != 2;
+print if 0 then "pinto 0" else "pinto 1";
+print if 1 then "pinto 0" else "pinto 1";

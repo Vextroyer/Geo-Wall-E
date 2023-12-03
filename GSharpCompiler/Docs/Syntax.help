@@ -11,3 +11,7 @@ Rules
 8- Operands for operators : `^` `*` `/` `%` `+` `-` `<` `<=` `>` `>=` must be numbers.
 9- Cannot apply more than once the relational operators `<` `<=` `>` `>=` `==` `!=`
 10- Both branches of an if-then-else expression must have the same return type.
+11- A function declaration is illegal when:
+    -A constant exist with the same name on the actual or any parent scope. Derived from rule # 1
+    -An argument exist with the same name on the actual scope. Derived from rule # 3.
+    -A function exist with the same name and same arity on the actual scope. Extension of rule # 3.

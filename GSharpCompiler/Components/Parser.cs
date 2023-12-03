@@ -76,7 +76,7 @@ class Parser : GSharpCompilerComponent
                 aux = ParseRayStmt();
                 break;
             case TokenType.ID:
-                aux = ParseConstantDeclaration();
+                aux = ParseDeclaration();
                 break;
             case TokenType.PRINT:
                 aux = ParsePrintStmt();
@@ -212,6 +212,24 @@ class Parser : GSharpCompilerComponent
 
         return new Stmt.Ray(_line, _offset, id, p1, p2, new Element.String(comment));
     }
+    ///<summary>Parse a declaration statement.</summary>
+    private Stmt.Declaration ParseDeclaration(){
+        //The actual token is an identifier.
+        //The type of declaration depends on the next token
+        switch(PeekNext.Type){
+            case TokenType.EQUAL:
+                //Identifier followed by an equal sign means a constant declaration.
+                return ParseConstantDeclaration();
+            case TokenType.LEFT_PAREN:
+                //Identifier followed by parentheses means a function declaration.
+                return ParseFunctionDeclaration();
+            default:
+                OnErrorFound(Peek.Line,Peek.Offset,"Identifier found on top level statement, but no declaration follows. If you intend to evaluate an expression use the `eval` keyword before the identifier.");
+                break;
+        }
+        //Unreachable code.
+        throw new Exception("Invalid execution path reached");
+    }
     private Stmt.Declaration.Constant ParseConstantDeclaration()
     {
         Token id = Consume(TokenType.ID, "Expected identifier");
@@ -219,6 +237,29 @@ class Parser : GSharpCompilerComponent
         Expr expr = ParseExpression();
         ErrorIfEmpty(expr, id.Line, id.Offset, $"Assigned empty expression to constant `{id.Lexeme}`");//Rule 2
         return new Stmt.Declaration.Constant(id, expr);
+    }
+    private Stmt.Declaration.Function ParseFunctionDeclaration(){
+        Token id = Consume(TokenType.ID,"Expected identifier on function declaration");
+        Consume(TokenType.LEFT_PAREN);
+
+        ///<summary>Helper method to parse the arguments of a function.</summary>
+        List<Token> ParseFunctionArguments(){
+            List<Token> arguments = new List<Token>();
+            if(Peek.Type == TokenType.RIGHT_PAREN) return arguments;//A closing parenthesis means no arguments.
+
+            do{
+                Consume(TokenType.ID,"Identifier expected as argument");
+                arguments.Add(Previous);
+            }while(Match(TokenType.COMMA));
+            return arguments;
+        }
+
+        List<Token> arguments = ParseFunctionArguments();
+        Consume(TokenType.RIGHT_PAREN,"Expected `)` on function declaration");
+        Consume(TokenType.EQUAL,"Expected `=` after function signature");
+        Expr body = ParseExpression();
+        ErrorIfEmpty(body,id.Line,id.Offset,"Expected non-empty expression as function body");
+        return new Stmt.Declaration.Function(id,arguments,body);
     }
     private Stmt.Print ParsePrintStmt()
     {
@@ -415,6 +456,13 @@ class Parser : GSharpCompilerComponent
 
     //Return the current token without moving current,which without consuming its.
     private Token Peek { get => tokens[current]; }
+    ///<summary>The token after `current` token. If there is no more tokens after `current` returns the last token on `tokens`.</summary>
+    private Token PeekNext {
+        get{
+            if(current + 1 < tokens.Count)return tokens[current + 1];
+            return tokens[tokens.Count - 1];
+        }
+    }
     //Return the current token and move current one position ahead, this is called consume the token.
     private Token Advance()
     {

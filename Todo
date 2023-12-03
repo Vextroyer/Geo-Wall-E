@@ -32,7 +32,5 @@ Languge design:
 Hacer las pruebas de igualdad entre numeros utilizando comparacion con Epsilon.
 Usar double para mayor precision.
 
-Testear:
-    -Condicionales
-    -Relaciones (< <= > >= != ==)
-    -Operaciones logicas and , or
+
+Error en line.txt
