@@ -16,6 +16,8 @@ interface IVisitorStmt<T, U>
     public T VisitLinesStmt(Stmt.Lines stmt, Scope<U> scope);
     public T VisitSegmentStmt(Stmt.Segment stmt, Scope<U> scope);
     public T VisitRayStmt(Stmt.Ray stmt, Scope<U> scope);
+    public T VisitCircleStmt(Stmt.Circle stmt, Scope<U> scope);
+    public T VisitArcStmt(Stmt.Arc stmt, Scope<U> scope);
 }
 interface IVisitableStmt
 {
@@ -129,6 +131,50 @@ abstract class Stmt : IVisitableStmt
         public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
         {
             return visitor.VisitRayStmt(this, scope);
+        }
+    }
+     public class Circle : Stmt
+    {
+        public Token Id { get; private set; }//The name of the point will be used as identifier.
+        public Element.String Comment { get; private set; }//A comment associated to the line.
+
+        public Expr P1 { get; private set; }//first point
+        public Element.Number Radius { get; private set; }//radio 
+        public Circle(int _line, int _offset, Token _id, Expr _p1, Element.Number radius, Element.String _comment) : base(_line, _offset)
+        {
+            Id = _id;
+            P1 = _p1;
+            Radius = radius;
+            Comment = _comment;
+        }
+
+        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitCircleStmt(this, scope);
+        }
+    }
+    public class Arc : Stmt
+    {
+        public Token Id { get; private set; }//The name of the point will be used as identifier.
+        public Element.String Comment { get; private set; }//A comment associated to the line.
+
+        public Expr P1 { get; private set; }//first point
+        public Expr P2 { get; private set; }//first point
+        public Expr P3 { get; private set; }//first point
+        public Element.Number Radius { get; private set; }//radio 
+        public Arc(int _line, int _offset, Token _id, Expr _p1,Expr _p2,Expr _p3, Element.Number radius, Element.String _comment) : base(_line, _offset)
+        {
+            Id = _id;
+            P1 = _p1;
+            P2 = _p2;
+            P3 = _p3;
+            Radius = radius;
+            Comment = _comment;
+        }
+
+        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        {
+            return visitor.VisitArcStmt(this, scope);
         }
     }
     //Represents declaration of constants. A constant is a variable whose value cant be modified.
