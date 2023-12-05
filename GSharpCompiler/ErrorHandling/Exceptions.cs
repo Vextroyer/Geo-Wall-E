@@ -16,6 +16,11 @@ class RuntimeException : GSharpException{
     }
 }
 
+///<summary></summary>
+class ScopeException : GSharpException{
+    public ScopeException(string message):base(message){}
+}
+
 //Exceptions for each of the components of the compiler.
 
 ///<summary>Exception throwed by the scanner to signal errors.</summary>

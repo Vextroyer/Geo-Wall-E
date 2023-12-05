@@ -1,6 +1,8 @@
 /*
 On this class are defined the different objects that exist on a G# program execution.
 */
+using System.Collections;
+
 namespace GSharpCompiler;
 
 //Represents G# objects that can be drawed on screen. Not every object can be drawed.
@@ -20,7 +22,10 @@ public enum ElementType
     SEGMENT,
     RAY,
     CIRCLE,
-    ARC
+    ARC,
+    FUNCTION_LIST,
+    FUNCTION,
+    RUNTIME_DEFINED
 }
 
 //Base class for all elements that exist during runtime.
@@ -43,6 +48,8 @@ public abstract class Element
     //Boolean values are represented with numbers
     public static Element.Number TRUE = new Element.Number(1);
     public static Element.Number FALSE = new Element.Number(0);
+    ///<summary>Represents the runtime_defined type. Use this instead of declaring new RuntimeDefined objects.</summary>
+    public static Element.RuntimeDefined RUNTIME_DEFINED = new Element.RuntimeDefined();
 
     protected Element(ElementType type)
     {
@@ -50,6 +57,14 @@ public abstract class Element
     }
     //Equality operator
     public abstract Element.Number EqualTo(Element other);
+    ///<summary>Elements whose type deduction is defered to runtime.</summary>
+    public class RuntimeDefined : Element{
+        public RuntimeDefined():base(ElementType.RUNTIME_DEFINED){}
+        public override Number EqualTo(Element other)
+        {
+            throw new NotImplementedException("Cannot test equality on a RuntimeDefined element");
+        }
+    }
     public Element.Number NotEqualTo(Element other)
     {
         if (this.EqualTo(other) == Element.TRUE) return Element.FALSE;
@@ -167,7 +182,115 @@ public abstract class Element
             return Element.FALSE;
         }
     }
+    ///<summary>Represents a family of functions.</summary>
+    internal class FunctionList : Element, IList<Element.Function>{
+        public List<Element.Function> functions;
+        public FunctionList():base(ElementType.FUNCTION_LIST){
+            functions = new List<Element.Function>();
+        }
+        ///<summary>Determines wheter a function in the list has the given arity.</summary>
+        public bool ContainsArity(int arity){
+            if(arity < 0)throw new ArgumentException("Arity must be non-negative");
+            foreach(Element.Function function in functions)if(function.Arity == arity)return true;
+            return false;
+        }
+        public Function GetFunction(int arity){
+            if(arity < 0)throw new ArgumentException("Arity must be non-negative");
+            foreach(Element.Function function in functions)if(function.Arity == arity)return function;
+            throw new InvalidOperationException("A function with the provided arity was not found");
+        }
+        public Function this[int index] { get => functions[index]; set => functions[index] = value; }
 
+        public int Count => functions.Count;
+
+        public bool IsReadOnly => ((ICollection<Function>)functions).IsReadOnly;
+
+        public void Add(Function item)
+        {
+            functions.Add(item);
+        }
+
+        public void Clear()
+        {
+            functions.Clear();
+        }
+
+        public bool Contains(Function item)
+        {
+            return functions.Contains(item);
+        }
+
+        public void CopyTo(Function[] array, int arrayIndex)
+        {
+            functions.CopyTo(array, arrayIndex);
+        }
+
+        public override Number EqualTo(Element other)
+        {
+            throw new NotImplementedException("Cannot test equality on FunctionList");
+        }
+
+        public IEnumerator<Function> GetEnumerator()
+        {
+            return functions.GetEnumerator();
+        }
+
+        public int IndexOf(Function item)
+        {
+            return functions.IndexOf(item);
+        }
+
+        public void Insert(int index, Function item)
+        {
+            functions.Insert(index, item);
+        }
+
+        public bool Remove(Function item)
+        {
+            return functions.Remove(item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            functions.RemoveAt(index);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return functions.GetEnumerator();
+        }
+    }
+    ///<summary>Represents a function.</summary>
+    internal class Function : Element{
+        ///<summary>The arguments of the function.</summary>
+        public List<Element.String> Arguments {get; private set;}
+        ///<summary>The body of the function.</summary>
+        public Expr Body {get; private set;}
+        public Function(List<Token> arguments,Expr body):base(ElementType.FUNCTION){
+            Body = body;
+            Arguments = new List<Element.String>(arguments.Count);
+            foreach(Token identifier in arguments)Arguments.Add(new Element.String(identifier.Lexeme));
+        }
+        public override Number EqualTo(Element other)
+        {
+            throw new NotImplementedException("Cannot test equality on Function");
+        }
+        ///<summary>The arity of the function.</summary>
+        public int Arity {get => Arguments.Count;}
+        ///<summary>Create a body-less function with the given arity.</summary>
+        public static Element.Function MakeFunction(int arity){
+            if(arity < 0)throw new ArgumentException("Arity must be a non-negative integer");
+            List<Token> arguments = new  List<Token>(arity);
+            for(int i=0;i<arity;++i)arguments.Add(DUMMY);
+            return new Element.Function(arguments,Expr.EMPTY);
+        }
+        ///<summary>Create a function corresponding to the given function declaration.</summary>
+        public static Element.Function MakeFunction(Stmt.Declaration.Function funcDecl){
+            return new Element.Function(funcDecl.Arguments,funcDecl.Body);
+        }
+        ///<summary>A dummy token for creating functions that wont be used.</summary>
+        private static Token DUMMY = new Token(TokenType.EOF,"",null,-1,-1);
+    }
     //Represents a point on a 2D rectangular coordinate system.
     public class Point : Element, IDrawable
     {

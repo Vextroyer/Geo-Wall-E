@@ -5,8 +5,12 @@ StmtList = Stmt*; //A list of statements is zero or more statements.
 Stmt = PointStmt ';'; //Point statement
     PointStmt = 'point' ('(' NUMBER ',' NUMBER ')')? ID STRING?;
 
-Stmt = ConstantDeclaration ';'; //Declaration of a constant. Read only variable.
-    ConstantDeclaration = ID '=' Expr;
+Stmt = Declaration ';'; 
+    Declaration = ID '=' Expr ';';//Declaration of a constant. Read only variable.
+    Declaration = ID(Arguments) '=' Expr ';'; //Declaration of a function.
+        Arguments = (ID , (',' ID)* )?;
+
+Stmt = 'eval' Expr ';'; //The eval statemet, allow excecuting expressions as top-level statements.
 
 Stmt = 'print' Expr ';';//Print statement
 
@@ -17,7 +21,7 @@ Stmt = 'draw' Expr ';'; //Draw statement
 Stmt = ';'; //The empty statement
 
 //Set of the terminals that made the first word of the stmt production.
-First(stmt) = { ';' , 'point' , ID , 'print', 'color', 'restore' , 'draw' }
+First(stmt) = { ';' , 'point' , ID , 'print', 'color', 'restore' , 'draw' , 'call' }
 
 Expr = Conditional | Let-In | Or;
 Let-In = 'let' StmtList 'in' Expr);
@@ -29,10 +33,13 @@ Comparison = Term ( ('>' | '>=' | '<' | '<=') Term)?;
 Term = Factor ( ('+' | '-') Factor)*;
 Factor = Power ( ('*' | '%' | '/') Power)*;
 Power = UnaryExpr ( '^' Power)* ;
-UnaryExpr = ( ('!' | '-') UnaryExpr ) | VariableExpr;
-VariableExpr = ID | PrimaryExpr;
+UnaryExpr = ( ('!' | '-') UnaryExpr ) | VariableOrCallExpr;
+VariableOrCallExpr = CallExpr | VariableExpr | PrimaryExpr;
+    VariableExpr = ID;
+    CallExpr = ID '(' Parameters ')' ;
+        Parameters = (Expr , (',' Expr)* )? ;
 PrimaryExpr = NUMBER | STRING | GroupedExpr | EMPTY;
-GroupedExpr = '(' Expr ')';
+    GroupedExpr = '(' Expr ')';
 
 
 <!-- Expr = 'point' ('(' NUMBER ',' NUMBER ')') ; //Point expression -->

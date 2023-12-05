@@ -82,7 +82,7 @@ class Parser : GSharpCompilerComponent
                 aux = ParseArcStmt();
                 break;
             case TokenType.ID:
-                aux = ParseConstantDeclaration();
+                aux = ParseDeclaration();
                 break;
             case TokenType.PRINT:
                 aux = ParsePrintStmt();
@@ -93,6 +93,9 @@ class Parser : GSharpCompilerComponent
             case TokenType.COLOR:
             case TokenType.RESTORE:
                 aux = ParseColorStmt();
+                break;
+            case TokenType.EVAL:
+                aux = ParseEvalStmt();
                 break;
             default:
                 OnErrorFound(Peek.Line, Peek.Offset, "Not a statement");
@@ -263,13 +266,54 @@ class Parser : GSharpCompilerComponent
         if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
         return new Stmt.Arc(_line, _offset, id, p1,p2,p3, new Element.Number(radius), new Element.String(comment));
     }
-    private Stmt.ConstantDeclaration ParseConstantDeclaration()
+    ///<summary>Parse a declaration statement.</summary>
+    private Stmt.Declaration ParseDeclaration(){
+        //The actual token is an identifier.
+        //The type of declaration depends on the next token
+        switch(PeekNext.Type){
+            case TokenType.EQUAL:
+                //Identifier followed by an equal sign means a constant declaration.
+                return ParseConstantDeclaration();
+            case TokenType.LEFT_PAREN:
+                //Identifier followed by parentheses means a function declaration.
+                return ParseFunctionDeclaration();
+            default:
+                OnErrorFound(Peek.Line,Peek.Offset,"Identifier found on top level statement, but no declaration follows. If you intend to evaluate an expression use the `eval` keyword before the identifier.");
+                break;
+        }
+        //Unreachable code.
+        throw new Exception("Invalid execution path reached");
+    }
+    private Stmt.Declaration.Constant ParseConstantDeclaration()
     {
         Token id = Consume(TokenType.ID, "Expected identifier");
         Consume(TokenType.EQUAL, "Expected `=`");
         Expr expr = ParseExpression();
         ErrorIfEmpty(expr, id.Line, id.Offset, $"Assigned empty expression to constant `{id.Lexeme}`");//Rule 2
-        return new Stmt.ConstantDeclaration(id, expr);
+        return new Stmt.Declaration.Constant(id, expr);
+    }
+    private Stmt.Declaration.Function ParseFunctionDeclaration(){
+        Token id = Consume(TokenType.ID,"Expected identifier on function declaration");
+        Consume(TokenType.LEFT_PAREN);
+
+        ///<summary>Helper method to parse the arguments of a function.</summary>
+        List<Token> ParseFunctionArguments(){
+            List<Token> arguments = new List<Token>();
+            if(Peek.Type == TokenType.RIGHT_PAREN) return arguments;//A closing parenthesis means no arguments.
+
+            do{
+                Consume(TokenType.ID,"Identifier expected as argument");
+                arguments.Add(Previous);
+            }while(Match(TokenType.COMMA));
+            return arguments;
+        }
+
+        List<Token> arguments = ParseFunctionArguments();
+        Consume(TokenType.RIGHT_PAREN,"Expected `)` on function declaration");
+        Consume(TokenType.EQUAL,"Expected `=` after function signature");
+        Expr body = ParseExpression();
+        ErrorIfEmpty(body,id.Line,id.Offset,"Expected non-empty expression as function body");
+        return new Stmt.Declaration.Function(id,arguments,body);
     }
     private Stmt.Print ParsePrintStmt()
     {
@@ -329,6 +373,13 @@ class Parser : GSharpCompilerComponent
 
         Advance();//Consume the token who holds the color.
         return new Stmt.Color(line, offset, color);
+    }
+    private Stmt.Eval ParseEvalStmt(){
+        Consume(TokenType.EVAL);
+        int line = Previous.Line;
+        int offset = Previous.Offset;
+        Expr expr = ParseExpression();
+        return new Stmt.Eval(line,offset,expr);
     }
     #endregion Statement parsing
 
@@ -423,17 +474,36 @@ class Parser : GSharpCompilerComponent
                 ErrorIfEmpty(expr, Previous.Line, Previous.Offset, "Expected non-empty expression as operand");
                 return new Expr.Unary.Minus(Previous.Line, Previous.Offset, expr);
             default:
-                return ParseVariableExpression();
+                return ParseVariableOrCallExpression();
         }
     }
-    private Expr ParseVariableExpression()
+    private Expr ParseVariableOrCallExpression()
     {
+        //Parse a variable or a call
         if (Match(TokenType.ID))
         {
             Token id = Previous;
+            if(Match(TokenType.LEFT_PAREN)){
+                //Parse a call
+                List<Expr> parameters = ParseParameters();
+                Consume(TokenType.RIGHT_PAREN,$"Expected `)` after parameters on call to `{id.Lexeme}`");
+                return new Expr.Call(id,parameters);
+            }
+            //Parse a variable
             return new Expr.Variable(id);
         }
         return ParsePrimaryExpression();
+
+        ///<summary>Parse a function call parameters.</summary>
+        List<Expr> ParseParameters(){
+            List<Expr> parameters = new List<Expr>();
+            //A closing parenthesis means no parameters.
+            if(Peek.Type == TokenType.RIGHT_PAREN)return parameters;
+            do{
+                parameters.Add(ParseExpression());
+            }while(Match(TokenType.COMMA));
+            return parameters;
+        }
     }
     private Expr ParsePrimaryExpression()
     {
@@ -459,6 +529,13 @@ class Parser : GSharpCompilerComponent
 
     //Return the current token without moving current,which without consuming its.
     private Token Peek { get => tokens[current]; }
+    ///<summary>The token after `current` token. If there is no more tokens after `current` returns the last token on `tokens`.</summary>
+    private Token PeekNext {
+        get{
+            if(current + 1 < tokens.Count)return tokens[current + 1];
+            return tokens[tokens.Count - 1];
+        }
+    }
     //Return the current token and move current one position ahead, this is called consume the token.
     private Token Advance()
     {

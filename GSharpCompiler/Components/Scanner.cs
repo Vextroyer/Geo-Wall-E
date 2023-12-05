@@ -30,6 +30,7 @@ class Scanner : GSharpCompilerComponent
         {"ray",TokenType.RAY},
         {"circle",TokenType.CIRCLE},
         {"arc",TokenType.ARC},
+        {"eval",TokenType.EVAL},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},

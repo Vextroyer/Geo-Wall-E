@@ -4,24 +4,26 @@ Statements are instructions that modify the state of the program.
 namespace GSharpCompiler;
 using System.Collections;
 
-interface IVisitorStmt<T, U>
+interface IVisitorStmt<T>
 {
-    public T VisitEmptyStmt(Stmt.Empty stmt, Scope<U> scope);
-    public T VisitPointStmt(Stmt.Point stmt, Scope<U> scope);
-    public T VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt, Scope<U> scope);
-    public T VisitPrintStmt(Stmt.Print stmt, Scope<U> scope);
-    public T VisitColorStmt(Stmt.Color stmt, Scope<U> scope);
-    public T VisitDrawStmt(Stmt.Draw stmt, Scope<U> scope);
-    public T VisitStmtList(Stmt.StmtList stmt, Scope<U> scope);
-    public T VisitLinesStmt(Stmt.Lines stmt, Scope<U> scope);
-    public T VisitSegmentStmt(Stmt.Segment stmt, Scope<U> scope);
-    public T VisitRayStmt(Stmt.Ray stmt, Scope<U> scope);
-    public T VisitCircleStmt(Stmt.Circle stmt, Scope<U> scope);
-    public T VisitArcStmt(Stmt.Arc stmt, Scope<U> scope);
+    public T VisitEmptyStmt(Stmt.Empty stmt, Scope scope);
+    public T VisitPointStmt(Stmt.Point stmt, Scope scope);
+    public T VisitConstantDeclarationStmt(Stmt.Declaration.Constant stmt, Scope scope);
+    public T VisitFunctionDeclarationStmt(Stmt.Declaration.Function stmt, Scope scope);
+    public T VisitPrintStmt(Stmt.Print stmt, Scope scope);
+    public T VisitColorStmt(Stmt.Color stmt, Scope scope);
+    public T VisitDrawStmt(Stmt.Draw stmt, Scope scope);
+    public T VisitStmtList(Stmt.StmtList stmt, Scope scope);
+    public T VisitLinesStmt(Stmt.Lines stmt, Scope scope);
+    public T VisitSegmentStmt(Stmt.Segment stmt, Scope scope);
+    public T VisitRayStmt(Stmt.Ray stmt, Scope scope);
+    public T VisitEvalStmt(Stmt.Eval stmt, Scope scope);
+    public T VisitCircleStmt(Stmt.Circle stmt, Scope scope);
+    public T VisitArcStmt(Stmt.Arc stmt, Scope scope);
 }
 interface IVisitableStmt
 {
-    public T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope);
+    public T Accept<T>(IVisitorStmt<T> visitor, Scope scope);
 }
 //Base class for statements.
 abstract class Stmt : IVisitableStmt
@@ -35,12 +37,12 @@ abstract class Stmt : IVisitableStmt
         Offset = _offset;
     }
     //Required to work in conjuction with the IVisitorStmt interface.
-    abstract public T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope);
+    abstract public T Accept<T>(IVisitorStmt<T> visitor, Scope scope);
     ///<summary>Represents an empty statement.</summary>
     public class Empty : Stmt
     {
         public Empty() : base(0, 0) { }
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitEmptyStmt(this, scope);
         }
@@ -64,7 +66,7 @@ abstract class Stmt : IVisitableStmt
             Comment = _comment;
         }
 
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitPointStmt(this, scope);
         }
@@ -73,8 +75,8 @@ abstract class Stmt : IVisitableStmt
     //Represents a `Lines` statement.
     public class Lines : Stmt
     {
-        public Token Id { get; private set; }//The name of the point will be used as identifier.
-        public Element.String Comment { get; private set; }//A comment associated to the line.
+        public Token Id { get; protected set; }//The name of the point will be used as identifier.
+        public Element.String Comment { get; protected set; }//A comment associated to the line.
 
         public Expr P1 { get; private set; }//first point
         public Expr P2 { get; private set; }//second 
@@ -86,49 +88,28 @@ abstract class Stmt : IVisitableStmt
             Comment = _comment;
         }
 
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitLinesStmt(this, scope);
         }
     }
     //Represents a `Segment` statement.
-    public class Segment : Stmt
+    public class Segment : Lines
     {
-        public Token Id { get; private set; }//The name of the point will be used as identifier.
-        public Element.String Comment { get; private set; }//A comment associated to the line.
-
-        public Expr P1 { get; private set; }//first point
-        public Expr P2 { get; private set; }//second 
-        public Segment(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset)
-        {
-            Id = _id;
-            P1 = _p1;
-            P2 = _p2;
-            Comment = _comment;
-        }
-
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public Segment(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment):base(_line,_offset,_id,_p1,_p2,_comment)
+        {}
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitSegmentStmt(this, scope);
         }
     }
     //Represents a `Ray` statement.
-    public class Ray : Stmt
+    public class Ray : Lines
     {
-        public Token Id { get; private set; }//The name of the point will be used as identifier.
-        public Element.String Comment { get; private set; }//A comment associated to the line.
+        public Ray(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset,_id,_p1,_p2,_comment)
+        {}
 
-        public Expr P1 { get; private set; }//first point
-        public Expr P2 { get; private set; }//second 
-        public Ray(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset)
-        {
-            Id = _id;
-            P1 = _p1;
-            P2 = _p2;
-            Comment = _comment;
-        }
-
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitRayStmt(this, scope);
         }
@@ -148,7 +129,7 @@ abstract class Stmt : IVisitableStmt
             Comment = _comment;
         }
 
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitCircleStmt(this, scope);
         }
@@ -172,26 +153,48 @@ abstract class Stmt : IVisitableStmt
             Comment = _comment;
         }
 
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitArcStmt(this, scope);
         }
     }
-    //Represents declaration of constants. A constant is a variable whose value cant be modified.
-    public class ConstantDeclaration : Stmt
-    {
-        public Token Id { get; private set; }
-        public Expr Rvalue { get; private set; }
-
-        public ConstantDeclaration(Token _id, Expr _expr) : base(_id.Line, _id.Offset)
-        {
-            Id = _id;
-            Rvalue = _expr;
+    ///<summary>Base class for declarations. A declaration associates an identifier with an Element, for example Number or Function.</summary>
+    public abstract class Declaration : Stmt{
+        ///<summary>The Identifier which will be binded to the Element.</summary>
+        public Token Id {get; protected set;}
+        protected Declaration(Token identifier):base(identifier.Line,identifier.Offset){
+            Id = identifier;
         }
 
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
-        {
-            return visitor.VisitConstantDeclarationStmt(this, scope);
+        abstract public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope);
+
+        ///<summary>Represents declaration of constants.</summary>
+        public class Constant : Declaration{
+            ///<summary>Expression to be associated to the identifier.</summary>
+            public Expr RValue {get; private set;}
+            public Constant(Token identifier, Expr rvalue):base(identifier){
+                RValue = rvalue;
+            }
+            public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
+            {
+                return visitor.VisitConstantDeclarationStmt(this, scope);
+            }
+        }
+        ///<summary>Represents function declarations.</summary>
+        public class Function : Declaration{
+            ///<summary>The identifiers that made the arguments of the function.</summary>
+            public List<Token> Arguments {get; private set;}
+            ///<summary>The expr that made the body of the function.</summary>
+            public Expr Body {get; private set;}
+            public Function(Token identifier,List<Token> arguments, Expr body):base(identifier){
+                Arguments = arguments;
+                Body = body;
+            }
+            public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
+            {
+                return visitor.VisitFunctionDeclarationStmt(this, scope);
+            }
+            public int Arity {get => Arguments.Count;}
         }
     }
 
@@ -204,12 +207,23 @@ abstract class Stmt : IVisitableStmt
             _Expr = _expr;
         }
 
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitDrawStmt(this, scope);
         }
     }
-
+    ///<summary>An Eval statement allow evaluating an expression as a top level statement.</summary>
+    public class Eval : Stmt{
+        ///<summary>The expression to be evaluated.</summary>
+        public Expr Expr{get; private set;}
+        public Eval(int line,int offset,Expr expr):base(line,offset){
+            Expr = expr;
+        }
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
+        {
+            return visitor.VisitEvalStmt(this, scope);
+        }
+    }
     //Print statement
     public class Print : Stmt
     {
@@ -218,7 +232,7 @@ abstract class Stmt : IVisitableStmt
         {
             _Expr = _expr;
         }
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitPrintStmt(this, scope);
         }
@@ -234,7 +248,7 @@ abstract class Stmt : IVisitableStmt
             IsRestore = _restore;
         }
 
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitColorStmt(this, scope);
         }
@@ -249,7 +263,7 @@ abstract class Stmt : IVisitableStmt
         {
             this.stmts = new List<Stmt>();
         }
-        public override T Accept<T, U>(IVisitorStmt<T, U> visitor, Scope<U> scope)
+        public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitStmtList(this, scope);
         }

@@ -14,7 +14,7 @@ print p1;
 
 //Nested let-in usage
 print let
-        a = let 
+        z = let 
                 b = if 2 + 3 < 5 then 1 else (2-3)^5;
                 c = let
                         k = 3 + b * b;
@@ -23,32 +23,32 @@ print let
             in
                 - b - c;
       in
-        987 * a;
+        987 * z;
 
 //Some arithmetics
 print let
-        a = 2;
+        z = 2;
         b = 3;
         c = 7;
       in
-        a * c - b;
+        z * c - b;
 
 //Empty statements
 print let ;;;;;;;;; in -27;
 
 //Let-in used inside an if-else-then expression
-a = if (let x = 2; in x * x) < 4 then "Oh no, its bugged" else "Woooo, it works";
-print a;
+q = if (let x = 2; in x * x) < 4 then "Oh no, its bugged" else "Woooo, it works";
+print q;
 
 print 
     let
-        a = let
+        z = let
             b = 4;
         in b;
         b = let // Es válido porque está declarada luego del hijo que la usa
             c = 5;
         in c;
-    in a + b;
+    in z + b;
 
 //Accesing variables in a parent scope.
-print let a = 1; in let b = 2; in let c = 3; in let d = 4; in let e = 5; in a + b + c + d + e;
+print let z = 1; in let b = 2; in let c = 3; in let d = 4; in let e = 5; in z + b + c + d + e;
