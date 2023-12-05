@@ -33,10 +33,13 @@ Comparison = Term ( ('>' | '>=' | '<' | '<=') Term)?;
 Term = Factor ( ('+' | '-') Factor)*;
 Factor = Power ( ('*' | '%' | '/') Power)*;
 Power = UnaryExpr ( '^' Power)* ;
-UnaryExpr = ( ('!' | '-') UnaryExpr ) | VariableExpr;
-VariableExpr = ID | PrimaryExpr;
+UnaryExpr = ( ('!' | '-') UnaryExpr ) | VariableOrCallExpr;
+VariableOrCallExpr = CallExpr | VariableExpr | PrimaryExpr;
+    VariableExpr = ID;
+    CallExpr = ID '(' Parameters ')' ;
+        Parameters = (Expr , (',' Expr)* )? ;
 PrimaryExpr = NUMBER | STRING | GroupedExpr | EMPTY;
-GroupedExpr = '(' Expr ')';
+    GroupedExpr = '(' Expr ')';
 
 
 <!-- Expr = 'point' ('(' NUMBER ',' NUMBER ')') ; //Point expression -->

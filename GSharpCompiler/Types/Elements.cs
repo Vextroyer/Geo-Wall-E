@@ -22,7 +22,8 @@ public enum ElementType
     SEGMENT,
     RAY,
     FUNCTION_LIST,
-    FUNCTION
+    FUNCTION,
+    RUNTIME_DEFINED
 }
 
 //Base class for all elements that exist during runtime.
@@ -43,6 +44,8 @@ public abstract class Element
     //Boolean values are represented with numbers
     public static Element.Number TRUE = new Element.Number(1);
     public static Element.Number FALSE = new Element.Number(0);
+    ///<summary>Represents the runtime_defined type. Use this instead of declaring new RuntimeDefined objects.</summary>
+    public static Element.RuntimeDefined RUNTIME_DEFINED = new Element.RuntimeDefined();
 
     protected Element(ElementType type)
     {
@@ -50,6 +53,14 @@ public abstract class Element
     }
     //Equality operator
     public abstract Element.Number EqualTo(Element other);
+    ///<summary>Elements whose type deduction is defered to runtime.</summary>
+    public class RuntimeDefined : Element{
+        public RuntimeDefined():base(ElementType.RUNTIME_DEFINED){}
+        public override Number EqualTo(Element other)
+        {
+            throw new NotImplementedException("Cannot test equality on a RuntimeDefined element");
+        }
+    }
     public Element.Number NotEqualTo(Element other)
     {
         if (this.EqualTo(other) == Element.TRUE) return Element.FALSE;

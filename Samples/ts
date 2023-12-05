@@ -1,5 +1,13 @@
 //Sample program to save functionalities to test.
 
+a() = "Helloworld";
 
-//Accesing variables in a parent scope.
-print let a = 1; in let b = 2; in let c = 3; in let d = 4; in let e = 5; in a + b + c + d + e;
+print a();
+
+
+eval let
+    a = 3;
+    b(a) = a;
+    print b(2);
+    print b(a);
+    in b(5);

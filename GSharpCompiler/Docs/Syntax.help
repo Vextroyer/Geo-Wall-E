@@ -15,3 +15,5 @@ Rules
     -A constant exist with the same name on the actual or any parent scope. Derived from rule # 1
     -An argument exist with the same name on the actual scope. Derived from rule # 3.
     -A function exist with the same name and same arity on the actual scope. Extension of rule # 3.
+12- Operations on a RuntimeDefined element:
+    -yield a RuntimeDefined element except when operated with an undefined element,which yield undefined.

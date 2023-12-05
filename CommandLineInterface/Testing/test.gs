@@ -212,3 +212,22 @@ print 2 == 2;
 print 2 != 2;
 print if 0 then "pinto 0" else "pinto 1";
 print if 1 then "pinto 0" else "pinto 1";
+
+print let
+        a() = "helloworld";
+      in a();
+
+print let
+        a() = "helloworld";
+      in let
+            a = 3;
+            b(a) = a;
+      in b(a);
+
+print let
+        fib(n) = if n <= 1 then 1 else fib(n - 1) + fib(n - 2);
+      in fib(10);
+
+print let
+        fact(n) = if(n <= 0) then 1 else n * fact(n - 1);
+      in fact(5);

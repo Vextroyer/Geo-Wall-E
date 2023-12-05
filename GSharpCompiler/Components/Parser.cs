@@ -420,17 +420,36 @@ class Parser : GSharpCompilerComponent
                 ErrorIfEmpty(expr, Previous.Line, Previous.Offset, "Expected non-empty expression as operand");
                 return new Expr.Unary.Minus(Previous.Line, Previous.Offset, expr);
             default:
-                return ParseVariableExpression();
+                return ParseVariableOrCallExpression();
         }
     }
-    private Expr ParseVariableExpression()
+    private Expr ParseVariableOrCallExpression()
     {
+        //Parse a variable or a call
         if (Match(TokenType.ID))
         {
             Token id = Previous;
+            if(Match(TokenType.LEFT_PAREN)){
+                //Parse a call
+                List<Expr> parameters = ParseParameters();
+                Consume(TokenType.RIGHT_PAREN,$"Expected `)` after parameters on call to `{id.Lexeme}`");
+                return new Expr.Call(id,parameters);
+            }
+            //Parse a variable
             return new Expr.Variable(id);
         }
         return ParsePrimaryExpression();
+
+        ///<summary>Parse a function call parameters.</summary>
+        List<Expr> ParseParameters(){
+            List<Expr> parameters = new List<Expr>();
+            //A closing parenthesis means no parameters.
+            if(Peek.Type == TokenType.RIGHT_PAREN)return parameters;
+            do{
+                parameters.Add(ParseExpression());
+            }while(Match(TokenType.COMMA));
+            return parameters;
+        }
     }
     private Expr ParsePrimaryExpression()
     {

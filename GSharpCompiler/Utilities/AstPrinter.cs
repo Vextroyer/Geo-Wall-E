@@ -192,4 +192,17 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
     {
         return $"let({Print(expr.LetStmts)})\nin({Print(expr.InExpr)})";
     }
+
+    public string VisitCallExpr(Expr.Call expr,Scope scope){
+        return $"{expr.Id.Lexeme}({PrintArguments()})";
+
+        string PrintArguments(){
+            string ret = "";
+            for(int i=0;i<expr.Parameters.Count;++i){
+                ret += Print(expr.Parameters[i]);
+                if(i < expr.Parameters.Count - 1)ret += ',';
+            }
+            return ret;
+        }
+    }
 }

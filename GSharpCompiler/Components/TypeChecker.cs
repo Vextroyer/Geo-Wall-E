@@ -215,7 +215,12 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         Element rValue = Check(unaryMinusExpr._Expr, scope);
         try
         {
+            if (rValue.Type == ElementType.RUNTIME_DEFINED){
+                unaryMinusExpr.RequiresRuntimeCheck = true;
+                return Element.NUMBER;
+            }
             if (rValue.Type != ElementType.NUMBER) OnErrorFound(unaryMinusExpr.Line, unaryMinusExpr.Offset, $"Applied `-` operator to a {rValue.Type} operand");
+            unaryMinusExpr.RequiresRuntimeCheck = false;
         }
         catch (RecoveryModeException)
         {
@@ -275,20 +280,28 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     private void CheckNumberOperands(Expr.Binary binaryExpr, Scope scope)
     {
+        bool runtimeCheck = false;
         try
         {
             Element operand = Check(binaryExpr.Left, scope);//Check left operand
-            if (operand.Type != ElementType.NUMBER) OnErrorFound(binaryExpr.Left.Line, binaryExpr.Left.Offset, $"Left operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
+            if(operand.Type == ElementType.RUNTIME_DEFINED){
+                runtimeCheck = true;
+            }
+            else if (operand.Type != ElementType.NUMBER) OnErrorFound(binaryExpr.Left.Line, binaryExpr.Left.Offset, $"Left operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
         }
         catch (RecoveryModeException) { }
         try
         {
             Element operand = Check(binaryExpr.Right, scope);//Check right operand
-            if (operand.Type != ElementType.NUMBER) OnErrorFound(binaryExpr.Right.Line, binaryExpr.Right.Offset, $"Right operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
+            if(operand.Type == ElementType.RUNTIME_DEFINED){
+                runtimeCheck = true;
+            }
+            else if (operand.Type != ElementType.NUMBER) OnErrorFound(binaryExpr.Right.Line, binaryExpr.Right.Offset, $"Right operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
         }
         catch (RecoveryModeException) { }
         //On error recovery mode assume that the operands are numbers and continue, this works because the return type of the methods
         //that use this method is always a number.
+        binaryExpr.RequiresRuntimeCheck = runtimeCheck;
     }
     private void CheckLineDeclaration(Stmt.Lines lineStmt, Scope scope){
         //Both expressions must be points in order to build the line
@@ -304,7 +317,6 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         //On error recovery mode assume that the parameters are points and continue, this works because the return type of the methods
         //that use this method a well defined type.
     }
-
     public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope scope)
     {
         Check(equalEqualExpr.Left, scope);
@@ -338,8 +350,13 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         Check(conditionalExpr.Condition, scope);//Check condition
         Element thenBranchElement = Check(conditionalExpr.ThenBranchExpr, scope);//Check if branch expression
         Element elseBranchElement = Check(conditionalExpr.ElseBranchExpr, scope);//Check else branch expression
-        if (thenBranchElement.Type != elseBranchElement.Type) OnErrorFound(conditionalExpr.Line, conditionalExpr.Offset, $"Expected equal return types for `if-then-else` expression branches, but {thenBranchElement.Type} and {elseBranchElement.Type} were found.");
+        if(thenBranchElement.Type == ElementType.RUNTIME_DEFINED) return elseBranchElement;
+        if(elseBranchElement.Type == ElementType.RUNTIME_DEFINED) return thenBranchElement;
+        
         //This error can't be recovered here, it will be recovered on a lower node of the syntax tree.
+        if (thenBranchElement.Type != elseBranchElement.Type) OnErrorFound(conditionalExpr.Line, conditionalExpr.Offset, $"Expected equal return types for `if-then-else` expression branches, but {thenBranchElement.Type} and {elseBranchElement.Type} were found.");
+
+        conditionalExpr.RequiresRuntimeCheck = false;
         return thenBranchElement;
     }
     public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope scope)
@@ -348,5 +365,24 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         foreach (Stmt stmt in letInExpr.LetStmts) Check(stmt, letInScope);
         Element inExprElement = Check(letInExpr.InExpr, letInScope);
         return inExprElement;
+    }
+    public Element VisitCallExpr(Expr.Call callExpr, Scope scope){
+        try{
+            //Check that the identifier associated to the call corresponds to a given function.
+            scope.Get(callExpr.Id.Lexeme,callExpr.Arity);
+            //Check the parameters of the function
+            foreach(Expr parameterExpr in callExpr.Parameters){
+                try{
+                    Check(parameterExpr,scope);
+                }
+                catch(RecoveryModeException){
+                    //If a parameter has semantic issues detect it as an error, but continue checking the other parameters.
+                }
+            }
+        }catch(ScopeException e){
+            OnErrorFound(callExpr.Line,callExpr.Offset,e.Message);
+        }
+        //Cannot recover after the call because the return type of the call cant be determined.
+        return Element.RUNTIME_DEFINED;
     }
 }

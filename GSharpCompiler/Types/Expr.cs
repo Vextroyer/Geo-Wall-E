@@ -28,6 +28,7 @@ interface IVisitorExpr<T>{
     public T VisitBinaryOrExpr(Expr.Binary.Or expr,Scope scope);
     public T VisitConditionalExpr(Expr.Conditional expr,Scope scope);
     public T VisitLetInExpr(Expr.LetIn expr, Scope scope);
+    public T VisitCallExpr(Expr.Call expr,Scope scope);
 }
 interface IVisitableExpr{
     public T Accept<T>(IVisitorExpr<T> visitor,Scope scope);
@@ -37,9 +38,11 @@ interface IVisitableExpr{
 abstract class Expr : IVisitableExpr{
     public int Line {get; private set;}
     public int Offset {get; private set;}
+    public virtual bool RequiresRuntimeCheck {get; set;}
     protected Expr(int _line,int _offset){
         Line = _line;
         Offset = _offset;
+        RequiresRuntimeCheck = true;
     }
 
     //Required to work in conjuction with the VisitorStmt interface.
@@ -52,6 +55,7 @@ abstract class Expr : IVisitableExpr{
         {
             return visitor.VisitEmptyExpr(this,scope);
         }
+        public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
     }
     public static Empty EMPTY = new Empty();//This is the empty expression.
     
@@ -64,6 +68,7 @@ abstract class Expr : IVisitableExpr{
         {
             return visitor.VisitNumberExpr(this,scope);
         }
+        public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
     }
     public class String : Expr{
         public Element.String Value {get; private set;}
@@ -74,6 +79,7 @@ abstract class Expr : IVisitableExpr{
         {
             return visitor.VisitStringExpr(this,scope);
         }
+        public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
     }
     //A Variable expression stores an identifier who is asscociated with an element.
     public class Variable : Expr{
@@ -85,6 +91,22 @@ abstract class Expr : IVisitableExpr{
         {
             return visitor.VisitVariableExpr(this,scope);
         }
+        public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
+    }
+    ///<summary>Represent function calls.</summary>
+    public class Call : Expr{
+        public Token Id {get; private set;}
+        public List<Expr> Parameters {get; private set;}
+        public int Arity {get => Parameters.Count;}
+        public Call(Token id,List<Expr> parameters):base(id.Line,id.Offset){
+            Id = id;
+            Parameters = parameters;
+        }
+        public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
+        {
+            return visitor.VisitCallExpr(this,scope);
+        }
+        public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
     }
     //Base class for unary operators.
     public abstract class Unary : Expr
@@ -102,6 +124,7 @@ abstract class Expr : IVisitableExpr{
             {
                 return visitor.VisitUnaryNotExpr(this,scope);
             }
+            public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
         }
         //Represents `-` operator
         public class Minus : Unary
@@ -254,6 +277,7 @@ abstract class Expr : IVisitableExpr{
             {
                 return visitor.VisitBinaryEqualEqualExpr(this,scope);
             }
+            public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
         }
         //Represents the `!=` operator for greater-than relation
         public class NotEqual : Binary{
@@ -262,6 +286,7 @@ abstract class Expr : IVisitableExpr{
             {
                 return visitor.VisitBinaryNotEqualExpr(this,scope);
             }
+            public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
         }
         //Represents the `&` operator for logical and
         public class And : Binary{
@@ -270,6 +295,7 @@ abstract class Expr : IVisitableExpr{
             {
                 return visitor.VisitBinaryAndExpr(this,scope);
             }
+            public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
         }
         //Represents the `|` operator for logical or
         public class Or : Binary{
@@ -278,6 +304,7 @@ abstract class Expr : IVisitableExpr{
             {
                 return visitor.VisitBinaryOrExpr(this,scope);
             }
+            public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
         }
     }
     //Conditional operator if-then-else
@@ -310,5 +337,6 @@ abstract class Expr : IVisitableExpr{
         {
             return visitor.VisitLetInExpr(this,scope);
         }
+        public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
     }
 }
