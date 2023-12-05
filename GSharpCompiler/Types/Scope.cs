@@ -108,13 +108,7 @@ class Scope{
     }
     ///<summary>Creates a new scope with <c>parentScope</c> as parent. Bind the arguments with the parameters(As constants, except if they are functions.). Doesnt interfere with constant declarations on enclosing scopes because it shadows them.</summary>
     public static Scope RequestScopeForFunction(List<Element.String> Arguments,List<Element> Parameters, Scope? parentScope = null){
-        if(Arguments.Count != Parameters.Count){
-            System.Console.WriteLine("Arguments");
-            foreach(var i in Arguments)System.Console.WriteLine(i);
-            Console.WriteLine("parameters");
-            foreach(var v in Parameters)System.Console.WriteLine(v);
-            throw new ScopeException("Arguments and parameters count doesnt match");
-        }
+        if(Arguments.Count != Parameters.Count)throw new ScopeException("Arguments and parameters count doesnt match");
         Scope functionScope = new Scope();
         for(int i=0;i<Arguments.Count;++i){
             if(Parameters[i].Type == ElementType.FUNCTION)functionScope.SetArgument(Arguments[i].Value,Parameters[i]);

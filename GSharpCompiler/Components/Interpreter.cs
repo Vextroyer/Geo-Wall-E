@@ -192,7 +192,6 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     }
 
     public Element VisitBinarySumExpr(Expr.Binary.Sum sumExpr, Scope scope){
-        System.Console.WriteLine(sumExpr.RequiresRuntimeCheck);
         Element left = Evaluate(sumExpr.Left,scope);
         if(sumExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(sumExpr.Line,sumExpr.Offset,$"Left operand of `+` is of type {left.Type}");
         Element right = Evaluate(sumExpr.Right,scope);
@@ -263,16 +262,9 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     }
 
     public Element VisitConditionalExpr(Expr.Conditional conditionalExpr, Scope scope){
-        //This could lead to security holes
-        if(!conditionalExpr.RequiresRuntimeCheck){
-            if( IsTruthy(Evaluate(conditionalExpr.Condition,scope)) == Element.TRUE ) return Evaluate(conditionalExpr.ThenBranchExpr,scope);
-            return Evaluate(conditionalExpr.ElseBranchExpr,scope);
-        }
-        Element thenBranchElement = Evaluate(conditionalExpr.ThenBranchExpr,scope);
-        Element elseBranchElement = Evaluate(conditionalExpr.ElseBranchExpr,scope);
-        if(thenBranchElement.Type != elseBranchElement.Type)throw new RuntimeException(conditionalExpr.Line,conditionalExpr.Offset,$"Expected equal return types for `if-then-else` expression branches, but {thenBranchElement.Type} and {elseBranchElement.Type} were found.");
-        if(IsTruthy(Evaluate(conditionalExpr.Condition,scope)) == Element.TRUE)return thenBranchElement;
-        return elseBranchElement;
+        //This could lead to security holes, because if the conditional is declared inside a function then it would not be checked for having the same return type for both operands.
+        if( IsTruthy(Evaluate(conditionalExpr.Condition,scope)) == Element.TRUE ) return Evaluate(conditionalExpr.ThenBranchExpr,scope);
+        return Evaluate(conditionalExpr.ElseBranchExpr,scope);
     }
 
     public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope scope){
