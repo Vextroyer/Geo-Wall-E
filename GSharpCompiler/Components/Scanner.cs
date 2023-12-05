@@ -28,6 +28,8 @@ class Scanner : GSharpCompilerComponent
         {"line",TokenType.LINE},
         {"segment",TokenType.SEGMENT},
         {"ray",TokenType.RAY},
+        {"circle",TokenType.CIRCLE},
+        {"arc",TokenType.ARC},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},

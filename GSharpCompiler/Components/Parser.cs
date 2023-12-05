@@ -75,6 +75,12 @@ class Parser : GSharpCompilerComponent
             case TokenType.RAY:
                 aux = ParseRayStmt();
                 break;
+            case TokenType.CIRCLE:
+                aux = ParseCircleStmt();
+                break;
+            case TokenType.ARC:
+                aux = ParseArcStmt();
+                break;
             case TokenType.ID:
                 aux = ParseConstantDeclaration();
                 break;
@@ -190,7 +196,7 @@ class Parser : GSharpCompilerComponent
     {
         int _line = Peek.Line;
         int _offset = Peek.Offset;
-        Consume(TokenType.RAY, "Expected `segment` keyword");
+        Consume(TokenType.RAY, "Expected `ray` keyword");
 
         Consume(TokenType.LEFT_PAREN);
         // p1 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as first parameter").Literal!;
@@ -208,6 +214,54 @@ class Parser : GSharpCompilerComponent
         if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
 
         return new Stmt.Ray(_line, _offset, id, p1, p2, new Element.String(comment));
+    }
+    private Stmt.Circle ParseCircleStmt()
+    {
+        int _line = Peek.Line;
+        int _offset = Peek.Offset;
+        Consume(TokenType.CIRCLE, "Expected `circle` keyword");
+
+        float radius = Utils.RandomCoordinate();
+
+        Consume(TokenType.LEFT_PAREN);
+        Expr p1 = ParseExpression();
+        Consume(TokenType.COMMA, "Expected comma `,`");
+        radius = (float)Consume(TokenType.NUMBER, "Expected NUMBER as second parameter").Literal!;
+        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+
+
+        Token id = Consume(TokenType.ID, "Expected identifier");
+
+        //If the current token is an string then its a comment on the line.
+        string comment = "";
+        if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
+        return new Stmt.Circle(_line, _offset, id, p1, new Element.Number(radius), new Element.String(comment));
+    }
+    private Stmt.Arc ParseArcStmt()
+    {
+        int _line = Peek.Line;
+        int _offset = Peek.Offset;
+        Consume(TokenType.ARC, "Expected `arc` keyword");
+
+        float radius = Utils.RandomCoordinate();
+
+        Consume(TokenType.LEFT_PAREN);
+        Expr p1 = ParseExpression();
+        Consume(TokenType.COMMA, "Expected comma `,`");
+        Expr p2 = ParseExpression();
+        Consume(TokenType.COMMA, "Expected comma `,`");
+        Expr p3 = ParseExpression();
+        Consume(TokenType.COMMA, "Expected comma `,`");
+        radius = (float)Consume(TokenType.NUMBER, "Expected NUMBER as second parameter").Literal!;
+        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+
+
+        Token id = Consume(TokenType.ID, "Expected identifier");
+
+        //If the current token is an string then its a comment on the line.
+        string comment = "";
+        if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
+        return new Stmt.Arc(_line, _offset, id, p1,p2,p3, new Element.Number(radius), new Element.String(comment));
     }
     private Stmt.ConstantDeclaration ParseConstantDeclaration()
     {

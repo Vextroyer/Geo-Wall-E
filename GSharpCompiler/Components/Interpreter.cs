@@ -26,7 +26,7 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     //Interpret a program.
     public List<IDrawable> Interpret(Program program)
     {
-        Interpret(program.Stmts,globalScope);
+        Interpret(program.Stmts, globalScope);
         return drawables;
     }
     #region Interpret statements
@@ -35,7 +35,8 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         stmt.Accept(this, scope);
         return null;
     }
-    public object? VisitStmtList(Stmt.StmtList stmtList, Scope<Element> scope){
+    public object? VisitStmtList(Stmt.StmtList stmtList, Scope<Element> scope)
+    {
         foreach (Stmt stmt in stmtList)
         {
             Interpret(stmt, scope);
@@ -48,25 +49,35 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     }
     public object? VisitPointStmt(Stmt.Point point, Scope<Element> scope)
     {
-        scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), point.X, point.Y, point.Comment,colorStack.Top));
+        scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), point.X, point.Y, point.Comment, colorStack.Top));
         return null;
     }
-      public object? VisitLinesStmt(Stmt.Lines lines, Scope<Element> scope)
+    public object? VisitLinesStmt(Stmt.Lines lines, Scope<Element> scope)
     {
-        scope.SetArgument(lines.Id.Lexeme, new Element.Lines(new Element.String(lines.Id.Lexeme),(Element.Point)Evaluate(lines.P1,scope) , (Element.Point)(Evaluate(lines.P2,scope)),lines.Comment,colorStack.Top));
+        scope.SetArgument(lines.Id.Lexeme, new Element.Lines(new Element.String(lines.Id.Lexeme), (Element.Point)Evaluate(lines.P1, scope), (Element.Point)(Evaluate(lines.P2, scope)), lines.Comment, colorStack.Top));
         return null;
     }
-     public object? VisitSegmentStmt(Stmt.Segment segment, Scope<Element> scope)
+    public object? VisitSegmentStmt(Stmt.Segment segment, Scope<Element> scope)
     {
-        scope.SetArgument(segment.Id.Lexeme, new Element.Segment(new Element.String(segment.Id.Lexeme),(Element.Point)Evaluate(segment.P1,scope) , (Element.Point)(Evaluate(segment.P2,scope)),segment.Comment,colorStack.Top));
+        scope.SetArgument(segment.Id.Lexeme, new Element.Segment(new Element.String(segment.Id.Lexeme), (Element.Point)Evaluate(segment.P1, scope), (Element.Point)(Evaluate(segment.P2, scope)), segment.Comment, colorStack.Top));
         return null;
     }
-     public object? VisitRayStmt(Stmt.Ray ray, Scope<Element> scope)
+    public object? VisitRayStmt(Stmt.Ray ray, Scope<Element> scope)
     {
-        scope.SetArgument(ray.Id.Lexeme, new Element.Ray(new Element.String(ray.Id.Lexeme),(Element.Point)Evaluate(ray.P1,scope) , (Element.Point)(Evaluate(ray.P2,scope)),ray.Comment,colorStack.Top));
+        scope.SetArgument(ray.Id.Lexeme, new Element.Ray(new Element.String(ray.Id.Lexeme), (Element.Point)Evaluate(ray.P1, scope), (Element.Point)(Evaluate(ray.P2, scope)), ray.Comment, colorStack.Top));
         return null;
     }
-
+    public object? VisitCircleStmt(Stmt.Circle circle, Scope<Element> scope)
+    {
+        scope.SetArgument(circle.Id.Lexeme, new Element.Circle(new Element.String(circle.Id.Lexeme), (Element.Point)Evaluate(circle.P1, scope), circle.Radius, circle.Comment, colorStack.Top));
+        
+        return null;
+    }
+    public object? VisitArcStmt(Stmt.Arc arc, Scope<Element> scope)
+    {
+        scope.SetArgument(arc.Id.Lexeme, new Element.Arc(new Element.String(arc.Id.Lexeme), (Element.Point)Evaluate(arc.P1, scope), (Element.Point)Evaluate(arc.P2, scope), (Element.Point)Evaluate(arc.P3, scope),arc.Radius, arc.Comment, colorStack.Top));
+        return null;
+    }
     public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declaration, Scope<Element> scope)
     {
         scope.SetConstant(declaration.Id.Lexeme, Evaluate(declaration.Rvalue, scope));
@@ -74,7 +85,7 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     }
     public object? VisitPrintStmt(Stmt.Print stmt, Scope<Element> scope)
     {
-        if(stmt._Expr == Expr.EMPTY)outputStream.WriteLine();
+        if (stmt._Expr == Expr.EMPTY) outputStream.WriteLine();
         else outputStream.WriteLine(Evaluate(stmt._Expr, scope));
         return null;
     }
@@ -101,8 +112,9 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
     {
         return expr.Accept(this, scope);
     }
-    
-    public Element VisitEmptyExpr(Expr.Empty expr,Scope<Element> scope){
+
+    public Element VisitEmptyExpr(Expr.Empty expr, Scope<Element> scope)
+    {
         return Element.UNDEFINED;
     }
 
@@ -127,104 +139,121 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         return IsNotTruty(rValue);
     }
 
-    public Element VisitUnaryMinusExpr(Expr.Unary.Minus unaryMinus, Scope<Element> scope){
-        Element.Number rValue = (Element.Number) Evaluate(unaryMinus._Expr,scope);
+    public Element VisitUnaryMinusExpr(Expr.Unary.Minus unaryMinus, Scope<Element> scope)
+    {
+        Element.Number rValue = (Element.Number)Evaluate(unaryMinus._Expr, scope);
         return -rValue;
     }
 
-    public Element VisitBinaryPowerExpr(Expr.Binary.Power powerExpr, Scope<Element> scope){
-        Element.Number left = (Element.Number) Evaluate(powerExpr.Left,scope);
-        Element.Number right = (Element.Number) Evaluate(powerExpr.Right,scope);
+    public Element VisitBinaryPowerExpr(Expr.Binary.Power powerExpr, Scope<Element> scope)
+    {
+        Element.Number left = (Element.Number)Evaluate(powerExpr.Left, scope);
+        Element.Number right = (Element.Number)Evaluate(powerExpr.Right, scope);
         return left ^ right;
     }
 
-    public Element VisitBinaryProductExpr(Expr.Binary.Product productExpr, Scope<Element> scope){
-        Element.Number left = (Element.Number) Evaluate(productExpr.Left,scope);
-        Element.Number right = (Element.Number) Evaluate(productExpr.Right,scope);
+    public Element VisitBinaryProductExpr(Expr.Binary.Product productExpr, Scope<Element> scope)
+    {
+        Element.Number left = (Element.Number)Evaluate(productExpr.Left, scope);
+        Element.Number right = (Element.Number)Evaluate(productExpr.Right, scope);
         return left * right;
     }
 
-    public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope<Element> scope){
-        Element.Number left = (Element.Number) Evaluate(divisionExpr.Left,scope);
-        Element.Number right = (Element.Number) Evaluate(divisionExpr.Right,scope);
-        if(right.Value == 0.0f)throw new RuntimeException(divisionExpr.Line,divisionExpr.Operator.Offset,"Division by 0");
+    public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope<Element> scope)
+    {
+        Element.Number left = (Element.Number)Evaluate(divisionExpr.Left, scope);
+        Element.Number right = (Element.Number)Evaluate(divisionExpr.Right, scope);
+        if (right.Value == 0.0f) throw new RuntimeException(divisionExpr.Line, divisionExpr.Operator.Offset, "Division by 0");
         return left / right;
     }
 
-    public Element VisitBinaryModulusExpr(Expr.Binary.Modulus modulusExpr, Scope<Element> scope){
-        Element.Number left = (Element.Number) Evaluate(modulusExpr.Left,scope);
-        Element.Number right = (Element.Number) Evaluate(modulusExpr.Right,scope);
-        if(right.Value == 0.0f)throw new RuntimeException(modulusExpr.Line,modulusExpr.Operator.Offset,"Division by 0");
+    public Element VisitBinaryModulusExpr(Expr.Binary.Modulus modulusExpr, Scope<Element> scope)
+    {
+        Element.Number left = (Element.Number)Evaluate(modulusExpr.Left, scope);
+        Element.Number right = (Element.Number)Evaluate(modulusExpr.Right, scope);
+        if (right.Value == 0.0f) throw new RuntimeException(modulusExpr.Line, modulusExpr.Operator.Offset, "Division by 0");
         return left % right;
     }
 
-    public Element VisitBinarySumExpr(Expr.Binary.Sum sumExpr, Scope<Element> scope){
-        Element.Number left = (Element.Number) Evaluate(sumExpr.Left,scope);
-        Element.Number right = (Element.Number) Evaluate(sumExpr.Right,scope);
+    public Element VisitBinarySumExpr(Expr.Binary.Sum sumExpr, Scope<Element> scope)
+    {
+        Element.Number left = (Element.Number)Evaluate(sumExpr.Left, scope);
+        Element.Number right = (Element.Number)Evaluate(sumExpr.Right, scope);
         return left + right;
     }
 
-    public Element VisitBinaryDifferenceExpr(Expr.Binary.Difference differenceExpr, Scope<Element> scope){
-        Element.Number left = (Element.Number) Evaluate(differenceExpr.Left,scope);
-        Element.Number right = (Element.Number) Evaluate(differenceExpr.Right,scope);
+    public Element VisitBinaryDifferenceExpr(Expr.Binary.Difference differenceExpr, Scope<Element> scope)
+    {
+        Element.Number left = (Element.Number)Evaluate(differenceExpr.Left, scope);
+        Element.Number right = (Element.Number)Evaluate(differenceExpr.Right, scope);
         return left - right;
     }
 
-    public Element VisitBinaryLessExpr(Expr.Binary.Less lessExpr, Scope<Element> scope){
-        Element.Number left =(Element.Number) Evaluate(lessExpr.Left,scope);
-        Element.Number right =(Element.Number) Evaluate(lessExpr.Right,scope);
+    public Element VisitBinaryLessExpr(Expr.Binary.Less lessExpr, Scope<Element> scope)
+    {
+        Element.Number left = (Element.Number)Evaluate(lessExpr.Left, scope);
+        Element.Number right = (Element.Number)Evaluate(lessExpr.Right, scope);
         return left < right;
     }
 
-    public Element VisitBinaryLessEqualExpr(Expr.Binary.LessEqual lessEqualExpr, Scope<Element> scope){
-        Element.Number left =(Element.Number) Evaluate(lessEqualExpr.Left,scope);
-        Element.Number right =(Element.Number) Evaluate(lessEqualExpr.Right,scope);
+    public Element VisitBinaryLessEqualExpr(Expr.Binary.LessEqual lessEqualExpr, Scope<Element> scope)
+    {
+        Element.Number left = (Element.Number)Evaluate(lessEqualExpr.Left, scope);
+        Element.Number right = (Element.Number)Evaluate(lessEqualExpr.Right, scope);
         return left <= right;
     }
 
-    public Element VisitBinaryGreaterExpr(Expr.Binary.Greater greaterExpr, Scope<Element> scope){
-        Element.Number left =(Element.Number) Evaluate(greaterExpr.Left,scope);
-        Element.Number right =(Element.Number) Evaluate(greaterExpr.Right,scope);
+    public Element VisitBinaryGreaterExpr(Expr.Binary.Greater greaterExpr, Scope<Element> scope)
+    {
+        Element.Number left = (Element.Number)Evaluate(greaterExpr.Left, scope);
+        Element.Number right = (Element.Number)Evaluate(greaterExpr.Right, scope);
         return left > right;
     }
 
-    public Element VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual greaterEqualExpr, Scope<Element> scope){
-        Element.Number left =(Element.Number) Evaluate(greaterEqualExpr.Left,scope);
-        Element.Number right =(Element.Number) Evaluate(greaterEqualExpr.Right,scope);
+    public Element VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual greaterEqualExpr, Scope<Element> scope)
+    {
+        Element.Number left = (Element.Number)Evaluate(greaterEqualExpr.Left, scope);
+        Element.Number right = (Element.Number)Evaluate(greaterEqualExpr.Right, scope);
         return left >= right;
     }
 
-    public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope<Element> scope){
-        Element left = Evaluate(equalEqualExpr.Left,scope);
-        Element right = Evaluate(equalEqualExpr.Right,scope);
+    public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope<Element> scope)
+    {
+        Element left = Evaluate(equalEqualExpr.Left, scope);
+        Element right = Evaluate(equalEqualExpr.Right, scope);
         return left.EqualTo(right);
     }
 
-    public Element VisitBinaryNotEqualExpr(Expr.Binary.NotEqual notEqualExpr, Scope<Element> scope){
-        Element left = Evaluate(notEqualExpr.Left,scope);
-        Element right = Evaluate(notEqualExpr.Right,scope);
+    public Element VisitBinaryNotEqualExpr(Expr.Binary.NotEqual notEqualExpr, Scope<Element> scope)
+    {
+        Element left = Evaluate(notEqualExpr.Left, scope);
+        Element right = Evaluate(notEqualExpr.Right, scope);
         return left.NotEqualTo(right);
     }
 
-    public Element VisitBinaryAndExpr(Expr.Binary.And andExpr, Scope<Element> scope){
-        if(IsTruthy(Evaluate(andExpr.Left,scope)) == Element.FALSE)return Element.FALSE;//Shortcircuit
-        return IsTruthy(Evaluate(andExpr.Right,scope));
+    public Element VisitBinaryAndExpr(Expr.Binary.And andExpr, Scope<Element> scope)
+    {
+        if (IsTruthy(Evaluate(andExpr.Left, scope)) == Element.FALSE) return Element.FALSE;//Shortcircuit
+        return IsTruthy(Evaluate(andExpr.Right, scope));
     }
 
-    public Element VisitBinaryOrExpr(Expr.Binary.Or orExpr, Scope<Element> scope){
-        if(IsTruthy(Evaluate(orExpr.Left,scope)) == Element.TRUE)return Element.TRUE;//Shortcircuit
-        return IsTruthy(Evaluate(orExpr.Right,scope));
+    public Element VisitBinaryOrExpr(Expr.Binary.Or orExpr, Scope<Element> scope)
+    {
+        if (IsTruthy(Evaluate(orExpr.Left, scope)) == Element.TRUE) return Element.TRUE;//Shortcircuit
+        return IsTruthy(Evaluate(orExpr.Right, scope));
     }
 
-    public Element VisitConditionalExpr(Expr.Conditional conditionalExpr, Scope<Element> scope){
-        if( IsTruthy(Evaluate(conditionalExpr.Condition,scope)) == Element.TRUE ) return Evaluate(conditionalExpr.ThenBranchExpr,scope);
-        return Evaluate(conditionalExpr.ElseBranchExpr,scope);
+    public Element VisitConditionalExpr(Expr.Conditional conditionalExpr, Scope<Element> scope)
+    {
+        if (IsTruthy(Evaluate(conditionalExpr.Condition, scope)) == Element.TRUE) return Evaluate(conditionalExpr.ThenBranchExpr, scope);
+        return Evaluate(conditionalExpr.ElseBranchExpr, scope);
     }
 
-    public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope<Element> scope){
+    public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope<Element> scope)
+    {
         Scope<Element> letInScope = new Scope<Element>(scope);
-        foreach(Stmt stmt in letInExpr.LetStmts)Interpret(stmt,letInScope);
-        return Evaluate(letInExpr.InExpr,letInScope);
+        foreach (Stmt stmt in letInExpr.LetStmts) Interpret(stmt, letInScope);
+        return Evaluate(letInExpr.InExpr, letInScope);
     }
     #endregion Interpret expressions
 
@@ -243,9 +272,10 @@ class Interpreter : IVisitorStmt<object?, Element>, IVisitorExpr<Element, Elemen
         }
     }
     //Returns the opposite truth value of the given element.
-    private Element.Number IsNotTruty(Element element){
+    private Element.Number IsNotTruty(Element element)
+    {
         Element.Number truthValue = IsTruthy(element);
-        if(truthValue == Element.TRUE)return Element.FALSE;
+        if (truthValue == Element.TRUE) return Element.FALSE;
         return Element.TRUE;
     }
 }

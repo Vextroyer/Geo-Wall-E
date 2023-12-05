@@ -18,7 +18,9 @@ public enum ElementType
     POINT,
     LINE,
     SEGMENT,
-    RAY
+    RAY,
+    CIRCLE,
+    ARC
 }
 
 //Base class for all elements that exist during runtime.
@@ -34,6 +36,8 @@ public abstract class Element
     public static Element.Lines LINES = new Element.Lines(STRING, POINT, POINT, STRING, Color.BLACK);
     public static Element.Segment SEGMENT = new Element.Segment(STRING, POINT, POINT, STRING, Color.BLACK);
     public static Element.Ray RAY = new Element.Ray(STRING, POINT, POINT, STRING, Color.BLACK);
+    public static Element.Circle CIRCLE = new Element.Circle(STRING, POINT, NUMBER, STRING, Color.BLACK);
+    public static Element.Arc ARC = new Element.Arc(STRING, POINT,POINT,POINT, NUMBER, STRING, Color.BLACK);
     ///<summary>Represents the undefined type. Use this instead of declaring new Undefined objects.</summary>
     public static Element.Undefined UNDEFINED = new Element.Undefined();
     //Boolean values are represented with numbers
@@ -288,6 +292,70 @@ public abstract class Element
         {
             if (other.Type != this.Type) return Element.FALSE;
             if (((Element.Ray)other).p1 == this.p1 && ((Element.Ray)other).p2 == this.p2) return Element.TRUE;
+            return Element.FALSE;
+        }
+    }
+        public class Circle : Element, IDrawable
+    {
+        public Element.String name;
+        public Element.String comment;
+        public Element.Point p1;
+        public Element.Number radius;
+
+        public Color Color { get; private set; }
+
+        public Circle(Element.String _name, Element.Point _p1, Element.Number _radius, Element.String _comment, Color color) : base(ElementType.CIRCLE)
+        {
+            name = _name;
+            comment = _comment;
+             p1= _p1;
+            radius = _radius;
+            Color = color;
+        }
+        
+
+        public override string ToString()
+        {
+            return $"{name}({p1.x},{p1.y}){radius}{comment}";
+        }
+        public override Number EqualTo(Element other)
+        {
+            if (other.Type != this.Type) return Element.FALSE;
+            if (((Element.Circle)other).p1 == this.p1 && ((Element.Circle)other).radius == this.radius) return Element.TRUE;
+            return Element.FALSE;
+        }
+    }
+        public class Arc : Element, IDrawable
+    {
+        public Element.String name;
+        public Element.String comment;
+        public Element.Point p1;
+        public Element.Point p2;
+        public Element.Point p3;
+        public Element.Number radius;
+
+        public Color Color { get; private set; }
+
+        public Arc(Element.String _name, Element.Point _p1, Element.Point _p2, Element.Point _p3, Element.Number _radius, Element.String _comment, Color color) : base(ElementType.ARC)
+        {
+            name = _name;
+            comment = _comment;
+             p1= _p1;
+             p2= _p2;
+             p3= _p3;
+            radius = _radius;
+            Color = color;
+        }
+        
+
+        public override string ToString()
+        {
+            return $"{name}({p1.x},{p1.y})({p2.x},{p2.y})({p3.x},{p3.y}){radius}{comment}";
+        }
+        public override Number EqualTo(Element other)
+        {
+            if (other.Type != this.Type) return Element.FALSE;
+            if (((Element.Arc)other).p1 == this.p1 &&((Element.Arc)other).p2 == this.p2 &&((Element.Arc)other).p3 == this.p3 && ((Element.Arc)other).radius == this.radius) return Element.TRUE;
             return Element.FALSE;
         }
     }

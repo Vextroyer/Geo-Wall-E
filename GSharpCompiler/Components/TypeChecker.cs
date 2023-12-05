@@ -104,6 +104,34 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?, Element>, IVi
         }
         return null;
     }
+    public object? VisitCircleStmt(Stmt.Circle circleStmt, Scope<Element> scope)
+    {
+        try
+        {
+            if (scope.IsConstant(circleStmt.Id.Lexeme)) OnErrorFound(circleStmt.Line, circleStmt.Offset, $"Redeclaration of constant {circleStmt.Id.Lexeme}");//Rule 1
+            if (scope.HasBinding(circleStmt.Id.Lexeme)) OnErrorFound(circleStmt.Line, circleStmt.Offset, $"Circle `{circleStmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
+            scope.SetArgument(circleStmt.Id.Lexeme, Element.CIRCLE);
+        }
+        catch (RecoveryModeException)
+        {
+            //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+        }
+        return null;
+    }
+    public object? VisitArcStmt(Stmt.Arc arcStmt, Scope<Element> scope)
+    {
+        try
+        {
+            if (scope.IsConstant(arcStmt.Id.Lexeme)) OnErrorFound(arcStmt.Line, arcStmt.Offset, $"Redeclaration of constant {arcStmt.Id.Lexeme}");//Rule 1
+            if (scope.HasBinding(arcStmt.Id.Lexeme)) OnErrorFound(arcStmt.Line, arcStmt.Offset, $"Arc `{arcStmt.Id.Lexeme}` is declared twice on the same scope");//Rule 3
+            scope.SetArgument(arcStmt.Id.Lexeme, Element.ARC);
+        }
+        catch (RecoveryModeException)
+        {
+            //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+        }
+        return null;
+    }
 
     public object? VisitConstantDeclarationStmt(Stmt.ConstantDeclaration declStmt, Scope<Element> scope)
     {

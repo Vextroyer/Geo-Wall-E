@@ -35,14 +35,20 @@ class AstPrinter : IVisitorStmt<string, Element>, IVisitorExpr<string, Element>
         return $"line({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{Print(stmt.P2)})";
     }
     public string VisitRayStmt(Stmt.Ray stmt, Scope<Element> scope)
-    {
-        //return $"line({stmt.Id.Lexeme},{stmt.Comment},{VisitVariableExpr((Expr.Variable)stmt.P1,scope)},{VisitVariableExpr((Expr.Variable)stmt.P2,scope)})";
+    {   
         return $"ray({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{Print(stmt.P2)})";
     }
     public string VisitSegmentStmt(Stmt.Segment stmt, Scope<Element> scope)
     {
-        //return $"line({stmt.Id.Lexeme},{stmt.Comment},{VisitVariableExpr((Expr.Variable)stmt.P1,scope)},{VisitVariableExpr((Expr.Variable)stmt.P2,scope)})";
         return $"segment({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{Print(stmt.P2)})";
+    }
+    public string VisitCircleStmt(Stmt.Circle stmt, Scope<Element> scope)
+    {
+        return $"circle({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{stmt.Radius})";
+    }
+    public string VisitArcStmt(Stmt.Arc stmt, Scope<Element> scope)
+    {
+        return $"arc({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{Print(stmt.P2)},{Print(stmt.P3)},{stmt.Radius})";
     }
     public string VisitConstantDeclarationStmt(Stmt.ConstantDeclaration stmt, Scope<Element> scope)
     {
