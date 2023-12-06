@@ -37,7 +37,7 @@ class Client{
             Console.Write("> ");
             string? source = Console.ReadLine();//The code inputed by the user.
             if(string.IsNullOrEmpty(source))continue;//User just pressed enter or hit to many spaces.
-            Compiler.Response compilerResponse = Compiler.CompileFromSource(source,flags);
+            Compiler.Response compilerResponse = Compiler.CompileFromSource(source,"ReplSession",flags);
             HandleError(compilerResponse);
         }
     }

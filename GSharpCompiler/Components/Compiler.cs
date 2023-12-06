@@ -20,10 +20,10 @@ public static class Compiler
             errors.Add(new Error(-1,-1,e.Message));
             return new Response(errors,drawables,true);
         }
-        return CompileFromSource(sourceCode,flags);
+        return CompileFromSource(sourceCode,path,flags);
     }
     //Compile from a string containing the source code.
-    public static Response CompileFromSource(string source,Flags? flags = null)
+    public static Response CompileFromSource(string source,string sourceFileName,Flags? flags = null)
     {
         //Use default flags
         if(flags == null)flags = new Flags();
@@ -34,7 +34,7 @@ public static class Compiler
         try
         {   
             //Scan the source code and produce the tokens.
-            List<Token> tokens = new Scanner(source,flags.MaxErrorCount,errors).Scan();
+            List<Token> tokens = new Scanner(source,sourceFileName,flags.MaxErrorCount,errors).Scan();
 
             //Print scanner output
             if(flags.PrintDebugInfo)Utils.PrintTokens(tokens,flags.OutputStream);
