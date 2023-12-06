@@ -63,8 +63,12 @@ static class Utils{
     ///<summary>Compare two real values up to a precission Epsilon.</summary>
     public static int Compare(float x,float y){
         if(float.IsNegative(x-y))return -1;//x < y
-        if(x - y <= Epsilon)return 0;//x = y
+        if(IsZero(x-y))return 0;//x = y
         return 1;//x > y
+    }
+    public static bool IsZero(float x){
+        if(x <= Epsilon)return true;
+        return false;
     }
     private static float Epsilon = 1e-6f;
 }

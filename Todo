@@ -39,3 +39,5 @@ Darle valor a los puntos declarados aleatoriamente en runtime. Porque se lo asig
 f(x) = if x == 1 then 1 else let point p; print p; draw p; in f(x - 1);
 
 print f(10);
+
+Redesign equality comparisons.
