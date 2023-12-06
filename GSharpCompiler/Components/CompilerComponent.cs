@@ -9,12 +9,15 @@ abstract class GSharpCompilerComponent : ICompileTimeErrorHandler{
         MaxErrorCount = maxErrorCount;
         Errors = errors;
     }
-    public virtual void HandleError(IAbortable caller,bool enforceAbort,int MaxErrorCount,ICollection<GSharpCompiler.Error> errors,string message,int line,int offset){
-        errors.Add(new GSharpCompiler.Error(line,offset,message));//Add the new error to the collection.
+    public virtual void HandleError(IAbortable caller,bool enforceAbort,int MaxErrorCount,ICollection<GSharpCompiler.Error> errors,string message,int line,int offset,string file){
+        errors.Add(new GSharpCompiler.Error(line,offset,file,message));//Add the new error to the collection.
         if(enforceAbort || errors.Count >= MaxErrorCount)caller.Abort();//If enforceAbort is set to true or the limit of error is reached ,abort.
     }
-    public virtual void OnErrorFound(int line,int offset,string message,bool enforceAbort = false){
-        HandleError(this,enforceAbort,this.MaxErrorCount,this.Errors,message,line,offset);
+    public virtual void OnErrorFound(IErrorLocalizator error,string message,bool enforceAbort = false){
+        HandleError(this,enforceAbort,this.MaxErrorCount,this.Errors,message,error.Line,error.Offset,error.File);
+    }
+    public virtual void OnErrorFound(int line,int offset,string file,string message,bool enforceAbort = false){
+        HandleError(this,enforceAbort,this.MaxErrorCount,this.Errors,message,line,offset,file);
     }
     public abstract void Abort();
 }

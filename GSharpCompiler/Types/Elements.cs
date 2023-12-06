@@ -289,7 +289,7 @@ public abstract class Element
             return new Element.Function(funcDecl.Arguments,funcDecl.Body);
         }
         ///<summary>A dummy token for creating functions that wont be used.</summary>
-        private static Token DUMMY = new Token(TokenType.EOF,"",null,-1,-1);
+        private static Token DUMMY = new Token(TokenType.EOF,"",null,-1,-1,new char[]{'D','U','M','M','Y'});
     }
     //Represents a point on a 2D rectangular coordinate system.
     public class Point : Element, IDrawable

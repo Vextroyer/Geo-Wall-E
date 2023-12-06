@@ -34,3 +34,8 @@ Usar double para mayor precision.
 
 
 Error en line.txt
+
+Darle valor a los puntos declarados aleatoriamente en runtime. Porque se lo asigna en el parser.
+f(x) = if x == 1 then 1 else let point p; print p; draw p; in f(x - 1);
+
+print f(10);

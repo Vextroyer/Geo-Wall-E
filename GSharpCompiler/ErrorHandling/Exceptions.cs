@@ -5,14 +5,23 @@ abstract class GSharpException : Exception{
     public GSharpException(string message=""):base(message){}
 }
 ///<summary>Base class for compile-time exceptions.</summary>
-abstract class CompileTimeException : GSharpException{}
+abstract class CompileTimeException : GSharpException{
+    public CompileTimeException(string message=""):base(message){}
+}
 ///<summary>Base class for runtime exceptions.</summary>
 class RuntimeException : GSharpException{
     public int Line {get; private set;}
     public int Offset { get; private set;}
-    public RuntimeException(int line,int offset,string message):base(message){
+    public string File {get; private set;}
+    public RuntimeException(int line,int offset,string file,string message):base(message){
         Line = line;
         Offset=offset;
+        File = file;
+    }
+    public RuntimeException(IErrorLocalizator error,string message):base(message){
+        Line = error.Line;
+        Offset = error.Offset;
+        File = error.File;
     }
 }
 
@@ -31,3 +40,12 @@ class ParserException : CompileTimeException {}
 class TypeCheckerException : CompileTimeException{}
 ///<summary>Signals the CompilerComponent that an error has occurred but the excecution should continue.</summary>
 class RecoveryModeException : CompileTimeException{}
+///<summary>Exception throwed by the dependency resolver.</summary>
+class DependencyResolverException : CompileTimeException{}
+///<summary>Signals that a file has circular dependencies.</summary>
+class CircularDependenciesException : CompileTimeException{
+    public string File {get; private set;}
+    public CircularDependenciesException(string file,string message):base(message){
+        File = file;
+    }
+}

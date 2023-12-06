@@ -12,6 +12,8 @@ class Scanner : GSharpCompilerComponent
     private int start = 0;//First character of the actual token
     private int line = 1;//Current line
     private int offset = 0;//Current character since the begining of the line
+    ///<summary>The name of the file being scanned.</summary>
+    private char[] fileName;
 
     private static readonly Dictionary<string,TokenType> keywords = new Dictionary<string, TokenType>()
     {
@@ -31,6 +33,7 @@ class Scanner : GSharpCompilerComponent
         {"circle",TokenType.CIRCLE},
         {"arc",TokenType.ARC},
         {"eval",TokenType.EVAL},
+        {"import",TokenType.IMPORT},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},
@@ -45,9 +48,10 @@ class Scanner : GSharpCompilerComponent
         {"restore",TokenType.RESTORE}
   
     };
-    public Scanner(string? _source,int maxErrorCount,ICollection<GSharpCompiler.Error> errors):base(maxErrorCount,errors){
+    public Scanner(string? _source,string _fileName,int maxErrorCount,ICollection<GSharpCompiler.Error> errors):base(maxErrorCount,errors){
         if(_source == null)source = "";
         else source = _source;
+        fileName = _fileName.ToCharArray();
     }
     ///<summary>Abort by trowhing a <c>ScannerException</c> .</summary>
     public override void Abort(){
@@ -60,7 +64,7 @@ class Scanner : GSharpCompilerComponent
             ScanToken();
         }
 
-        tokens.Add(new Token(TokenType.EOF,"",null,line,source.Length));//Its elegant
+        tokens.Add(new Token(TokenType.EOF,"",null,line,source.Length,fileName));//Its elegant
         return new List<Token>(tokens);//Returns a copy of the token list.
     }
 
@@ -118,10 +122,10 @@ class Scanner : GSharpCompilerComponent
                     break;
                 }
                 else if(c == '.'){
-                    OnErrorFound(line,ComputeOffset,"Expected digit before `.`");
+                    OnErrorFound(line,ComputeOffset,new string(fileName),"Expected digit before `.`");
                     break;
                 }
-                OnErrorFound(line,ComputeOffset,"Unrecognized character");
+                OnErrorFound(line,ComputeOffset,new string(fileName),"Unrecognized character");
                 break;
         }
     }
@@ -138,7 +142,7 @@ class Scanner : GSharpCompilerComponent
             if(c == '\n')OnNewLineFound();//This is for supporting multi-line strings
         }
 
-        if(IsAtEnd) OnErrorFound(openingQuoteLine,openingQuoteOffset,"Opening quote whitout enclosing quote found",true);
+        if(IsAtEnd) OnErrorFound(openingQuoteLine,openingQuoteOffset,new string(fileName),"Opening quote whitout enclosing quote found",true);
         Advance();//Consume the closing quote
 
         string value = source.Substring(start + 1,current - start - 2);//The string content without the enclosing quotes
@@ -176,13 +180,13 @@ class Scanner : GSharpCompilerComponent
             Advance();//Consume the '.'
             
             //If there is no digit after the dot then its an error
-            if(!IsDigit(Peek))OnErrorFound(line,ComputeOffset,"Expected digit after `.`");
+            if(!IsDigit(Peek))OnErrorFound(line,ComputeOffset,new string(fileName),"Expected digit after `.`");
 
             while(IsDigit(Peek))Advance();//Consume the trailing digits
         }
 
         //If there exist an alphanumeric character after a digit, then this is misstyped identifier.
-        if(IsAlpha(Peek)) OnErrorFound(line,ComputeOffset,"Identifiers can't start with numbers");
+        if(IsAlpha(Peek)) OnErrorFound(line,ComputeOffset,new string(fileName),"Identifiers can't start with numbers");
 
         AddToken(TokenType.NUMBER,float.Parse(source.Substring(start,current - start)));
     }
@@ -194,7 +198,7 @@ class Scanner : GSharpCompilerComponent
     //Create a token
     private void AddToken(TokenType type,object? literal){
         string lexeme = source.Substring(start,current - start);
-        tokens.Add(new Token(type,lexeme,literal,line,ComputeOffset));
+        tokens.Add(new Token(type,lexeme,literal,line,ComputeOffset,fileName));
     }
 
     //Hit the end of the source code

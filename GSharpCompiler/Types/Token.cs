@@ -1,7 +1,7 @@
 namespace GSharpCompiler;
 
 ///<summary>A token encapsulate every lexeme on the source code an give it a type and optionally a value.</summary>
-class Token{
+class Token : IErrorLocalizator{
     ///<summary>The type of the token.</summary>
     public TokenType Type {get; private set;}//The type of the token.
     ///<summary>The source code string from which this token was created.</summary>
@@ -12,13 +12,17 @@ class Token{
     public int Offset{get; private set;}//The amount of characters from the start of the line to the first character of the token.
     ///<summary>The value of this token. <example>Lexeme "2.25" has literal value of 2.25.</example></summary>
     public object? Literal {get; private set;}//The literal value of the token
-
-    public Token(TokenType type,string lexeme,object? literal,int line,int offset){
+    public string File {get => new string(file);}
+    ///<summary>The name of the file which contains the source code.</summary>
+    private char[] file;
+    public char[] ExposeFile {get => file;}
+    public Token(TokenType type,string lexeme,object? literal,int line,int offset,char[] fileName){
         this.Type = type;
         this.Lexeme = lexeme;
         this.Literal = literal;
         this.Line = line;
         this.Offset = offset;
+        file = fileName;
     }
 
     public override string ToString()

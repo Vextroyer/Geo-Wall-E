@@ -17,13 +17,13 @@ public static class Compiler
         try{
             sourceCode = Utils.GetSourceFromFile(path);
         }catch(Exception e){
-            errors.Add(new Error(-1,-1,e.Message));
+            errors.Add(new Error(-1,-1,path,e.Message));
             return new Response(errors,drawables,true);
         }
-        return CompileFromSource(sourceCode,flags);
+        return CompileFromSource(sourceCode,path,flags);
     }
     //Compile from a string containing the source code.
-    public static Response CompileFromSource(string source,Flags? flags = null)
+    public static Response CompileFromSource(string source,string sourceFileName,Flags? flags = null)
     {
         //Use default flags
         if(flags == null)flags = new Flags();
@@ -34,13 +34,10 @@ public static class Compiler
         try
         {   
             //Scan the source code and produce the tokens.
-            List<Token> tokens = new Scanner(source,flags.MaxErrorCount,errors).Scan();
-
-            //Print scanner output
-            if(flags.PrintDebugInfo)Utils.PrintTokens(tokens,flags.OutputStream);
+            List<Token> tokens = new DependencyResolver(source,sourceFileName,errors,flags).ScanAndResolveDependencies();
 
             //If errors where found stop the compilation process.
-            if(errors.Count > 0)throw new ScannerException();
+            if(errors.Count > 0)throw new DependencyResolverException();
 
             //Parse the tokens into an abstract syntax tree and store the tree.
             Program program = new Parser(tokens,flags.MaxErrorCount,errors).Parse();
@@ -64,12 +61,12 @@ public static class Compiler
             //Scanner,Parser,TypeChecker
         }
         catch(RuntimeException e){
-            errors.Add(new Error(e.Line,e.Offset,e.Message));
+            errors.Add(new Error(e.Line,e.Offset,e.File,e.Message));
         }
         catch (Exception e)
         {
             //Write exception to log.
-            errors.Add(new Error(0,0,"Unexpected error, check log and report to developers"));
+            errors.Add(new Error(0,0,"","Unexpected error, check log and report to developers"));
             Utils.AppendToLog(e);
         }
 

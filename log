@@ -1,0 +1,17 @@
+
+12/6/2023 12:39:56 AM
+Unable to cast object of type 'Concat2Iterator`1[GSharpCompiler.Token]' to type 'System.Collections.Generic.List`1[GSharpCompiler.Token]'.
+   at GSharpCompiler.Compiler.DependencyResolver.ScanAndResolveDependencies(String originalFile) in /home/victor/C#/1-ProyectosActuales/WallE/GSharpCompiler/Components/Compiler.cs:line 167
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in /home/victor/C#/1-ProyectosActuales/WallE/GSharpCompiler/Components/Compiler.cs:line 38
+
+12/6/2023 12:51:09 AM
+Object reference not set to an instance of an object.
+   at GSharpCompiler.AstPrinter.Print(Stmt stmt) in /home/victor/C#/1-ProyectosActuales/WallE/GSharpCompiler/Utilities/AstPrinter.cs:line 10
+   at GSharpCompiler.Utils.PrintAst(Program program, TextWriter outputStream) in /home/victor/C#/1-ProyectosActuales/WallE/GSharpCompiler/Utilities/Utils.cs:line 27
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in /home/victor/C#/1-ProyectosActuales/WallE/GSharpCompiler/Components/Compiler.cs:line 50
+
+12/6/2023 12:53:08 AM
+Object reference not set to an instance of an object.
+   at GSharpCompiler.AstPrinter.Print(Stmt stmt) in /home/victor/C#/1-ProyectosActuales/WallE/GSharpCompiler/Utilities/AstPrinter.cs:line 10
+   at GSharpCompiler.Utils.PrintAst(Program program, TextWriter outputStream) in /home/victor/C#/1-ProyectosActuales/WallE/GSharpCompiler/Utilities/Utils.cs:line 27
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in /home/victor/C#/1-ProyectosActuales/WallE/GSharpCompiler/Components/Compiler.cs:line 50

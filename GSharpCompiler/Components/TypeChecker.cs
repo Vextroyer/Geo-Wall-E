@@ -15,9 +15,9 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
 
     public override void Abort() { throw new TypeCheckerException(); }
 
-    public override void OnErrorFound(int line, int offset, string message, bool enforceAbort = false)
+    public override void OnErrorFound(IErrorLocalizator error, string message, bool enforceAbort = false)
     {
-        base.OnErrorFound(line, offset, message, enforceAbort);
+        base.OnErrorFound(error, message, enforceAbort);
         throw new RecoveryModeException();
     }
 
@@ -53,7 +53,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             try{
                 scope.SetArgument(pointStmt.Id.Lexeme, Element.POINT);
             }catch(ScopeException e){
-                OnErrorFound(pointStmt.Line,pointStmt.Offset,e.Message);
+                OnErrorFound(pointStmt,e.Message);
             }
         }
         catch (RecoveryModeException)
@@ -73,7 +73,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             try{
                 scope.SetArgument(linesStmt.Id.Lexeme, Element.LINES);
             }catch(ScopeException e){
-                OnErrorFound(linesStmt.Line,linesStmt.Offset,e.Message);
+                OnErrorFound(linesStmt,e.Message);
             }
         }
         catch (RecoveryModeException)
@@ -92,7 +92,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             try{
                 scope.SetArgument(segmentStmt.Id.Lexeme, Element.SEGMENT);
             }catch(ScopeException e){
-                OnErrorFound(segmentStmt.Line,segmentStmt.Offset,e.Message);
+                OnErrorFound(segmentStmt,e.Message);
             }
         }
         catch (RecoveryModeException)
@@ -111,7 +111,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             try{
                 scope.SetArgument(rayStmt.Id.Lexeme, Element.RAY);
             }catch(ScopeException e){
-                OnErrorFound(rayStmt.Line,rayStmt.Offset,e.Message);
+                OnErrorFound(rayStmt,e.Message);
             }
         }
         catch (RecoveryModeException)
@@ -127,7 +127,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             try{
                 scope.SetArgument(circleStmt.Id.Lexeme, Element.CIRCLE);
             }catch(ScopeException e){
-                OnErrorFound(circleStmt.Line,circleStmt.Offset,e.Message);
+                OnErrorFound(circleStmt,e.Message);
             }
         }
         catch (RecoveryModeException)
@@ -143,7 +143,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             try{
                 scope.SetArgument(arcStmt.Id.Lexeme, Element.ARC);
             }catch(ScopeException e){
-                OnErrorFound(arcStmt.Line,arcStmt.Offset,e.Message);
+                OnErrorFound(arcStmt,e.Message);
             }
         }
         catch (RecoveryModeException)
@@ -160,7 +160,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             try{
                 scope.SetConstant(declStmt.Id.Lexeme, rValue);
             }catch(ScopeException e){
-                OnErrorFound(declStmt.Line,declStmt.Offset,e.Message);
+                OnErrorFound(declStmt,e.Message);
             }
         }
         catch (RecoveryModeException)
@@ -175,7 +175,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             try{
                 scope.SetArgument(functionStmt.Id.Lexeme,Element.Function.MakeFunction(functionStmt.Arity));
             }catch(ScopeException e){
-                OnErrorFound(functionStmt.Line,functionStmt.Offset,e.Message);
+                OnErrorFound(functionStmt,e.Message);
             }
         }catch(RecoveryModeException){
             //The execution continues as if the function were never declared.
@@ -198,7 +198,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         //element is of class Element, but its an instance of a subclass of Element, some of which implements the interface IDrawable. Rule # 5
         try
         {
-            if (!(element is IDrawable)) OnErrorFound(drawStmt._Expr.Line, drawStmt._Expr.Offset, $"Element of type `{element.Type}` is not drawable");
+            if (!(element is IDrawable)) OnErrorFound(drawStmt, $"Element of type `{element.Type}` is not drawable");
         }
         catch (RecoveryModeException) { }
         return null;
@@ -230,7 +230,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             return scope.Get(variableExpr.Id.Lexeme);
         }catch(ScopeException e){
             //Using an undeclared variable cannot be recovered here because the return type cant be determined.
-            OnErrorFound(variableExpr.Line, variableExpr.Offset,e.Message);//Rule 4
+            OnErrorFound(variableExpr,e.Message);//Rule 4
         }
         //Unreachable code.
         throw new Exception("Invalid excecution path reached");
@@ -251,7 +251,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
                 unaryMinusExpr.RequiresRuntimeCheck = true;
                 return Element.NUMBER;
             }
-            if (rValue.Type != ElementType.NUMBER) OnErrorFound(unaryMinusExpr.Line, unaryMinusExpr.Offset, $"Applied `-` operator to a {rValue.Type} operand");
+            if (rValue.Type != ElementType.NUMBER) OnErrorFound(unaryMinusExpr, $"Applied `-` operator to a {rValue.Type} operand");
             unaryMinusExpr.RequiresRuntimeCheck = false;
         }
         catch (RecoveryModeException)
@@ -319,7 +319,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             if(operand.Type == ElementType.RUNTIME_DEFINED){
                 runtimeCheck = true;
             }
-            else if (operand.Type != ElementType.NUMBER) OnErrorFound(binaryExpr.Left.Line, binaryExpr.Left.Offset, $"Left operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
+            else if (operand.Type != ElementType.NUMBER) OnErrorFound(binaryExpr, $"Left operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
         }
         catch (RecoveryModeException) { }
         try
@@ -328,7 +328,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             if(operand.Type == ElementType.RUNTIME_DEFINED){
                 runtimeCheck = true;
             }
-            else if (operand.Type != ElementType.NUMBER) OnErrorFound(binaryExpr.Right.Line, binaryExpr.Right.Offset, $"Right operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
+            else if (operand.Type != ElementType.NUMBER) OnErrorFound(binaryExpr, $"Right operand of `{binaryExpr.Operator.Lexeme}` is {operand.Type} and must be NUMBER");
         }
         catch (RecoveryModeException) { }
         //On error recovery mode assume that the operands are numbers and continue, this works because the return type of the methods
@@ -339,12 +339,12 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         //Both expressions must be points in order to build the line
         try{
             Element parameter = Check(lineStmt.P1,scope);
-            if(parameter.Type != ElementType.POINT)OnErrorFound(lineStmt.Line,lineStmt.Offset,$"Expected `POINT` as first parameter but {parameter.Type} was found");
+            if(parameter.Type != ElementType.POINT)OnErrorFound(lineStmt,$"Expected `POINT` as first parameter but {parameter.Type} was found");
         }
         catch(RecoveryModeException){}
         try{
             Element parameter = Check(lineStmt.P2,scope);
-            if(parameter.Type != ElementType.POINT)OnErrorFound(lineStmt.Line,lineStmt.Offset,$"Expected `POINT` as second parameter but {parameter.Type} was found");
+            if(parameter.Type != ElementType.POINT)OnErrorFound(lineStmt,$"Expected `POINT` as second parameter but {parameter.Type} was found");
         }catch(RecoveryModeException){}
         //On error recovery mode assume that the parameters are points and continue, this works because the return type of the methods
         //that use this method a well defined type.
@@ -386,7 +386,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         if(elseBranchElement.Type == ElementType.RUNTIME_DEFINED) return thenBranchElement;
         
         //This error can't be recovered here, it will be recovered on a lower node of the syntax tree.
-        if (thenBranchElement.Type != elseBranchElement.Type) OnErrorFound(conditionalExpr.Line, conditionalExpr.Offset, $"Expected equal return types for `if-then-else` expression branches, but {thenBranchElement.Type} and {elseBranchElement.Type} were found.");
+        if (thenBranchElement.Type != elseBranchElement.Type) OnErrorFound(conditionalExpr, $"Expected equal return types for `if-then-else` expression branches, but {thenBranchElement.Type} and {elseBranchElement.Type} were found.");
 
         conditionalExpr.RequiresRuntimeCheck = false;
         return thenBranchElement;
@@ -412,7 +412,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
                 }
             }
         }catch(ScopeException e){
-            OnErrorFound(callExpr.Line,callExpr.Offset,e.Message);
+            OnErrorFound(callExpr,e.Message);
         }
         //Cannot recover after the call because the return type of the call cant be determined.
         return Element.RUNTIME_DEFINED;

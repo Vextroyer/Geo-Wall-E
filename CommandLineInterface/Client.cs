@@ -37,7 +37,7 @@ class Client{
             Console.Write("> ");
             string? source = Console.ReadLine();//The code inputed by the user.
             if(string.IsNullOrEmpty(source))continue;//User just pressed enter or hit to many spaces.
-            Compiler.Response compilerResponse = Compiler.CompileFromSource(source,flags);
+            Compiler.Response compilerResponse = Compiler.CompileFromSource(source,"ReplSession",flags);
             HandleError(compilerResponse);
         }
     }
@@ -106,7 +106,7 @@ class Client{
             {
                 foreach(Error error in compilerResponse.Errors)
                 {
-                    ReportError(error.Line,error.Offset,error.Message);
+                    ReportError(error.Line,error.Offset,error.Message,error.File);
                 }
             }
             return true;
@@ -118,9 +118,9 @@ class Client{
         Console.WriteLine(message);
         Console.ForegroundColor = ConsoleColor.White;
     }
-    private static void ReportError(int line,int offset,string message){
+    private static void ReportError(int line,int offset,string message,string file){
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"{message} at line {line} , column {offset}");
+        Console.WriteLine($"{message} at line {line} , column {offset} on {file}");
         Console.ForegroundColor = ConsoleColor.White;
     }
 }
