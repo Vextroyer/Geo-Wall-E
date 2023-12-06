@@ -103,6 +103,9 @@ class Parser : GSharpCompilerComponent
             case TokenType.EVAL:
                 aux = ParseEvalStmt();
                 break;
+            case TokenType.IMPORT:
+                aux = IgnoreImportStmt();
+                break;
             default:
                 OnErrorFound(Peek, "Not a statement");
                 break;
@@ -367,6 +370,33 @@ class Parser : GSharpCompilerComponent
         Token evalToken = Consume(TokenType.EVAL);
         Expr expr = ParseExpression();
         return new Stmt.Eval(evalToken.Line,evalToken.Offset,evalToken.ExposeFile,expr);
+    }
+    public List<string> ParseImports(){
+        List<string> imports = new List<string>();
+        while(Match(TokenType.IMPORT)){
+            Token file = Consume(TokenType.STRING,$"Expected STRING after `import` but {Peek.Type} found");
+            imports.Add((string)file.Literal!);
+            Consume(TokenType.SEMICOLON,"Expected `;` after `import` statement.");
+        }
+        //Detect imports which are not at the top.
+        while(!IsAtEnd){
+            //These imports are not at the top.
+            if(Peek.Type == TokenType.IMPORT){
+                try{
+                    OnErrorFound(Peek,$"`import` must be placed before any other statements");
+                }
+                catch(RecoveryModeException){
+
+                }
+            }
+            Advance();
+        }
+        return imports;
+    }
+    public Stmt IgnoreImportStmt(){
+        Consume(TokenType.IMPORT);
+        Consume(TokenType.STRING,$"Expected STRING after `import` but {Peek.Type} found");
+        return Stmt.EMPTY;
     }
     #endregion Statement parsing
 

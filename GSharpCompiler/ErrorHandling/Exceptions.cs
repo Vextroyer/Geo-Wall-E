@@ -5,7 +5,9 @@ abstract class GSharpException : Exception{
     public GSharpException(string message=""):base(message){}
 }
 ///<summary>Base class for compile-time exceptions.</summary>
-abstract class CompileTimeException : GSharpException{}
+abstract class CompileTimeException : GSharpException{
+    public CompileTimeException(string message=""):base(message){}
+}
 ///<summary>Base class for runtime exceptions.</summary>
 class RuntimeException : GSharpException{
     public int Line {get; private set;}
@@ -38,3 +40,4 @@ class ParserException : CompileTimeException {}
 class TypeCheckerException : CompileTimeException{}
 ///<summary>Signals the CompilerComponent that an error has occurred but the excecution should continue.</summary>
 class RecoveryModeException : CompileTimeException{}
+class CircularDependenciesException : CompileTimeException{}

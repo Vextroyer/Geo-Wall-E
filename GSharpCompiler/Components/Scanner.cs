@@ -33,6 +33,7 @@ class Scanner : GSharpCompilerComponent
         {"circle",TokenType.CIRCLE},
         {"arc",TokenType.ARC},
         {"eval",TokenType.EVAL},
+        {"import",TokenType.IMPORT},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},

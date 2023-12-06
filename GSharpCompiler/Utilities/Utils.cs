@@ -44,6 +44,7 @@ static class Utils{
     ///<param name="path">The path to the file.</summary>
     public static string GetSourceFromFile(string path){
         path = Path.GetFullPath(path);//Convert the path to absolute path, this is to support relative paths
+        Console.WriteLine(path);
 
         //The file doesnt exist, this is an error.
         if(!Path.Exists(path))throw new FileNotFoundException();

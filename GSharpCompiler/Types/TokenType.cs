@@ -14,7 +14,7 @@ enum TokenType{
     LET,IN,
 
     //Control symbols.
-    COMMA, SEMICOLON,
+    COMMA, SEMICOLON, IMPORT,
 
     //Represents an identifier.
     ID,
