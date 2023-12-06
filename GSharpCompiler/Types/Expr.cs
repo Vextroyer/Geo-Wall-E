@@ -35,13 +35,17 @@ interface IVisitableExpr{
 }
 
 //Base class for expressions.
-abstract class Expr : IVisitableExpr{
+abstract class Expr : IVisitableExpr, IErrorLocalizator{
     public int Line {get; private set;}
     public int Offset {get; private set;}
+    public string File {get => new string(fileName); }
+    private char[] fileName;
+    public char[] ExposeFile {get => fileName;}
     public virtual bool RequiresRuntimeCheck {get; set;}
-    protected Expr(int _line,int _offset){
+    protected Expr(int _line,int _offset,char[] _fileName){
         Line = _line;
         Offset = _offset;
+        fileName = _fileName;
         RequiresRuntimeCheck = true;
     }
 
@@ -50,7 +54,7 @@ abstract class Expr : IVisitableExpr{
 
     //Represents the empty expression.
     public class Empty : Expr{
-        public Empty():base(0,0){}
+        public Empty():base(0,0,new char[]{'E','M','P','T','Y'}){}
         public override T Accept<T>(IVisitorExpr<T> visitor,Scope scope)
         {
             return visitor.VisitEmptyExpr(this,scope);
@@ -61,7 +65,7 @@ abstract class Expr : IVisitableExpr{
     
     public class Number : Expr{
         public Element.Number Value {get; private set;}
-        public Number(int line,int offset,float _value):base(line,offset){
+        public Number(int line,int offset,char[] fileName,float _value):base(line,offset,fileName){
             Value = new Element.Number(_value);
         }
         public override T Accept<T>(IVisitorExpr<T> visitor,Scope scope)
@@ -72,7 +76,7 @@ abstract class Expr : IVisitableExpr{
     }
     public class String : Expr{
         public Element.String Value {get; private set;}
-        public String(int line,int offset,string _value):base(line,offset){
+        public String(int line,int offset,char[] fileName,string _value):base(line,offset,fileName){
             Value = new Element.String(_value);
         }
         public override T Accept<T>(IVisitorExpr<T> visitor,Scope scope)
@@ -84,7 +88,7 @@ abstract class Expr : IVisitableExpr{
     //A Variable expression stores an identifier who is asscociated with an element.
     public class Variable : Expr{
         public Token Id {get; private set;}
-        public Variable(Token _id):base(_id.Line,_id.Offset){
+        public Variable(Token _id,char[] fileName):base(_id.Line,_id.Offset,fileName){
             Id = _id;
         }
         public override T Accept<T>(IVisitorExpr<T> visitor,Scope scope)
@@ -98,7 +102,7 @@ abstract class Expr : IVisitableExpr{
         public Token Id {get; private set;}
         public List<Expr> Parameters {get; private set;}
         public int Arity {get => Parameters.Count;}
-        public Call(Token id,List<Expr> parameters):base(id.Line,id.Offset){
+        public Call(Token id,char[] fileName,List<Expr> parameters):base(id.Line,id.Offset,fileName){
             Id = id;
             Parameters = parameters;
         }
@@ -113,13 +117,13 @@ abstract class Expr : IVisitableExpr{
     {
         public Expr _Expr {get; private set;}
         abstract public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope);
-        protected Unary(int line,int offset,Expr _expr):base(line,offset)
+        protected Unary(int line,int offset,char[] fileName,Expr _expr):base(line,offset,fileName)
         {
             _Expr = _expr;
         }
         //Represents `!` operator.
         public class Not : Unary{
-            public Not(int line,int offset,Expr _expr):base(line,offset,_expr){}
+            public Not(int line,int offset,char[] fileName,Expr _expr):base(line,offset,fileName,_expr){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitUnaryNotExpr(this,scope);
@@ -129,7 +133,7 @@ abstract class Expr : IVisitableExpr{
         //Represents `-` operator
         public class Minus : Unary
         {
-            public Minus(int line,int offset,Expr _expr):base(line,offset,_expr){}
+            public Minus(int line,int offset,char[] fileName,Expr _expr):base(line,offset,fileName,_expr){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitUnaryMinusExpr(this,scope);
@@ -175,24 +179,24 @@ abstract class Expr : IVisitableExpr{
             }
         }
         ///<summary>Build a binary expression according to the given operation.</summary>
-        public static Expr.Binary MakeBinaryExpr(int line,int offset,Token operation,Expr left,Expr right){
+        public static Expr.Binary MakeBinaryExpr(int line,int offset,char[] fileName,Token operation,Expr left,Expr right){
             Type binaryExprType = GetTypeFromOperation(operation.Type);
             //Create an object derived from Expr.Binary
-            Expr.Binary binaryExpr = (Activator.CreateInstance(binaryExprType,line,offset,operation,left,right) as Expr.Binary)!;
+            Expr.Binary binaryExpr = (Activator.CreateInstance(binaryExprType,line,offset,fileName,operation,left,right) as Expr.Binary)!;
             return binaryExpr;
         }
         public Expr Left {get; private set;}
         public Expr Right {get; private set;}
         public Token Operator {get; private set;}
         abstract public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope);
-        protected Binary(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset){
+        protected Binary(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName){
             Left = left;
             Right = right;
             Operator = _operator;
         }
         //Represents the `^` operator for exponentiation.
         public class Power : Binary{
-            public Power(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public Power(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryPowerExpr(this,scope);
@@ -200,7 +204,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `*` operator for multiplication.
         public class Product : Binary{
-            public Product(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public Product(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryProductExpr(this,scope);
@@ -208,7 +212,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `/` operator for division.
         public class Division : Binary{
-            public Division(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public Division(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryDivisionExpr(this,scope);
@@ -216,7 +220,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `%` operator for modulus.
         public class Modulus : Binary{
-            public Modulus(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public Modulus(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryModulusExpr(this,scope);
@@ -224,7 +228,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `+` operator for sum
         public class Sum : Binary{
-            public Sum(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public Sum(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinarySumExpr(this,scope);
@@ -232,7 +236,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `-` operator for difference
         public class Difference : Binary{
-            public Difference(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public Difference(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryDifferenceExpr(this,scope);
@@ -240,7 +244,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `<` operator for less-than relation
         public class Less : Binary{
-            public Less(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public Less(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryLessExpr(this,scope);
@@ -248,7 +252,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `<=` operator for less-than or equal relation
         public class LessEqual : Binary{
-            public LessEqual(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public LessEqual(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryLessEqualExpr(this,scope);
@@ -256,7 +260,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `>` operator for greater-than relation
         public class Greater : Binary{
-            public Greater(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public Greater(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryGreaterExpr(this,scope);
@@ -264,7 +268,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `>=` operator for greater-than or equal relation
         public class GreaterEqual : Binary{
-            public GreaterEqual(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public GreaterEqual(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryGreaterEqualExpr(this,scope);
@@ -272,7 +276,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `==` operator for greater-than relation
         public class EqualEqual : Binary{
-            public EqualEqual(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public EqualEqual(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryEqualEqualExpr(this,scope);
@@ -281,7 +285,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `!=` operator for greater-than relation
         public class NotEqual : Binary{
-            public NotEqual(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public NotEqual(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryNotEqualExpr(this,scope);
@@ -290,7 +294,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `&` operator for logical and
         public class And : Binary{
-            public And(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public And(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryAndExpr(this,scope);
@@ -299,7 +303,7 @@ abstract class Expr : IVisitableExpr{
         }
         //Represents the `|` operator for logical or
         public class Or : Binary{
-            public Or(int line,int offset,Token _operator,Expr left,Expr right):base(line,offset,_operator,left,right){}
+            public Or(int line,int offset,char[] fileName,Token _operator,Expr left,Expr right):base(line,offset,fileName,_operator,left,right){}
             public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
             {
                 return visitor.VisitBinaryOrExpr(this,scope);
@@ -313,7 +317,7 @@ abstract class Expr : IVisitableExpr{
         public Expr Condition {get; private set;}
         public Expr ThenBranchExpr {get; private set;}
         public Expr ElseBranchExpr {get; private set;}
-        public Conditional(int line,int offset,Expr condition,Expr thenBranchExpr,Expr elseBranchExpr):base(line,offset){
+        public Conditional(int line,int offset,char[] fileName,Expr condition,Expr thenBranchExpr,Expr elseBranchExpr):base(line,offset,fileName){
             Condition = condition;
             ThenBranchExpr = thenBranchExpr;
             ElseBranchExpr = elseBranchExpr;
@@ -329,7 +333,7 @@ abstract class Expr : IVisitableExpr{
         public Stmt.StmtList LetStmts {get; private set;}
         ///<summary>The expression after the `in` keyword.</summary>
         public Expr InExpr {get; private set;}
-        public LetIn(int line,int offset,Stmt.StmtList stmts,Expr expr):base(line,offset){
+        public LetIn(int line,int offset,char[] fileName,Stmt.StmtList stmts,Expr expr):base(line,offset,fileName){
             LetStmts = stmts;
             InExpr = expr;
         }

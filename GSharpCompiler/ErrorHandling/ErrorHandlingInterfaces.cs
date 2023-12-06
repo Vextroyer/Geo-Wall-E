@@ -23,9 +23,16 @@ interface ICompileTimeErrorHandler : IAbortable{
     ///<param name="message">The message of the error.</param>
     ///<param name="line">The line where the error was found.</param>
     ///<param name="offset">An approximate location of the column where the error was found.</param>
-    public void HandleError(IAbortable caller,bool enforceAbort,int MaxErrorCount,ICollection<GSharpCompiler.Error> errors,string message,int line,int offset);
+    public void HandleError(IAbortable caller,bool enforceAbort,int MaxErrorCount,ICollection<GSharpCompiler.Error> errors,string message,int line,int offset,string file);
     
     ///<summary>Simplified call to <c>HandleError</c> method.</summary>
-    public void OnErrorFound(int line,int offset,string message,bool enforceAbort = false);
+    public void OnErrorFound(IErrorLocalizator error,string message,bool enforceAbort = false);
+    public void OnErrorFound(int line,int offset,string file,string message,bool enforceAbort = false);
+}
+///<summary>Contains information on the location of the error.</summary>
+interface IErrorLocalizator{
+    public int Line {get ;}
+    public int Offset {get; }
+    public string File {get; }
 }
 

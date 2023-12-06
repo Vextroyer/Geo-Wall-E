@@ -26,22 +26,25 @@ interface IVisitableStmt
     public T Accept<T>(IVisitorStmt<T> visitor, Scope scope);
 }
 //Base class for statements.
-abstract class Stmt : IVisitableStmt
+abstract class Stmt : IVisitableStmt, IErrorLocalizator
 {
     //For error printing
     public int Line { get; private set; }
     public int Offset { get; private set; }
-    protected Stmt(int _line, int _offset)
+    public string File {get => new string(fileName);}
+    private char[] fileName;
+    protected Stmt(int _line, int _offset,char[] fileName)
     {
         Line = _line;
         Offset = _offset;
+        this.fileName = fileName;
     }
     //Required to work in conjuction with the IVisitorStmt interface.
     abstract public T Accept<T>(IVisitorStmt<T> visitor, Scope scope);
     ///<summary>Represents an empty statement.</summary>
     public class Empty : Stmt
     {
-        public Empty() : base(0, 0) { }
+        public Empty() : base(0, 0, new char[]{'E','M','P','T','Y'}) { }
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitEmptyStmt(this, scope);
@@ -58,7 +61,7 @@ abstract class Stmt : IVisitableStmt
 
         public Element.Number X { get; private set; }//X coordinate
         public Element.Number Y { get; private set; }//Y coordinate
-        public Point(int _line, int _offset, Token _id, Element.Number _x, Element.Number _y, Element.String _comment) : base(_line, _offset)
+        public Point(int _line, int _offset,char[] fileName,Token _id, Element.Number _x, Element.Number _y, Element.String _comment) : base(_line, _offset,fileName)
         {
             Id = _id;
             X = _x;
@@ -80,7 +83,7 @@ abstract class Stmt : IVisitableStmt
 
         public Expr P1 { get; private set; }//first point
         public Expr P2 { get; private set; }//second 
-        public Lines(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset)
+        public Lines(int _line, int _offset, char[] fileName,Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset,fileName)
         {
             Id = _id;
             P1 = _p1;
@@ -96,7 +99,7 @@ abstract class Stmt : IVisitableStmt
     //Represents a `Segment` statement.
     public class Segment : Lines
     {
-        public Segment(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment):base(_line,_offset,_id,_p1,_p2,_comment)
+        public Segment(int _line, int _offset, char[] fileName,Token _id, Expr _p1, Expr _p2, Element.String _comment):base(_line,_offset,fileName,_id,_p1,_p2,_comment)
         {}
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
@@ -106,7 +109,7 @@ abstract class Stmt : IVisitableStmt
     //Represents a `Ray` statement.
     public class Ray : Lines
     {
-        public Ray(int _line, int _offset, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset,_id,_p1,_p2,_comment)
+        public Ray(int _line, int _offset, char[] fileName ,Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset,fileName,_id,_p1,_p2,_comment)
         {}
 
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -121,7 +124,7 @@ abstract class Stmt : IVisitableStmt
 
         public Expr P1 { get; private set; }//first point
         public Element.Number Radius { get; private set; }//radio 
-        public Circle(int _line, int _offset, Token _id, Expr _p1, Element.Number radius, Element.String _comment) : base(_line, _offset)
+        public Circle(int _line, int _offset, char[] fileName,Token _id, Expr _p1, Element.Number radius, Element.String _comment) : base(_line, _offset,fileName)
         {
             Id = _id;
             P1 = _p1;
@@ -143,7 +146,7 @@ abstract class Stmt : IVisitableStmt
         public Expr P2 { get; private set; }//first point
         public Expr P3 { get; private set; }//first point
         public Element.Number Radius { get; private set; }//radio 
-        public Arc(int _line, int _offset, Token _id, Expr _p1,Expr _p2,Expr _p3, Element.Number radius, Element.String _comment) : base(_line, _offset)
+        public Arc(int _line, int _offset, char[] fileName,Token _id, Expr _p1,Expr _p2,Expr _p3, Element.Number radius, Element.String _comment) : base(_line, _offset,fileName)
         {
             Id = _id;
             P1 = _p1;
@@ -162,7 +165,7 @@ abstract class Stmt : IVisitableStmt
     public abstract class Declaration : Stmt{
         ///<summary>The Identifier which will be binded to the Element.</summary>
         public Token Id {get; protected set;}
-        protected Declaration(Token identifier):base(identifier.Line,identifier.Offset){
+        protected Declaration(Token identifier,char[] fileName):base(identifier.Line,identifier.Offset,fileName){
             Id = identifier;
         }
 
@@ -172,7 +175,7 @@ abstract class Stmt : IVisitableStmt
         public class Constant : Declaration{
             ///<summary>Expression to be associated to the identifier.</summary>
             public Expr RValue {get; private set;}
-            public Constant(Token identifier, Expr rvalue):base(identifier){
+            public Constant(Token identifier,char[] fileName, Expr rvalue):base(identifier,fileName){
                 RValue = rvalue;
             }
             public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -186,7 +189,7 @@ abstract class Stmt : IVisitableStmt
             public List<Token> Arguments {get; private set;}
             ///<summary>The expr that made the body of the function.</summary>
             public Expr Body {get; private set;}
-            public Function(Token identifier,List<Token> arguments, Expr body):base(identifier){
+            public Function(Token identifier,char[] fileName,List<Token> arguments, Expr body):base(identifier,fileName){
                 Arguments = arguments;
                 Body = body;
             }
@@ -202,7 +205,7 @@ abstract class Stmt : IVisitableStmt
     {
         public Expr _Expr { get; private set; }
 
-        public Draw(int line, int offset, Expr _expr) : base(line, offset)
+        public Draw(int line, int offset,char[] fileName, Expr _expr) : base(line, offset,fileName)
         {
             _Expr = _expr;
         }
@@ -216,7 +219,7 @@ abstract class Stmt : IVisitableStmt
     public class Eval : Stmt{
         ///<summary>The expression to be evaluated.</summary>
         public Expr Expr{get; private set;}
-        public Eval(int line,int offset,Expr expr):base(line,offset){
+        public Eval(int line,int offset,char[] fileName,Expr expr):base(line,offset,fileName){
             Expr = expr;
         }
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -228,7 +231,7 @@ abstract class Stmt : IVisitableStmt
     public class Print : Stmt
     {
         public Expr _Expr { get; private set; }//The expression to be printed.
-        public Print(int _line, int _offset, Expr _expr) : base(_line, _offset)
+        public Print(int _line, int _offset,char[] fileName ,Expr _expr) : base(_line, _offset,fileName)
         {
             _Expr = _expr;
         }
@@ -242,7 +245,7 @@ abstract class Stmt : IVisitableStmt
     {
         public GSharpCompiler.Color _Color { get; private set; }
         public bool IsRestore { get; private set; }
-        public Color(int line, int offset, GSharpCompiler.Color _color, bool _restore = false) : base(line, offset)
+        public Color(int line, int offset,char[] fileName ,GSharpCompiler.Color _color, bool _restore = false) : base(line, offset,fileName)
         {
             _Color = _color;
             IsRestore = _restore;
@@ -259,7 +262,7 @@ abstract class Stmt : IVisitableStmt
     {
         ///<summary>The statements that made the statement list.</summary>
         private List<Stmt> stmts;
-        public StmtList(int line, int offset) : base(line, offset)
+        public StmtList(int line, int offset,char[] fileName) : base(line, offset,fileName)
         {
             this.stmts = new List<Stmt>();
         }

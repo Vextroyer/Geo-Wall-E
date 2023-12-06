@@ -153,89 +153,89 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
 
     public Element VisitUnaryMinusExpr(Expr.Unary.Minus unaryMinus, Scope scope){
         Element rValue = Evaluate(unaryMinus._Expr,scope);
-        if(unaryMinus.RequiresRuntimeCheck && rValue is not Element.Number)throw new RuntimeException(unaryMinus.Line,unaryMinus.Offset,$"Applied `-` operator to element of type {rValue.Type}");
+        if(unaryMinus.RequiresRuntimeCheck && rValue is not Element.Number)throw new RuntimeException(unaryMinus,$"Applied `-` operator to element of type {rValue.Type}");
         return -(rValue as Element.Number)!;
     }
 
     public Element VisitBinaryPowerExpr(Expr.Binary.Power powerExpr, Scope scope){
         Element left = Evaluate(powerExpr.Left,scope);
-        if(powerExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(powerExpr.Line,powerExpr.Offset,$"Left operand of `^` is of type {left.Type}");
+        if(powerExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(powerExpr,$"Left operand of `^` is of type {left.Type}");
         Element right = Evaluate(powerExpr.Right,scope);
-        if(powerExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(powerExpr.Line,powerExpr.Offset,$"Right operand of `^` is of type {right.Type}");
+        if(powerExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(powerExpr,$"Right operand of `^` is of type {right.Type}");
         return (left as Element.Number)! ^ (right as Element.Number)!;
     }
 
     public Element VisitBinaryProductExpr(Expr.Binary.Product productExpr, Scope scope){
         Element left = Evaluate(productExpr.Left,scope);
-        if(productExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(productExpr.Line,productExpr.Offset,$"Left operand of `*` is of type {left.Type}");
+        if(productExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(productExpr,$"Left operand of `*` is of type {left.Type}");
         Element right = Evaluate(productExpr.Right,scope);
-        if(productExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(productExpr.Line,productExpr.Offset,$"Right operand of `*` is of type {right.Type}");
+        if(productExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(productExpr,$"Right operand of `*` is of type {right.Type}");
         return (left as Element.Number)! * (right as Element.Number)!;
     }
 
     public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope scope){
         Element left = Evaluate(divisionExpr.Left,scope);
-        if(divisionExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(divisionExpr.Line,divisionExpr.Offset,$"Left operand of `/` is of type {left.Type}");
+        if(divisionExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(divisionExpr,$"Left operand of `/` is of type {left.Type}");
         Element right = Evaluate(divisionExpr.Right,scope);
-        if(divisionExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(divisionExpr.Line,divisionExpr.Offset,$"Right operand of `/` is of type {right.Type}");
-        if((right as Element.Number)!.Value == 0.0f)throw new RuntimeException(divisionExpr.Line,divisionExpr.Operator.Offset,"Division by 0");
+        if(divisionExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(divisionExpr,$"Right operand of `/` is of type {right.Type}");
+        if((right as Element.Number)!.Value == 0.0f)throw new RuntimeException(divisionExpr,"Division by 0");
         return (left as Element.Number)! / (right as Element.Number)!;
     }
 
     public Element VisitBinaryModulusExpr(Expr.Binary.Modulus modulusExpr, Scope scope){
         Element left = Evaluate(modulusExpr.Left,scope);
-        if(modulusExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(modulusExpr.Line,modulusExpr.Offset,$"Left operand of `%` is of type {left.Type}");
+        if(modulusExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(modulusExpr,$"Left operand of `%` is of type {left.Type}");
         Element right = Evaluate(modulusExpr.Right,scope);
-        if(modulusExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(modulusExpr.Line,modulusExpr.Offset,$"Right operand of `%` is of type {right.Type}");
-        if((right as Element.Number)!.Value == 0.0f)throw new RuntimeException(modulusExpr.Line,modulusExpr.Operator.Offset,"Division by 0");
+        if(modulusExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(modulusExpr,$"Right operand of `%` is of type {right.Type}");
+        if((right as Element.Number)!.Value == 0.0f)throw new RuntimeException(modulusExpr,"Division by 0");
         return (left as Element.Number)! % (right as Element.Number)!;
     }
 
     public Element VisitBinarySumExpr(Expr.Binary.Sum sumExpr, Scope scope){
         Element left = Evaluate(sumExpr.Left,scope);
-        if(sumExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(sumExpr.Line,sumExpr.Offset,$"Left operand of `+` is of type {left.Type}");
+        if(sumExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(sumExpr,$"Left operand of `+` is of type {left.Type}");
         Element right = Evaluate(sumExpr.Right,scope);
-        if(sumExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(sumExpr.Line,sumExpr.Offset,$"Right operand of `+` is of type {right.Type}");
+        if(sumExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(sumExpr,$"Right operand of `+` is of type {right.Type}");
         return (left as Element.Number)! + (right as Element.Number)!;
     }
 
     public Element VisitBinaryDifferenceExpr(Expr.Binary.Difference differenceExpr, Scope scope){
         Element left = Evaluate(differenceExpr.Left,scope);
-        if(differenceExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(differenceExpr.Line,differenceExpr.Offset,$"Left operand of `-` is of type {left.Type}");
+        if(differenceExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(differenceExpr,$"Left operand of `-` is of type {left.Type}");
         Element right = Evaluate(differenceExpr.Right,scope);
-        if(differenceExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(differenceExpr.Line,differenceExpr.Offset,$"Right operand of `-` is of type {right.Type}");
+        if(differenceExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(differenceExpr,$"Right operand of `-` is of type {right.Type}");
         return (left as Element.Number)! - (right as Element.Number)!;
     }
 
     public Element VisitBinaryLessExpr(Expr.Binary.Less lessExpr, Scope scope){
         Element left = Evaluate(lessExpr.Left,scope);
-        if(lessExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(lessExpr.Line,lessExpr.Offset,$"Left operand of `<` is of type {left.Type}");
+        if(lessExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(lessExpr,$"Left operand of `<` is of type {left.Type}");
         Element right = Evaluate(lessExpr.Right,scope);
-        if(lessExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(lessExpr.Line,lessExpr.Offset,$"Right operand of `<` is of type {right.Type}");
+        if(lessExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(lessExpr,$"Right operand of `<` is of type {right.Type}");
         return (left as Element.Number)! < (right as Element.Number)!;
     }
 
     public Element VisitBinaryLessEqualExpr(Expr.Binary.LessEqual lessEqualExpr, Scope scope){
         Element left = Evaluate(lessEqualExpr.Left,scope);
-        if(lessEqualExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(lessEqualExpr.Line,lessEqualExpr.Offset,$"Left operand of `<=` is of type {left.Type}");
+        if(lessEqualExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(lessEqualExpr,$"Left operand of `<=` is of type {left.Type}");
         Element right = Evaluate(lessEqualExpr.Right,scope);
-        if(lessEqualExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(lessEqualExpr.Line,lessEqualExpr.Offset,$"Right operand of `<=` is of type {right.Type}");
+        if(lessEqualExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(lessEqualExpr,$"Right operand of `<=` is of type {right.Type}");
         return (left as Element.Number)! <= (right as Element.Number)!;
     }
 
     public Element VisitBinaryGreaterExpr(Expr.Binary.Greater greaterExpr, Scope scope){
         Element left = Evaluate(greaterExpr.Left,scope);
-        if(greaterExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(greaterExpr.Line,greaterExpr.Offset,$"Left operand of `>` is of type {left.Type}");
+        if(greaterExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(greaterExpr,$"Left operand of `>` is of type {left.Type}");
         Element right = Evaluate(greaterExpr.Right,scope);
-        if(greaterExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(greaterExpr.Line,greaterExpr.Offset,$"Right operand of `>` is of type {right.Type}");
+        if(greaterExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(greaterExpr,$"Right operand of `>` is of type {right.Type}");
         return (left as Element.Number)! > (right as Element.Number)!;
     }
 
     public Element VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual greaterEqualExpr, Scope scope){
         Element left = Evaluate(greaterEqualExpr.Left,scope);
-        if(greaterEqualExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(greaterEqualExpr.Line,greaterEqualExpr.Offset,$"Left operand of `>=` is of type {left.Type}");
+        if(greaterEqualExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(greaterEqualExpr,$"Left operand of `>=` is of type {left.Type}");
         Element right = Evaluate(greaterEqualExpr.Right,scope);
-        if(greaterEqualExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(greaterEqualExpr.Line,greaterEqualExpr.Offset,$"Right operand of `>=` is of type {right.Type}");
+        if(greaterEqualExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(greaterEqualExpr,$"Right operand of `>=` is of type {right.Type}");
         return (left as Element.Number)! >= (right as Element.Number)!;
     }
 
@@ -283,7 +283,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         Scope functionScope = Scope.RequestScopeForFunction(calledFunction.Arguments,parameters,scope);
         //Excecute the body of the function on the new scope.
         ++callStackCounter;
-        if(callStackCounter > callStackSize)throw new RuntimeException(callExpr.Line,callExpr.Offset,$"Stack overflow. Last called function was {callExpr.Id.Lexeme}");
+        if(callStackCounter > callStackSize)throw new RuntimeException(callExpr,$"Stack overflow. Last called function was {callExpr.Id.Lexeme}");
         Element result = Evaluate(calledFunction.Body,functionScope);
         --callStackCounter;
         return result;

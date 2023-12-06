@@ -121,10 +121,10 @@ class Scanner : GSharpCompilerComponent
                     break;
                 }
                 else if(c == '.'){
-                    OnErrorFound(line,ComputeOffset,"Expected digit before `.`");
+                    OnErrorFound(line,ComputeOffset,new string(fileName),"Expected digit before `.`");
                     break;
                 }
-                OnErrorFound(line,ComputeOffset,"Unrecognized character");
+                OnErrorFound(line,ComputeOffset,new string(fileName),"Unrecognized character");
                 break;
         }
     }
@@ -141,7 +141,7 @@ class Scanner : GSharpCompilerComponent
             if(c == '\n')OnNewLineFound();//This is for supporting multi-line strings
         }
 
-        if(IsAtEnd) OnErrorFound(openingQuoteLine,openingQuoteOffset,"Opening quote whitout enclosing quote found",true);
+        if(IsAtEnd) OnErrorFound(openingQuoteLine,openingQuoteOffset,new string(fileName),"Opening quote whitout enclosing quote found",true);
         Advance();//Consume the closing quote
 
         string value = source.Substring(start + 1,current - start - 2);//The string content without the enclosing quotes
@@ -179,13 +179,13 @@ class Scanner : GSharpCompilerComponent
             Advance();//Consume the '.'
             
             //If there is no digit after the dot then its an error
-            if(!IsDigit(Peek))OnErrorFound(line,ComputeOffset,"Expected digit after `.`");
+            if(!IsDigit(Peek))OnErrorFound(line,ComputeOffset,new string(fileName),"Expected digit after `.`");
 
             while(IsDigit(Peek))Advance();//Consume the trailing digits
         }
 
         //If there exist an alphanumeric character after a digit, then this is misstyped identifier.
-        if(IsAlpha(Peek)) OnErrorFound(line,ComputeOffset,"Identifiers can't start with numbers");
+        if(IsAlpha(Peek)) OnErrorFound(line,ComputeOffset,new string(fileName),"Identifiers can't start with numbers");
 
         AddToken(TokenType.NUMBER,float.Parse(source.Substring(start,current - start)));
     }

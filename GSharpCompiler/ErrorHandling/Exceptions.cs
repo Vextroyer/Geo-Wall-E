@@ -10,9 +10,16 @@ abstract class CompileTimeException : GSharpException{}
 class RuntimeException : GSharpException{
     public int Line {get; private set;}
     public int Offset { get; private set;}
-    public RuntimeException(int line,int offset,string message):base(message){
+    public string File {get; private set;}
+    public RuntimeException(int line,int offset,string file,string message):base(message){
         Line = line;
         Offset=offset;
+        File = file;
+    }
+    public RuntimeException(IErrorLocalizator error,string message):base(message){
+        Line = error.Line;
+        Offset = error.Offset;
+        File = error.File;
     }
 }
 

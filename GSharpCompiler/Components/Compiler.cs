@@ -17,7 +17,7 @@ public static class Compiler
         try{
             sourceCode = Utils.GetSourceFromFile(path);
         }catch(Exception e){
-            errors.Add(new Error(-1,-1,e.Message));
+            errors.Add(new Error(-1,-1,path,e.Message));
             return new Response(errors,drawables,true);
         }
         return CompileFromSource(sourceCode,path,flags);
@@ -64,12 +64,12 @@ public static class Compiler
             //Scanner,Parser,TypeChecker
         }
         catch(RuntimeException e){
-            errors.Add(new Error(e.Line,e.Offset,e.Message));
+            errors.Add(new Error(e.Line,e.Offset,e.File,e.Message));
         }
         catch (Exception e)
         {
             //Write exception to log.
-            errors.Add(new Error(0,0,"Unexpected error, check log and report to developers"));
+            errors.Add(new Error(0,0,"","Unexpected error, check log and report to developers"));
             Utils.AppendToLog(e);
         }
 
