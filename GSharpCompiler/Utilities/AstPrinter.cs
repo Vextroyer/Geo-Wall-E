@@ -7,7 +7,7 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
 {
     public string Print(Stmt stmt)
     {
-        return stmt.Accept(this, null);
+        return stmt.Accept(this, new Scope());
     }
 
     public string VisitStmtList(Stmt.StmtList stmtList, Scope scope)
@@ -86,7 +86,7 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
 
     public string Print(Expr expr)
     {
-        return expr.Accept(this, null);
+        return expr.Accept(this, new Scope());
     }
 
     public string VisitEmptyExpr(Expr.Empty expr, Scope scope)

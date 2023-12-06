@@ -4,8 +4,8 @@ static class Utils{
     ///<summary>Print the output of the Scanner.</summary>
     ///<param name="tokens">The scanner output</param>
     ///<param name="outputStream">A stream to print to.</param>
-    public static void PrintTokens(List<Token> tokens, TextWriter outputStream){
-        outputStream.WriteLine("Scanner output : Begin");
+    public static void PrintTokens(List<Token> tokens, TextWriter outputStream,string file = ""){
+        outputStream.WriteLine($"Scanner output {file} : Begin");
         outputStream.WriteLine("{");
         foreach(Token t in tokens)outputStream.WriteLine("\t" + t);
         outputStream.WriteLine("}");
@@ -44,10 +44,9 @@ static class Utils{
     ///<param name="path">The path to the file.</summary>
     public static string GetSourceFromFile(string path){
         path = Path.GetFullPath(path);//Convert the path to absolute path, this is to support relative paths
-        Console.WriteLine(path);
 
         //The file doesnt exist, this is an error.
-        if(!Path.Exists(path))throw new FileNotFoundException();
+        if(!Path.Exists(path))throw new FileNotFoundException(path);
 
         // byte[] bytes = File.ReadAllBytes(path);//Read the file content
         // string source = System.Text.Encoding.Default.GetString(bytes);//Convert binary content on its textual representation

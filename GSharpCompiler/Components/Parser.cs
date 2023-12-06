@@ -63,7 +63,7 @@ class Parser : GSharpCompilerComponent
     }
     private Stmt ParseStmt()
     {
-        Stmt aux = null;
+        Stmt? aux = null;
         switch (Peek.Type)
         {
             case TokenType.SEMICOLON:
@@ -104,7 +104,7 @@ class Parser : GSharpCompilerComponent
                 aux = ParseEvalStmt();
                 break;
             case TokenType.IMPORT:
-                aux = IgnoreImportStmt();
+                aux = ParseImportStmt();
                 break;
             default:
                 OnErrorFound(Peek, "Not a statement");
@@ -371,7 +371,8 @@ class Parser : GSharpCompilerComponent
         Expr expr = ParseExpression();
         return new Stmt.Eval(evalToken.Line,evalToken.Offset,evalToken.ExposeFile,expr);
     }
-    public List<string> ParseImports(){
+    ///<summary>Auxiliary method used by the DependencyResolver to obtain the files to import from a given file.</summary>
+    internal List<string> ParseImports(){
         List<string> imports = new List<string>();
         while(Match(TokenType.IMPORT)){
             Token file = Consume(TokenType.STRING,$"Expected STRING after `import` but {Peek.Type} found");
@@ -393,7 +394,8 @@ class Parser : GSharpCompilerComponent
         }
         return imports;
     }
-    public Stmt IgnoreImportStmt(){
+    ///<summary>Parse an import statement. Check that syntax is correct and ignore the statement because it has already been used by the DependencyResolver.</summary>
+    public Stmt ParseImportStmt(){
         Consume(TokenType.IMPORT);
         Consume(TokenType.STRING,$"Expected STRING after `import` but {Peek.Type} found");
         return Stmt.EMPTY;

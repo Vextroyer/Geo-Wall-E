@@ -40,4 +40,12 @@ class ParserException : CompileTimeException {}
 class TypeCheckerException : CompileTimeException{}
 ///<summary>Signals the CompilerComponent that an error has occurred but the excecution should continue.</summary>
 class RecoveryModeException : CompileTimeException{}
-class CircularDependenciesException : CompileTimeException{}
+///<summary>Exception throwed by the dependency resolver.</summary>
+class DependencyResolverException : CompileTimeException{}
+///<summary>Signals that a file has circular dependencies.</summary>
+class CircularDependenciesException : CompileTimeException{
+    public string File {get; private set;}
+    public CircularDependenciesException(string file,string message):base(message){
+        File = file;
+    }
+}
