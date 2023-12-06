@@ -36,8 +36,9 @@ Power = UnaryExpr ( '^' Power)* ;
 UnaryExpr = ( ('!' | '-') UnaryExpr ) | VariableOrCallExpr;
 VariableOrCallExpr = CallExpr | VariableExpr | PrimaryExpr;
     VariableExpr = ID;
-    CallExpr = ID '(' Parameters ')' ;
+    CallExpr = (ID '(' Parameters ')') | MeasureCall;
         Parameters = (Expr , (',' Expr)* )? ;
+    MeasureCall = 'measure' '(' Expr ',' Expr ')' ;
 PrimaryExpr = NUMBER | STRING | GroupedExpr | EMPTY;
     GroupedExpr = '(' Expr ')';
 

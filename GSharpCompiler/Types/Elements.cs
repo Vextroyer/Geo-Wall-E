@@ -16,6 +16,7 @@ public enum ElementType
 {
     UNDEFINED,
     NUMBER,
+    MEASURE,
     STRING,
     POINT,
     LINE,
@@ -43,6 +44,7 @@ public abstract class Element
     public static Element.Ray RAY = new Element.Ray(STRING, POINT, POINT, STRING, Color.BLACK);
     public static Element.Circle CIRCLE = new Element.Circle(STRING, POINT, NUMBER, STRING, Color.BLACK);
     public static Element.Arc ARC = new Element.Arc(STRING, POINT,POINT,POINT, NUMBER, STRING, Color.BLACK);
+    public static Element.Measure MEASURE = new Element.Measure(0);
     ///<summary>Represents the undefined type. Use this instead of declaring new Undefined objects.</summary>
     public static Element.Undefined UNDEFINED = new Element.Undefined();
     //Boolean values are represented with numbers
@@ -155,7 +157,36 @@ public abstract class Element
             return Element.FALSE;
         }
     }
-
+    ///<summary>Represents measures.</summary>
+    public class Measure : Element{
+        public float Value {get; private set;}
+        public Measure(float value):base(ElementType.MEASURE){
+            //Sanitize the input. A measure is always non negative.
+            Value = Math.Abs(value);
+        }
+        public override Number EqualTo(Element other)
+        {
+            if(other.Type != this.Type)return Element.FALSE;
+            if(Utils.Compare(this.Value,(other as Element.Measure)!.Value) == 0)return Element.TRUE;
+            return Element.FALSE;
+        }
+        static public Element.Measure operator+(Element.Measure left,Element.Measure right){
+            return new Element.Measure(left.Value + right.Value);
+        }
+        static public Element.Measure operator-(Element.Measure left,Element.Measure right){
+            return new Element.Measure(Math.Abs(left.Value - right.Value));
+        }
+        static public Element.Measure operator*(Element.Measure measure,Element.Number scale){
+            return new Element.Measure(measure.Value * Math.Abs(scale.Value));
+        }
+        static public Element.Measure operator/(Element.Measure left,Element.Measure right){
+            return new Element.Measure(float.Floor(left.Value / right.Value));
+        }
+        public override string ToString()
+        {
+            return Value.ToString() + 'u';
+        }
+    }
     //Represents a string.
     public class String : Element
     {
@@ -328,6 +359,13 @@ public abstract class Element
             if (other.Type != this.Type) return Element.FALSE;
             if (((Element.Point)other).x == this.x && ((Element.Point)other).y == this.y) return Element.TRUE;
             return Element.FALSE;
+        }
+        public static Element.Measure Distance(Element.Point p1,Element.Point p2){
+            float xSquare = (p1.x - p2.x).Value;
+            xSquare *= xSquare;
+            float ySquare = (p1.y - p2.y).Value;
+            ySquare *= ySquare;
+            return new Element.Measure(float.Sqrt(xSquare + ySquare));
         }
     }
 

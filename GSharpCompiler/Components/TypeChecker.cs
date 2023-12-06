@@ -417,4 +417,23 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         //Cannot recover after the call because the return type of the call cant be determined.
         return Element.RUNTIME_DEFINED;
     }
+    public Element VisitMeasureExpr(Expr.Measure expr,Scope scope){
+        bool requiresRuntimeCheck = false;
+        try{
+            Element p1 = Check(expr.P1,scope);
+            if(p1.Type == ElementType.RUNTIME_DEFINED)requiresRuntimeCheck = true;
+            else if(p1.Type != ElementType.POINT) OnErrorFound(expr,$"Expected POINT as first parameter but {p1.Type} was found");
+        }catch(RecoveryModeException){
+            //Recover
+        }
+        try{
+            Element p2 = Check(expr.P1,scope);
+            if(p2.Type == ElementType.RUNTIME_DEFINED)requiresRuntimeCheck = true;
+            else if(p2.Type != ElementType.POINT) OnErrorFound(expr,$"Expected POINT as second parameter but {p2.Type} was found");
+        }catch(RecoveryModeException){
+            //Recover
+        }
+        expr.RequiresRuntimeCheck = requiresRuntimeCheck;
+        return Element.MEASURE;
+    }
 }

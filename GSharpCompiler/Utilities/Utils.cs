@@ -59,4 +59,12 @@ static class Utils{
         string logMessage = $"\n{System.DateTime.Now}\n{e.Message}\n{e.StackTrace}\n";
         File.AppendAllText("log",logMessage);
     }
+
+    ///<summary>Compare two real values up to a precission Epsilon.</summary>
+    public static int Compare(float x,float y){
+        if(float.IsNegative(x-y))return -1;//x < y
+        if(x - y <= Epsilon)return 0;//x = y
+        return 1;//x > y
+    }
+    private static float Epsilon = 1e-6f;
 }

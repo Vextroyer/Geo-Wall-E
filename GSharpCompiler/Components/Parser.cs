@@ -495,20 +495,22 @@ class Parser : GSharpCompilerComponent
     private Expr ParseVariableOrCallExpression()
     {
         //Parse a variable or a call
-        if (Match(TokenType.ID))
-        {
-            Token id = Previous;
-            if(Match(TokenType.LEFT_PAREN)){
-                //Parse a call
-                List<Expr> parameters = ParseParameters();
-                Consume(TokenType.RIGHT_PAREN,$"Expected `)` after parameters on call to `{id.Lexeme}`");
-                return new Expr.Call(id,id.ExposeFile,parameters);
-            }
-            //Parse a variable
-            return new Expr.Variable(id,id.ExposeFile);
+        switch(Peek.Type){
+            case TokenType.MEASURE:
+                return ParseMeasureExpr();
+            case TokenType.ID:
+                Token id = Advance();
+                if(Match(TokenType.LEFT_PAREN)){
+                    //Parse a call
+                    List<Expr> parameters = ParseParameters();
+                    Consume(TokenType.RIGHT_PAREN,$"Expected `)` after parameters on call to `{id.Lexeme}`");
+                    return new Expr.Call(id,id.ExposeFile,parameters);
+                }
+                //Parse a variable
+                return new Expr.Variable(id,id.ExposeFile);
+            
+            default : return ParsePrimaryExpression();
         }
-        return ParsePrimaryExpression();
-
         ///<summary>Parse a function call parameters.</summary>
         List<Expr> ParseParameters(){
             List<Expr> parameters = new List<Expr>();
@@ -519,6 +521,17 @@ class Parser : GSharpCompilerComponent
             }while(Match(TokenType.COMMA));
             return parameters;
         }
+    }
+    private Expr ParseMeasureExpr(){
+        Token measureToken = Consume(TokenType.MEASURE);
+        Consume(TokenType.LEFT_PAREN,$"Expected `(` after call to function `measure`");
+        Expr firstPoint = ParseExpression();
+        ErrorIfEmpty(firstPoint,Previous,"Expected non-empty expression as first parameter");
+        Consume(TokenType.COMMA,"Expected `,` after parameter");
+        Expr secondPoint = ParseExpression();
+        ErrorIfEmpty(secondPoint,Previous,"Expectedd non-empty expression as second parameter.");
+        Consume(TokenType.RIGHT_PAREN,"Expected `)` after parameters");
+        return new Expr.Measure(measureToken,firstPoint,secondPoint);
     }
     private Expr ParsePrimaryExpression()
     {

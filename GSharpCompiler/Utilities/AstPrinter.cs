@@ -211,4 +211,7 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
             return ret;
         }
     }
+    public string VisitMeasureExpr(Expr.Measure expr,Scope scope){
+        return $"measure({Print(expr.P1)},{Print(expr.P2)})";
+    }
 }

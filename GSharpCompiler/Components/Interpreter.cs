@@ -288,6 +288,20 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         --callStackCounter;
         return result;
     }
+    public Element VisitMeasureExpr(Expr.Measure expr, Scope scope){
+        if(expr.RequiresRuntimeCheck){
+            Element p1 = Evaluate(expr.P1,scope);
+            if(p1.Type != ElementType.POINT)throw new RuntimeException(expr,$"Expected POINT as first parameter but {p1.Type} was found");
+            Element p2 = Evaluate(expr.P2,scope);
+            if(p2.Type != ElementType.POINT)throw new RuntimeException(expr,$"Expected POINT as second parameter but {p2.Type} was found");
+            return Element.Point.Distance((p1 as Element.Point)!,(p2 as Element.Point)!);
+        }
+        else{
+            Element.Point p1 = (Evaluate(expr.P1,scope) as Element.Point)!;
+            Element.Point p2 = (Evaluate(expr.P2,scope) as Element.Point)!;
+            return Element.Point.Distance(p1,p2);
+        }
+    }
     #endregion Interpret expressions
 
     //Determine if the given element is true or false. Undefined and 0 are false, everything else is true.
