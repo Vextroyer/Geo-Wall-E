@@ -17,9 +17,9 @@ class Parser : GSharpCompilerComponent
     {
         throw new ParserException();
     }
-    public override void OnErrorFound(int line, int offset, string file ,string message, bool enforceAbort = false)
+    public override void OnErrorFound(int line, int offset, string file, string message, bool enforceAbort = false)
     {
-        base.OnErrorFound(line, offset, file,message, enforceAbort);
+        base.OnErrorFound(line, offset, file, message, enforceAbort);
         //If the execution doesnt stop enter recovery mode.
         throw new RecoveryModeException();
     }
@@ -119,152 +119,178 @@ class Parser : GSharpCompilerComponent
         Expr expr = ParseExpression();
         ErrorIfEmpty(expr, drawToken, "Expected non-empty expression after `draw`");
 
-        return new Stmt.Draw(drawToken.Line,drawToken.Offset,drawToken.ExposeFile ,expr);
+        return new Stmt.Draw(drawToken.Line, drawToken.Offset, drawToken.ExposeFile, expr);
 
     }
     private Stmt.Point ParsePointStmt()
     {
         Token pointToken = Consume(TokenType.POINT, "Expected `point` keyword");
-        
-        //Since parsing phase points get their coordinates.
-        float x = Utils.RandomCoordinate();
-        float y = Utils.RandomCoordinate();
-        //A parenthesis after a point keyword means a constructor with the point coordinates.
         if (Peek.Type == TokenType.LEFT_PAREN)
         {
             Consume(TokenType.LEFT_PAREN);
-            x = (float)Consume(TokenType.NUMBER, "Expected NUMBER as first parameter").Literal!;
-            Consume(TokenType.COMMA, "Expected comma `,`");
-            y = (float)Consume(TokenType.NUMBER, "Expected NUMBER as second parameter").Literal!;
+            if (Peek.Type != TokenType.RIGHT_PAREN)
+            {
+
+                Expr x = ParseExpression();
+                Consume(TokenType.COMMA, "Expected comma `,`");
+                Expr y = ParseExpression();
+                Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+
+
+                Token id = Consume(TokenType.ID, "Expected identifier");
+
+                //If the current token is an string then its a comment on the point.
+                string comment = "";
+                if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
+                return new Stmt.Point(pointToken.Line, pointToken.Offset, pointToken.ExposeFile, id, x, y, new Element.String(comment));
+
+            }
             Consume(TokenType.RIGHT_PAREN, "Expected `)`");
         }
 
-        Token id = Consume(TokenType.ID, "Expected identifier");
+        Token id2 = Consume(TokenType.ID, "Expected identifier");
 
-        //If the current token is an string then its a comment on the point.
-        string comment = "";
-        if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
-
-        return new Stmt.Point(pointToken.Line, pointToken.Offset,pointToken.ExposeFile, id, new Element.Number(x), new Element.Number(y), new Element.String(comment));
+        return new Stmt.Point(pointToken.Line, pointToken.Offset, pointToken.ExposeFile, id2);
     }
 
     private Stmt.Lines ParseLinesStmt()
     {
         Token lineToken = Consume(TokenType.LINE, "Expected `line` keyword");
 
-        //Expr p1 = new Expr.Variable();
-        //Element.Point p2 = new Element.Point();
-
-        //A parenthesis after a point keyword means a constructor with the points.
-
-        Consume(TokenType.LEFT_PAREN);
-        // p1 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as first parameter").Literal!;
-        Expr p1 = ParseExpression();
-        Consume(TokenType.COMMA, "Expected comma `,`");
-        Expr p2 = ParseExpression();
-        //p2 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as second parameter").Literal!;
-        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+        if (Peek.Type == TokenType.LEFT_PAREN)
+        {
+            Consume(TokenType.LEFT_PAREN);
+            if (Peek.Type != TokenType.RIGHT_PAREN)
+            {
+                Expr p1 = ParseExpression();
+                Consume(TokenType.COMMA, "Expected comma `,`");
+                Expr p2 = ParseExpression();
+                Consume(TokenType.RIGHT_PAREN, "Expected `)`");
 
 
-        Token id = Consume(TokenType.ID, "Expected identifier");
+                Token id = Consume(TokenType.ID, "Expected identifier");
+                string comment = "";
+                if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
 
-        //If the current token is an string then its a comment on the line.
-        string comment = "";
-        if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
+                return new Stmt.Lines(lineToken.Line, lineToken.Offset, lineToken.ExposeFile, id, p1, p2, new Element.String(comment));
+            }
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+        }
 
-        return new Stmt.Lines(lineToken.Line, lineToken.Offset,lineToken.ExposeFile ,id, p1, p2, new Element.String(comment));
+        Token id2 = Consume(TokenType.ID, "Expected identifier");
+
+        return new Stmt.Lines(lineToken.Line, lineToken.Offset, lineToken.ExposeFile, id2);
     }
     private Stmt.Segment ParseSegmentStmt()
     {
-        Token segmentToken = Consume(TokenType.SEGMENT, "Expected `segment` keyword");
+        Token lineToken = Consume(TokenType.SEGMENT, "Expected `segment` keyword");
+        if (Peek.Type == TokenType.LEFT_PAREN)
+        {
+            Consume(TokenType.LEFT_PAREN);
+            if (Peek.Type != TokenType.RIGHT_PAREN)
+            {
+                Expr p1 = ParseExpression();
+                Consume(TokenType.COMMA, "Expected comma `,`");
+                Expr p2 = ParseExpression();
+                Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+                Token id = Consume(TokenType.ID, "Expected identifier");
 
-        Consume(TokenType.LEFT_PAREN);
-        // p1 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as first parameter").Literal!;
-        Expr p1 = ParseExpression();
-        Consume(TokenType.COMMA, "Expected comma `,`");
-        Expr p2 = ParseExpression();
-        //p2 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as second parameter").Literal!;
-        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+                string comment = "";
+                if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
 
-
-        Token id = Consume(TokenType.ID, "Expected identifier");
-
-        //If the current token is an string then its a comment on the line.
-        string comment = "";
-        if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
-
-        return new Stmt.Segment(segmentToken.Line, segmentToken.Offset, segmentToken.ExposeFile,id, p1, p2, new Element.String(comment));
+                return new Stmt.Segment(lineToken.Line, lineToken.Offset, lineToken.ExposeFile, id, p1, p2, new Element.String(comment));
+            }
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+        }
+        Token id2 = Consume(TokenType.ID, "Expected identifier");
+        return new Stmt.Segment(lineToken.Line, lineToken.Offset, lineToken.ExposeFile, id2);
     }
     private Stmt.Ray ParseRayStmt()
     {
-        Token rayToken = Consume(TokenType.RAY, "Expected `ray` keyword");
+        Token lineToken = Consume(TokenType.RAY, "Expected `ray` keyword");
+        if (Peek.Type == TokenType.LEFT_PAREN)
+        {
+            Consume(TokenType.LEFT_PAREN);
+            if (Peek.Type != TokenType.RIGHT_PAREN)
+            {
+                Expr p1 = ParseExpression();
+                Consume(TokenType.COMMA, "Expected comma `,`");
+                Expr p2 = ParseExpression();
+                Consume(TokenType.RIGHT_PAREN, "Expected `)`");
 
-        Consume(TokenType.LEFT_PAREN);
-        // p1 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as first parameter").Literal!;
-        Expr p1 = ParseExpression();
-        Consume(TokenType.COMMA, "Expected comma `,`");
-        Expr p2 = ParseExpression();
-        //p2 = (Element.Point)Consume(TokenType.POINT, "Expected POINT as second parameter").Literal!;
-        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+                Token id = Consume(TokenType.ID, "Expected identifier");
 
+                string comment = "";
+                if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
 
-        Token id = Consume(TokenType.ID, "Expected identifier");
+                return new Stmt.Ray(lineToken.Line, lineToken.Offset, lineToken.ExposeFile, id, p1, p2, new Element.String(comment));
+            }
 
-        //If the current token is an string then its a comment on the line.
-        string comment = "";
-        if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+        }
+        Token id2 = Consume(TokenType.ID, "Expected identifier");
+        return new Stmt.Ray(lineToken.Line, lineToken.Offset, lineToken.ExposeFile, id2);
 
-        return new Stmt.Ray(rayToken.Line, rayToken.Offset, rayToken.ExposeFile,id, p1, p2, new Element.String(comment));
     }
     private Stmt.Circle ParseCircleStmt()
     {
         Token circleToken = Consume(TokenType.CIRCLE, "Expected `circle` keyword");
+        if (Peek.Type == TokenType.LEFT_PAREN)
+        {
+            Consume(TokenType.LEFT_PAREN);
+            if (Peek.Type != TokenType.RIGHT_PAREN)
+            {
+                Expr p1 = ParseExpression();
+                Consume(TokenType.COMMA, "Expected comma `,`");
+                float radius = (float)Consume(TokenType.NUMBER, "Expected NUMBER as second parameter").Literal!;
+                Consume(TokenType.RIGHT_PAREN, "Expected `)`");
 
-        float radius = Utils.RandomCoordinate();
+                Token id = Consume(TokenType.ID, "Expected identifier");
+                string comment = "";
+                if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
+                return new Stmt.Circle(circleToken.Line, circleToken.Offset, circleToken.ExposeFile, id, p1, new Element.Number(radius), new Element.String(comment));
+            }
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+        }
+        Token id2 = Consume(TokenType.ID, "Expected identifier");
 
-        Consume(TokenType.LEFT_PAREN);
-        Expr p1 = ParseExpression();
-        Consume(TokenType.COMMA, "Expected comma `,`");
-        radius = (float)Consume(TokenType.NUMBER, "Expected NUMBER as second parameter").Literal!;
-        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
-
-
-        Token id = Consume(TokenType.ID, "Expected identifier");
-
-        //If the current token is an string then its a comment on the line.
-        string comment = "";
-        if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
-        return new Stmt.Circle(circleToken.Line, circleToken.Offset, circleToken.ExposeFile, id, p1, new Element.Number(radius), new Element.String(comment));
+        return new Stmt.Circle(circleToken.Line, circleToken.Offset, circleToken.ExposeFile, id2);
     }
     private Stmt.Arc ParseArcStmt()
     {
         Token arcToken = Consume(TokenType.ARC, "Expected `arc` keyword");
+        if (Peek.Type == TokenType.LEFT_PAREN)
+        {
+            Consume(TokenType.LEFT_PAREN);
+            if (Peek.Type != TokenType.RIGHT_PAREN)
+            {
+                Expr p1 = ParseExpression();
+                Consume(TokenType.COMMA, "Expected comma `,`");
+                Expr p2 = ParseExpression();
+                Consume(TokenType.COMMA, "Expected comma `,`");
+                Expr p3 = ParseExpression();
+                Consume(TokenType.COMMA, "Expected comma `,`");
+                float radius = (float)Consume(TokenType.NUMBER, "Expected NUMBER as second parameter").Literal!;
+                Consume(TokenType.RIGHT_PAREN, "Expected `)`");
 
-        float radius = Utils.RandomCoordinate();
+                Token id = Consume(TokenType.ID, "Expected identifier");
+                string comment = "";
+                if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
+                return new Stmt.Arc(arcToken.Line, arcToken.Offset, arcToken.ExposeFile, id, p1, p2, p3, new Element.Number(radius), new Element.String(comment));
+            }
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
 
-        Consume(TokenType.LEFT_PAREN);
-        Expr p1 = ParseExpression();
-        Consume(TokenType.COMMA, "Expected comma `,`");
-        Expr p2 = ParseExpression();
-        Consume(TokenType.COMMA, "Expected comma `,`");
-        Expr p3 = ParseExpression();
-        Consume(TokenType.COMMA, "Expected comma `,`");
-        radius = (float)Consume(TokenType.NUMBER, "Expected NUMBER as second parameter").Literal!;
-        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
-
-
-        Token id = Consume(TokenType.ID, "Expected identifier");
-
-        //If the current token is an string then its a comment on the line.
-        string comment = "";
-        if (Peek.Type == TokenType.STRING) comment = (string)Advance().Literal!;
-        return new Stmt.Arc(arcToken.Line, arcToken.Offset, arcToken.ExposeFile,id, p1,p2,p3, new Element.Number(radius), new Element.String(comment));
+        }
+        Token id2 = Consume(TokenType.ID, "Expected identifier");
+        return new Stmt.Arc(arcToken.Line, arcToken.Offset, arcToken.ExposeFile, id2);
     }
     ///<summary>Parse a declaration statement.</summary>
-    private Stmt.Declaration ParseDeclaration(){
+    private Stmt.Declaration ParseDeclaration()
+    {
         //The actual token is an identifier.
         //The type of declaration depends on the next token
-        switch(PeekNext.Type){
+        switch (PeekNext.Type)
+        {
             case TokenType.EQUAL:
                 //Identifier followed by an equal sign means a constant declaration.
                 return ParseConstantDeclaration();
@@ -272,7 +298,7 @@ class Parser : GSharpCompilerComponent
                 //Identifier followed by parentheses means a function declaration.
                 return ParseFunctionDeclaration();
             default:
-                OnErrorFound(Peek,"Identifier found on top level statement, but no declaration follows. If you intend to evaluate an expression use the `eval` keyword before the identifier.");
+                OnErrorFound(Peek, "Identifier found on top level statement, but no declaration follows. If you intend to evaluate an expression use the `eval` keyword before the identifier.");
                 break;
         }
         //Unreachable code.
@@ -286,33 +312,36 @@ class Parser : GSharpCompilerComponent
         ErrorIfEmpty(expr, id, $"Assigned empty expression to constant `{id.Lexeme}`");//Rule 2
         return new Stmt.Declaration.Constant(id, id.ExposeFile, expr);
     }
-    private Stmt.Declaration.Function ParseFunctionDeclaration(){
-        Token id = Consume(TokenType.ID,"Expected identifier on function declaration");
+    private Stmt.Declaration.Function ParseFunctionDeclaration()
+    {
+        Token id = Consume(TokenType.ID, "Expected identifier on function declaration");
         Consume(TokenType.LEFT_PAREN);
 
         ///<summary>Helper method to parse the arguments of a function.</summary>
-        List<Token> ParseFunctionArguments(){
+        List<Token> ParseFunctionArguments()
+        {
             List<Token> arguments = new List<Token>();
-            if(Peek.Type == TokenType.RIGHT_PAREN) return arguments;//A closing parenthesis means no arguments.
+            if (Peek.Type == TokenType.RIGHT_PAREN) return arguments;//A closing parenthesis means no arguments.
 
-            do{
-                Consume(TokenType.ID,"Identifier expected as argument");
+            do
+            {
+                Consume(TokenType.ID, "Identifier expected as argument");
                 arguments.Add(Previous);
-            }while(Match(TokenType.COMMA));
+            } while (Match(TokenType.COMMA));
             return arguments;
         }
 
         List<Token> arguments = ParseFunctionArguments();
-        Consume(TokenType.RIGHT_PAREN,"Expected `)` on function declaration");
-        Consume(TokenType.EQUAL,"Expected `=` after function signature");
+        Consume(TokenType.RIGHT_PAREN, "Expected `)` on function declaration");
+        Consume(TokenType.EQUAL, "Expected `=` after function signature");
         Expr body = ParseExpression();
-        ErrorIfEmpty(body,id,"Expected non-empty expression as function body");
-        return new Stmt.Declaration.Function(id,id.ExposeFile,arguments,body);
+        ErrorIfEmpty(body, id, "Expected non-empty expression as function body");
+        return new Stmt.Declaration.Function(id, id.ExposeFile, arguments, body);
     }
     private Stmt.Print ParsePrintStmt()
     {
         Token printToken = Consume(TokenType.PRINT);
-        return new Stmt.Print(printToken.Line,printToken.Offset,printToken.ExposeFile, ParseExpression());
+        return new Stmt.Print(printToken.Line, printToken.Offset, printToken.ExposeFile, ParseExpression());
     }
     private Stmt.Color ParseColorStmt()
     {
@@ -323,7 +352,7 @@ class Parser : GSharpCompilerComponent
         if (Peek.Type == TokenType.RESTORE)
         {
             Consume(TokenType.RESTORE);
-            return new Stmt.Color(line, offset, Previous.ExposeFile,Color.BLACK, true);
+            return new Stmt.Color(line, offset, Previous.ExposeFile, Color.BLACK, true);
         }
 
         Color color = Color.BLACK;
@@ -364,29 +393,36 @@ class Parser : GSharpCompilerComponent
         }
 
         Advance();//Consume the token who holds the color.
-        return new Stmt.Color(line, offset,Previous.ExposeFile, color);
+        return new Stmt.Color(line, offset, Previous.ExposeFile, color);
     }
-    private Stmt.Eval ParseEvalStmt(){
+    private Stmt.Eval ParseEvalStmt()
+    {
         Token evalToken = Consume(TokenType.EVAL);
         Expr expr = ParseExpression();
-        return new Stmt.Eval(evalToken.Line,evalToken.Offset,evalToken.ExposeFile,expr);
+        return new Stmt.Eval(evalToken.Line, evalToken.Offset, evalToken.ExposeFile, expr);
     }
     ///<summary>Auxiliary method used by the DependencyResolver to obtain the files to import from a given file.</summary>
-    internal List<string> ParseImports(){
+    internal List<string> ParseImports()
+    {
         List<string> imports = new List<string>();
-        while(Match(TokenType.IMPORT)){
-            Token file = Consume(TokenType.STRING,$"Expected STRING after `import` but {Peek.Type} found");
+        while (Match(TokenType.IMPORT))
+        {
+            Token file = Consume(TokenType.STRING, $"Expected STRING after `import` but {Peek.Type} found");
             imports.Add((string)file.Literal!);
-            Consume(TokenType.SEMICOLON,"Expected `;` after `import` statement.");
+            Consume(TokenType.SEMICOLON, "Expected `;` after `import` statement.");
         }
         //Detect imports which are not at the top.
-        while(!IsAtEnd){
+        while (!IsAtEnd)
+        {
             //These imports are not at the top.
-            if(Peek.Type == TokenType.IMPORT){
-                try{
-                    OnErrorFound(Peek,$"`import` must be placed before any other statements");
+            if (Peek.Type == TokenType.IMPORT)
+            {
+                try
+                {
+                    OnErrorFound(Peek, $"`import` must be placed before any other statements");
                 }
-                catch(RecoveryModeException){
+                catch (RecoveryModeException)
+                {
 
                 }
             }
@@ -395,9 +431,10 @@ class Parser : GSharpCompilerComponent
         return imports;
     }
     ///<summary>Parse an import statement. Check that syntax is correct and ignore the statement because it has already been used by the DependencyResolver.</summary>
-    public Stmt ParseImportStmt(){
+    public Stmt ParseImportStmt()
+    {
         Consume(TokenType.IMPORT);
-        Consume(TokenType.STRING,$"Expected STRING after `import` but {Peek.Type} found");
+        Consume(TokenType.STRING, $"Expected STRING after `import` but {Peek.Type} found");
         return Stmt.EMPTY;
     }
     #endregion Statement parsing
@@ -407,6 +444,18 @@ class Parser : GSharpCompilerComponent
     {
         switch (Peek.Type)
         {
+            case TokenType.ARC:
+                return ParseArcExpression();
+            case TokenType.CIRCLE:
+                return ParseCircleExpression();
+            case TokenType.LINE:
+                return ParseLinesExpression();
+            case TokenType.SEGMENT:
+                return ParseSegmentExpression();
+            case TokenType.RAY:
+                return ParseRayExpression();
+            case TokenType.POINT:
+                return ParsePointExpression();
             case TokenType.LET:
                 return ParseLetInExpression();
             case TokenType.IF:
@@ -415,6 +464,118 @@ class Parser : GSharpCompilerComponent
                 return ParseOrExpression();
         }
     }
+    private Expr ParsePointExpression()
+    {
+        Token pointToken = Consume(TokenType.POINT);
+
+        Consume(TokenType.LEFT_PAREN);
+        if (Peek.Type != TokenType.RIGHT_PAREN)
+        {
+            Expr x = ParseExpression();
+            Consume(TokenType.COMMA, "Expected comma `,`");
+            Expr y = ParseExpression();
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+
+            return new Expr.Point(pointToken.Line, pointToken.Offset, pointToken.ExposeFile, x, y);
+
+        }
+        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+
+        return new Expr.Point(pointToken.Line, pointToken.Offset, pointToken.ExposeFile);
+
+    }
+    private Expr.Lines ParseLinesExpression()
+    {
+        Token lineToken = Consume(TokenType.LINE, "Expected `line` keyword");
+
+        Consume(TokenType.LEFT_PAREN);
+        if (Peek.Type != TokenType.RIGHT_PAREN)
+        {
+            Expr p1 = ParseExpression();
+            Consume(TokenType.COMMA, "Expected comma `,`");
+            Expr p2 = ParseExpression();
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+            return new Expr.Lines(lineToken.Line, lineToken.Offset, lineToken.ExposeFile, p1, p2);
+        }
+
+        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+        System.Console.WriteLine("RAMON");
+        return new Expr.Lines(lineToken.Line, lineToken.Offset, lineToken.ExposeFile);
+    }
+    private Expr.Segment ParseSegmentExpression()
+    {
+        Token lineToken = Consume(TokenType.SEGMENT, "Expected `segment` keyword");
+
+        Consume(TokenType.LEFT_PAREN);
+        if (Peek.Type != TokenType.RIGHT_PAREN)
+        {
+            Expr p1 = ParseExpression();
+            Consume(TokenType.COMMA, "Expected comma `,`");
+            Expr p2 = ParseExpression();
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+
+            return new Expr.Segment(lineToken.Line, lineToken.Offset, lineToken.ExposeFile, p1, p2);
+        }
+        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+
+        return new Expr.Segment(lineToken.Line, lineToken.Offset, lineToken.ExposeFile);
+    }
+    private Expr.Ray ParseRayExpression()
+    {
+        Token lineToken = Consume(TokenType.RAY, "Expected `ray` keyword");
+
+        Consume(TokenType.LEFT_PAREN);
+        if (Peek.Type != TokenType.RIGHT_PAREN)
+        {
+            Expr p1 = ParseExpression();
+            Consume(TokenType.COMMA, "Expected comma `,`");
+            Expr p2 = ParseExpression();
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+
+            return new Expr.Ray(lineToken.Line, lineToken.Offset, lineToken.ExposeFile, p1, p2);
+        }
+
+        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+
+        return new Expr.Ray(lineToken.Line, lineToken.Offset, lineToken.ExposeFile);
+    }
+    private Expr.Circle ParseCircleExpression()
+    {
+        Token circleToken = Consume(TokenType.CIRCLE, "Expected `circle` keyword");
+
+        Consume(TokenType.LEFT_PAREN);
+        if (Peek.Type != TokenType.RIGHT_PAREN)
+        {
+            Expr p1 = ParseExpression();
+            Consume(TokenType.COMMA, "Expected comma `,`");
+            float radius = (float)Consume(TokenType.NUMBER, "Expected NUMBER as second parameter").Literal!;
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+            return new Expr.Circle(circleToken.Line, circleToken.Offset, circleToken.ExposeFile, p1, new Element.Number(radius));
+        }
+        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+        return new Expr.Circle(circleToken.Line, circleToken.Offset, circleToken.ExposeFile);
+    }
+
+    private Expr.Arc ParseArcExpression()
+    {
+        Token arcToken = Consume(TokenType.ARC, "Expected `arc` keyword");
+
+        Consume(TokenType.LEFT_PAREN);
+        if (Peek.Type != TokenType.RIGHT_PAREN)
+        {
+            Expr p1 = ParseExpression();
+            Consume(TokenType.COMMA, "Expected comma `,`");
+            Expr p2 = ParseExpression();
+            Consume(TokenType.COMMA, "Expected comma `,`");
+            Expr p3 = ParseExpression();
+            Consume(TokenType.COMMA, "Expected comma `,`");
+            float radius = (float)Consume(TokenType.NUMBER, "Expected NUMBER as second parameter").Literal!;
+            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+            return new Expr.Arc(arcToken.Line, arcToken.Offset, arcToken.ExposeFile, p1, p2, p3, new Element.Number(radius));
+        }
+        Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+        return new Expr.Arc(arcToken.Line, arcToken.Offset, arcToken.ExposeFile);
+    }
     private Expr ParseLetInExpression()
     {
         Token letToken = Consume(TokenType.LET);
@@ -422,7 +583,7 @@ class Parser : GSharpCompilerComponent
         Consume(TokenType.IN);
         Expr expr = ParseExpression();
         ErrorIfEmpty(expr, letToken, "Expected non-empty expression after `in` keyword");
-        return new Expr.LetIn(letToken.Line, letToken.Offset,letToken.ExposeFile,stmts, expr);
+        return new Expr.LetIn(letToken.Line, letToken.Offset, letToken.ExposeFile, stmts, expr);
     }
     private Expr ParseConditionalExpression()
     {
@@ -435,7 +596,7 @@ class Parser : GSharpCompilerComponent
         Consume(TokenType.ELSE, "Expected `else` keyword");
         Expr elseBranchExpr = ParseExpression();
         ErrorIfEmpty(elseBranchExpr, ifToken, "Expected non-empty expression after `else`");
-        return new Expr.Conditional(ifToken.Line, ifToken.Offset, ifToken.ExposeFile,condition, thenBranchExpr, elseBranchExpr);
+        return new Expr.Conditional(ifToken.Line, ifToken.Offset, ifToken.ExposeFile, condition, thenBranchExpr, elseBranchExpr);
     }
     private Expr ParseOrExpression()
     {
@@ -482,12 +643,12 @@ class Parser : GSharpCompilerComponent
                 Advance();//Consume the operator
                 expr = ParseUnaryExpression();
                 ErrorIfEmpty(expr, Previous, "Expected non-empty expression as operand");
-                return new Expr.Unary.Not(Previous.Line, Previous.Offset,Previous.ExposeFile,expr);
+                return new Expr.Unary.Not(Previous.Line, Previous.Offset, Previous.ExposeFile, expr);
             case TokenType.MINUS:
                 Advance();//Consume the operator
                 expr = ParseUnaryExpression();
                 ErrorIfEmpty(expr, Previous, "Expected non-empty expression as operand");
-                return new Expr.Unary.Minus(Previous.Line, Previous.Offset,Previous.ExposeFile,expr);
+                return new Expr.Unary.Minus(Previous.Line, Previous.Offset, Previous.ExposeFile, expr);
             default:
                 return ParseVariableOrCallExpression();
         }
@@ -512,13 +673,15 @@ class Parser : GSharpCompilerComponent
             default : return ParsePrimaryExpression();
         }
         ///<summary>Parse a function call parameters.</summary>
-        List<Expr> ParseParameters(){
+        List<Expr> ParseParameters()
+        {
             List<Expr> parameters = new List<Expr>();
             //A closing parenthesis means no parameters.
-            if(Peek.Type == TokenType.RIGHT_PAREN)return parameters;
-            do{
+            if (Peek.Type == TokenType.RIGHT_PAREN) return parameters;
+            do
+            {
                 parameters.Add(ParseExpression());
-            }while(Match(TokenType.COMMA));
+            } while (Match(TokenType.COMMA));
             return parameters;
         }
     }
@@ -538,9 +701,9 @@ class Parser : GSharpCompilerComponent
         switch (Peek.Type)
         {
             case TokenType.NUMBER:
-                return new Expr.Number(Peek.Line, Peek.Offset,Peek.ExposeFile, (float)Advance().Literal!);
+                return new Expr.Number(Peek.Line, Peek.Offset, Peek.ExposeFile, (float)Advance().Literal!);
             case TokenType.STRING:
-                return new Expr.String(Peek.Line, Peek.Offset, Peek.ExposeFile,(string)Advance().Literal!);
+                return new Expr.String(Peek.Line, Peek.Offset, Peek.ExposeFile, (string)Advance().Literal!);
             case TokenType.LEFT_PAREN://Grouping expressions
                 Consume(TokenType.LEFT_PAREN);
                 Expr expr = ParseExpression();
@@ -558,9 +721,11 @@ class Parser : GSharpCompilerComponent
     //Return the current token without moving current,which without consuming its.
     private Token Peek { get => tokens[current]; }
     ///<summary>The token after `current` token. If there is no more tokens after `current` returns the last token on `tokens`.</summary>
-    private Token PeekNext {
-        get{
-            if(current + 1 < tokens.Count)return tokens[current + 1];
+    private Token PeekNext
+    {
+        get
+        {
+            if (current + 1 < tokens.Count) return tokens[current + 1];
             return tokens[tokens.Count - 1];
         }
     }
@@ -577,7 +742,7 @@ class Parser : GSharpCompilerComponent
     {
         if (Peek.Type == type) return Advance();
         //Heuristically report the location of the error as the end of the previous token.
-        OnErrorFound(Previous.Line, Previous.Offset + Previous.Lexeme.Length, Previous.File,message);
+        OnErrorFound(Previous.Line, Previous.Offset + Previous.Lexeme.Length, Previous.File, message);
         //Unreachable code
         return Peek;
     }
@@ -596,9 +761,9 @@ class Parser : GSharpCompilerComponent
         return false;
     }
     ///<summary>If <c>expr</c> is the EMPTY expression its detected as an error.</summary>
-    private void ErrorIfEmpty(Expr expr, IErrorLocalizator error,string message, bool enforceAbort = false)
+    private void ErrorIfEmpty(Expr expr, IErrorLocalizator error, string message, bool enforceAbort = false)
     {
-        if (expr == Expr.EMPTY) OnErrorFound(error,message, enforceAbort);
+        if (expr == Expr.EMPTY) OnErrorFound(error, message, enforceAbort);
     }
     ///<summary>Common behaviour for parsing associative binary operators. A negative loopLimit greater than zero limits the number of times the operator can be associated, applied contiguosly.</summary>
     private Expr ParseAssociativeBinaryOperator(Func<Expr> parseLeft, Func<Expr> parseRight, int loopLimit, params TokenType[] types)
@@ -611,10 +776,10 @@ class Parser : GSharpCompilerComponent
             //Rule #9
             if (loopLimit > 0 && loopCount == loopLimit) OnErrorFound(Previous, $"Cannot use '{Previous.Lexeme}' after '{firstOperation.Lexeme}'. Consider using parenthesis and/or logical operators.");
             Token operation = Previous;
-            ErrorIfEmpty(left,operation,"Expected non-empty expression as left operand");
+            ErrorIfEmpty(left, operation, "Expected non-empty expression as left operand");
             Expr right = parseRight();//If the operation is right associative then the parseRight method will recursively call this method somehow.
             ErrorIfEmpty(right, operation, "Expected non-empty expression as right operand");
-            left = Expr.Binary.MakeBinaryExpr(left.Line, left.Offset, left.ExposeFile,operation, left, right);
+            left = Expr.Binary.MakeBinaryExpr(left.Line, left.Offset, left.ExposeFile, operation, left, right);
             ++loopCount;
         }
         return left;

@@ -31,9 +31,9 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
     //For error printing
     public int Line { get; private set; }
     public int Offset { get; private set; }
-    public string File {get => new string(fileName);}
+    public string File { get => new string(fileName); }
     private char[] fileName;
-    protected Stmt(int _line, int _offset,char[] fileName)
+    protected Stmt(int _line, int _offset, char[] fileName)
     {
         Line = _line;
         Offset = _offset;
@@ -44,7 +44,7 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
     ///<summary>Represents an empty statement.</summary>
     public class Empty : Stmt
     {
-        public Empty() : base(0, 0, new char[]{'E','M','P','T','Y'}) { }
+        public Empty() : base(0, 0, new char[] { 'E', 'M', 'P', 'T', 'Y' }) { }
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitEmptyStmt(this, scope);
@@ -59,14 +59,21 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
         public Token Id { get; private set; }//The name of the point will be used as identifier.
         public Element.String Comment { get; private set; }//A comment associated to the point.
 
-        public Element.Number X { get; private set; }//X coordinate
-        public Element.Number Y { get; private set; }//Y coordinate
-        public Point(int _line, int _offset,char[] fileName,Token _id, Element.Number _x, Element.Number _y, Element.String _comment) : base(_line, _offset,fileName)
+        public Expr X { get; private set; }//X coordinate
+        public Expr Y { get; private set; }//Y coordinate
+        public bool FullDeclarated { get; private set; }
+        public Point(int _line, int _offset, char[] fileName, Token _id, Expr _x, Expr _y, Element.String _comment) : base(_line, _offset, fileName)
         {
             Id = _id;
             X = _x;
             Y = _y;
             Comment = _comment;
+            FullDeclarated = true;
+        }
+        public Point(int _line, int _offset, char[] fileName, Token _id) : base(_line, _offset, fileName)
+        {
+            Id=_id;
+            FullDeclarated = false;
         }
 
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -81,14 +88,23 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
         public Token Id { get; protected set; }//The name of the point will be used as identifier.
         public Element.String Comment { get; protected set; }//A comment associated to the line.
 
-        public Expr P1 { get; private set; }//first point
-        public Expr P2 { get; private set; }//second 
-        public Lines(int _line, int _offset, char[] fileName,Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset,fileName)
+        public Expr P1 { get; protected set; }//first point
+        public Expr P2 { get; protected set; }//second 
+        public bool FullDeclarated { get; protected set; }
+        public Lines(int _line, int _offset, char[] fileName, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset, fileName)
         {
             Id = _id;
             P1 = _p1;
             P2 = _p2;
             Comment = _comment;
+            FullDeclarated = true;
+        }
+        public Lines(int _line, int _offset, char[] fileName,Token _id) : base(_line, _offset, fileName)
+        {
+            Id=_id;
+            P1 = new Expr.Empty();
+            P2 = new Expr.Empty();
+            FullDeclarated = false;
         }
 
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -99,8 +115,20 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
     //Represents a `Segment` statement.
     public class Segment : Lines
     {
-        public Segment(int _line, int _offset, char[] fileName,Token _id, Expr _p1, Expr _p2, Element.String _comment):base(_line,_offset,fileName,_id,_p1,_p2,_comment)
-        {}
+        //  public bool FullDeclarated { get; private set; }
+        public Segment(int _line, int _offset, char[] fileName, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset, fileName, _id, _p1, _p2, _comment)
+        {
+            FullDeclarated = true;
+
+        }
+        public Segment(int _line, int _offset, char[] fileName,Token _id) : base(_line, _offset, fileName,_id)
+        {
+            Id=_id;
+            FullDeclarated = false;
+            P1 = new Expr.Empty();
+            P2 = new Expr.Empty();
+
+        }
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitSegmentStmt(this, scope);
@@ -109,27 +137,45 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
     //Represents a `Ray` statement.
     public class Ray : Lines
     {
-        public Ray(int _line, int _offset, char[] fileName ,Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset,fileName,_id,_p1,_p2,_comment)
-        {}
+        public Ray(int _line, int _offset, char[] fileName, Token _id, Expr _p1, Expr _p2, Element.String _comment) : base(_line, _offset, fileName, _id, _p1, _p2, _comment)
+        {
+            FullDeclarated = true;
+        }
+        public Ray(int _line, int _offset, char[] fileName,Token _id) : base(_line, _offset, fileName,_id)
+        {
+            Id=_id;
+            FullDeclarated = false;
+            P1 = new Expr.Empty();
+            P2 = new Expr.Empty();
+        }
 
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
         {
             return visitor.VisitRayStmt(this, scope);
         }
     }
-     public class Circle : Stmt
+    public class Circle : Stmt
     {
         public Token Id { get; private set; }//The name of the point will be used as identifier.
         public Element.String Comment { get; private set; }//A comment associated to the line.
 
         public Expr P1 { get; private set; }//first point
         public Element.Number Radius { get; private set; }//radio 
-        public Circle(int _line, int _offset, char[] fileName,Token _id, Expr _p1, Element.Number radius, Element.String _comment) : base(_line, _offset,fileName)
+        public bool FullDeclarated { get; private set; }
+        public Circle(int _line, int _offset, char[] fileName, Token _id, Expr _p1, Element.Number radius, Element.String _comment) : base(_line, _offset, fileName)
         {
             Id = _id;
             P1 = _p1;
             Radius = radius;
             Comment = _comment;
+            FullDeclarated=true;
+        }
+        public Circle(int _line, int _offset, char[] fileName,Token _id) : base(_line, _offset, fileName)
+        {
+            Id = _id;
+            P1 = new Expr.Empty();
+            FullDeclarated=false;
+            
         }
 
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -146,7 +192,8 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
         public Expr P2 { get; private set; }//first point
         public Expr P3 { get; private set; }//first point
         public Element.Number Radius { get; private set; }//radio 
-        public Arc(int _line, int _offset, char[] fileName,Token _id, Expr _p1,Expr _p2,Expr _p3, Element.Number radius, Element.String _comment) : base(_line, _offset,fileName)
+        public bool FullDeclarated { get; private set; }
+        public Arc(int _line, int _offset, char[] fileName, Token _id, Expr _p1, Expr _p2, Expr _p3, Element.Number radius, Element.String _comment) : base(_line, _offset, fileName)
         {
             Id = _id;
             P1 = _p1;
@@ -154,6 +201,16 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
             P3 = _p3;
             Radius = radius;
             Comment = _comment;
+            FullDeclarated=true;
+        }
+        public Arc(int _line, int _offset, char[] fileName, Token _id) : base(_line, _offset, fileName)
+        {
+            Id = _id;
+            P1 = new Expr.Empty();
+            P2 = new Expr.Empty();
+            P3 = new Expr.Empty();
+            FullDeclarated=false;
+           
         }
 
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -162,20 +219,24 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
         }
     }
     ///<summary>Base class for declarations. A declaration associates an identifier with an Element, for example Number or Function.</summary>
-    public abstract class Declaration : Stmt{
+    public abstract class Declaration : Stmt
+    {
         ///<summary>The Identifier which will be binded to the Element.</summary>
-        public Token Id {get; protected set;}
-        protected Declaration(Token identifier,char[] fileName):base(identifier.Line,identifier.Offset,fileName){
+        public Token Id { get; protected set; }
+        protected Declaration(Token identifier, char[] fileName) : base(identifier.Line, identifier.Offset, fileName)
+        {
             Id = identifier;
         }
 
         abstract public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope);
 
         ///<summary>Represents declaration of constants.</summary>
-        public class Constant : Declaration{
+        public class Constant : Declaration
+        {
             ///<summary>Expression to be associated to the identifier.</summary>
-            public Expr RValue {get; private set;}
-            public Constant(Token identifier,char[] fileName, Expr rvalue):base(identifier,fileName){
+            public Expr RValue { get; private set; }
+            public Constant(Token identifier, char[] fileName, Expr rvalue) : base(identifier, fileName)
+            {
                 RValue = rvalue;
             }
             public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -184,12 +245,14 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
             }
         }
         ///<summary>Represents function declarations.</summary>
-        public class Function : Declaration{
+        public class Function : Declaration
+        {
             ///<summary>The identifiers that made the arguments of the function.</summary>
-            public List<Token> Arguments {get; private set;}
+            public List<Token> Arguments { get; private set; }
             ///<summary>The expr that made the body of the function.</summary>
-            public Expr Body {get; private set;}
-            public Function(Token identifier,char[] fileName,List<Token> arguments, Expr body):base(identifier,fileName){
+            public Expr Body { get; private set; }
+            public Function(Token identifier, char[] fileName, List<Token> arguments, Expr body) : base(identifier, fileName)
+            {
                 Arguments = arguments;
                 Body = body;
             }
@@ -197,7 +260,7 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
             {
                 return visitor.VisitFunctionDeclarationStmt(this, scope);
             }
-            public int Arity {get => Arguments.Count;}
+            public int Arity { get => Arguments.Count; }
         }
     }
 
@@ -205,7 +268,7 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
     {
         public Expr _Expr { get; private set; }
 
-        public Draw(int line, int offset,char[] fileName, Expr _expr) : base(line, offset,fileName)
+        public Draw(int line, int offset, char[] fileName, Expr _expr) : base(line, offset, fileName)
         {
             _Expr = _expr;
         }
@@ -216,10 +279,12 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
         }
     }
     ///<summary>An Eval statement allow evaluating an expression as a top level statement.</summary>
-    public class Eval : Stmt{
+    public class Eval : Stmt
+    {
         ///<summary>The expression to be evaluated.</summary>
-        public Expr Expr{get; private set;}
-        public Eval(int line,int offset,char[] fileName,Expr expr):base(line,offset,fileName){
+        public Expr Expr { get; private set; }
+        public Eval(int line, int offset, char[] fileName, Expr expr) : base(line, offset, fileName)
+        {
             Expr = expr;
         }
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -231,7 +296,7 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
     public class Print : Stmt
     {
         public Expr _Expr { get; private set; }//The expression to be printed.
-        public Print(int _line, int _offset,char[] fileName ,Expr _expr) : base(_line, _offset,fileName)
+        public Print(int _line, int _offset, char[] fileName, Expr _expr) : base(_line, _offset, fileName)
         {
             _Expr = _expr;
         }
@@ -245,7 +310,7 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
     {
         public GSharpCompiler.Color _Color { get; private set; }
         public bool IsRestore { get; private set; }
-        public Color(int line, int offset,char[] fileName ,GSharpCompiler.Color _color, bool _restore = false) : base(line, offset,fileName)
+        public Color(int line, int offset, char[] fileName, GSharpCompiler.Color _color, bool _restore = false) : base(line, offset, fileName)
         {
             _Color = _color;
             IsRestore = _restore;
@@ -262,7 +327,7 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
     {
         ///<summary>The statements that made the statement list.</summary>
         private List<Stmt> stmts;
-        public StmtList(int line, int offset,char[] fileName) : base(line, offset,fileName)
+        public StmtList(int line, int offset, char[] fileName) : base(line, offset, fileName)
         {
             this.stmts = new List<Stmt>();
         }

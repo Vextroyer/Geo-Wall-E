@@ -40,7 +40,8 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         stmt.Accept(this, scope);
         return null;
     }
-    public object? VisitStmtList(Stmt.StmtList stmtList, Scope scope){
+    public object? VisitStmtList(Stmt.StmtList stmtList, Scope scope)
+    {
         foreach (Stmt stmt in stmtList)
         {
             Interpret(stmt, scope);
@@ -53,33 +54,58 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     }
     public object? VisitPointStmt(Stmt.Point point, Scope scope)
     {
-        scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), point.X, point.Y, point.Comment, colorStack.Top));
+        if (point.FullDeclarated)
+        {
+            scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), (Element.Number)Evaluate(point.X, scope), (Element.Number)Evaluate(point.Y, scope), point.Comment, colorStack.Top));
+        }
+        else {System.Console.WriteLine("VICTOR"); 
+            scope.SetArgument(point.Id.Lexeme, new Element.Point(colorStack.Top)); }
         return null;
     }
-      public object? VisitLinesStmt(Stmt.Lines lines, Scope scope)
+    public object? VisitLinesStmt(Stmt.Lines lines, Scope scope)
     {
-        scope.SetArgument(lines.Id.Lexeme, new Element.Lines(new Element.String(lines.Id.Lexeme), (Element.Point)Evaluate(lines.P1, scope), (Element.Point)(Evaluate(lines.P2, scope)), lines.Comment, colorStack.Top));
+        if (lines.FullDeclarated)
+        {
+            scope.SetArgument(lines.Id.Lexeme, new Element.Lines(new Element.String(lines.Id.Lexeme), (Element.Point)Evaluate(lines.P1, scope), (Element.Point)(Evaluate(lines.P2, scope)), lines.Comment, colorStack.Top));
+        }
+        else
+        {
+            scope.SetArgument(lines.Id.Lexeme, new Element.Lines(colorStack.Top));
+        }
         return null;
     }
-     public object? VisitSegmentStmt(Stmt.Segment segment, Scope scope)
+    public object? VisitSegmentStmt(Stmt.Segment segment, Scope scope)
     {
-        scope.SetArgument(segment.Id.Lexeme, new Element.Segment(new Element.String(segment.Id.Lexeme), (Element.Point)Evaluate(segment.P1, scope), (Element.Point)(Evaluate(segment.P2, scope)), segment.Comment, colorStack.Top));
+        if (segment.FullDeclarated)
+        {
+            scope.SetArgument(segment.Id.Lexeme, new Element.Segment(new Element.String(segment.Id.Lexeme), (Element.Point)Evaluate(segment.P1, scope), (Element.Point)(Evaluate(segment.P2, scope)), segment.Comment, colorStack.Top));
+        }
+        else { scope.SetArgument(segment.Id.Lexeme, new Element.Segment(colorStack.Top)); }
         return null;
     }
-     public object? VisitRayStmt(Stmt.Ray ray, Scope scope)
+    public object? VisitRayStmt(Stmt.Ray ray, Scope scope)
     {
-        scope.SetArgument(ray.Id.Lexeme, new Element.Ray(new Element.String(ray.Id.Lexeme), (Element.Point)Evaluate(ray.P1, scope), (Element.Point)(Evaluate(ray.P2, scope)), ray.Comment, colorStack.Top));
+        if (ray.FullDeclarated)
+        {
+            scope.SetArgument(ray.Id.Lexeme, new Element.Ray(new Element.String(ray.Id.Lexeme), (Element.Point)Evaluate(ray.P1, scope), (Element.Point)(Evaluate(ray.P2, scope)), ray.Comment, colorStack.Top));
+        }
+        else { scope.SetArgument(ray.Id.Lexeme, new Element.Ray(colorStack.Top)); }
         return null;
     }
     public object? VisitCircleStmt(Stmt.Circle circle, Scope scope)
     {
-        scope.SetArgument(circle.Id.Lexeme, new Element.Circle(new Element.String(circle.Id.Lexeme), (Element.Point)Evaluate(circle.P1, scope), circle.Radius, circle.Comment, colorStack.Top));
-        
+        if (circle.FullDeclarated)
+        {
+            scope.SetArgument(circle.Id.Lexeme, new Element.Circle(new Element.String(circle.Id.Lexeme), (Element.Point)Evaluate(circle.P1, scope), circle.Radius, circle.Comment, colorStack.Top));
+        }
+        else { scope.SetArgument(circle.Id.Lexeme, new Element.Circle(colorStack.Top)); }
         return null;
     }
     public object? VisitArcStmt(Stmt.Arc arc, Scope scope)
+    {if(arc.FullDeclarated)
     {
-        scope.SetArgument(arc.Id.Lexeme, new Element.Arc(new Element.String(arc.Id.Lexeme), (Element.Point)Evaluate(arc.P1, scope), (Element.Point)Evaluate(arc.P2, scope), (Element.Point)Evaluate(arc.P3, scope),arc.Radius, arc.Comment, colorStack.Top));
+        scope.SetArgument(arc.Id.Lexeme, new Element.Arc(new Element.String(arc.Id.Lexeme), (Element.Point)Evaluate(arc.P1, scope), (Element.Point)Evaluate(arc.P2, scope), (Element.Point)Evaluate(arc.P3, scope), arc.Radius, arc.Comment, colorStack.Top));
+    }else{scope.SetArgument(arc.Id.Lexeme,new Element.Arc(colorStack.Top));}
         return null;
     }
 
@@ -88,8 +114,9 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         scope.SetConstant(declaration.Id.Lexeme, Evaluate(declaration.RValue, scope));
         return null;
     }
-    public object? VisitFunctionDeclarationStmt(Stmt.Declaration.Function functionStmt, Scope scope){
-        scope.SetArgument(functionStmt.Id.Lexeme,Element.Function.MakeFunction(functionStmt));
+    public object? VisitFunctionDeclarationStmt(Stmt.Declaration.Function functionStmt, Scope scope)
+    {
+        scope.SetArgument(functionStmt.Id.Lexeme, Element.Function.MakeFunction(functionStmt));
         return null;
     }
     public object? VisitPrintStmt(Stmt.Print stmt, Scope scope)
@@ -113,8 +140,9 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         return null;
     }
 
-    public object? VisitEvalStmt(Stmt.Eval stmt, Scope scope){
-        Evaluate(stmt.Expr,scope);
+    public object? VisitEvalStmt(Stmt.Eval stmt, Scope scope)
+    {
+        Evaluate(stmt.Expr, scope);
         return null;
     }
 
@@ -126,7 +154,8 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     {
         return expr.Accept(this, scope);
     }
-    public Element VisitEmptyExpr(Expr.Empty expr,Scope scope){
+    public Element VisitEmptyExpr(Expr.Empty expr, Scope scope)
+    {
         return Element.UNDEFINED;
     }
 
@@ -149,6 +178,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     {
         return  !Evaluate(unaryNot._Expr, scope);
     }
+
 
     public Element VisitUnaryMinusExpr(Expr.Unary.Minus expr, Scope scope){
         try{
@@ -242,15 +272,17 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         }
     }
 
-    public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope scope){
-        Element left = Evaluate(equalEqualExpr.Left,scope);
-        Element right = Evaluate(equalEqualExpr.Right,scope);
+    public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope scope)
+    {
+        Element left = Evaluate(equalEqualExpr.Left, scope);
+        Element right = Evaluate(equalEqualExpr.Right, scope);
         return left.EqualTo(right);
     }
 
-    public Element VisitBinaryNotEqualExpr(Expr.Binary.NotEqual notEqualExpr, Scope scope){
-        Element left = Evaluate(notEqualExpr.Left,scope);
-        Element right = Evaluate(notEqualExpr.Right,scope);
+    public Element VisitBinaryNotEqualExpr(Expr.Binary.NotEqual notEqualExpr, Scope scope)
+    {
+        Element left = Evaluate(notEqualExpr.Left, scope);
+        Element right = Evaluate(notEqualExpr.Right, scope);
         return left.NotEqualTo(right);
     }
 
@@ -264,30 +296,128 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         return TruthValue(Evaluate(orExpr.Right,scope));
     }
 
-    public Element VisitConditionalExpr(Expr.Conditional conditionalExpr, Scope scope){
+    public Element VisitConditionalExpr(Expr.Conditional conditionalExpr, Scope scope)
+    {
         //This could lead to security holes, because if the conditional is declared inside a function then it would not be checked for having the same return type for both operands.
         if( TruthValue(Evaluate(conditionalExpr.Condition,scope)) == Element.TRUE ) return Evaluate(conditionalExpr.ThenBranchExpr,scope);
         return Evaluate(conditionalExpr.ElseBranchExpr,scope);
     }
 
-    public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope scope){
+    public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope scope)
+    {
         Scope letInScope = new Scope(scope);
-        foreach(Stmt stmt in letInExpr.LetStmts)Interpret(stmt,letInScope);
-        return Evaluate(letInExpr.InExpr,letInScope);
+        foreach (Stmt stmt in letInExpr.LetStmts) Interpret(stmt, letInScope);
+        return Evaluate(letInExpr.InExpr, letInScope);
+    }
+    public Element VisitPointExpr(Expr.Point pointExpr, Scope scope)
+    {
+        try
+        {
+            if (pointExpr.FullDeclarated)
+            {
+                return new Element.Point(new Element.String(""), (Element.Number)Evaluate(pointExpr.X, scope), (Element.Number)Evaluate(pointExpr.Y, scope), new Element.String(""), colorStack.Top);
+            }
+            else
+            {
+                return new Element.Point(colorStack.Top);
+            }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(pointExpr, e.Message);
+        }
+    }
+    public Element VisitLinesExpr(Expr.Lines linesExpr, Scope scope)
+    {
+        try
+        {
+            if (linesExpr.FullDeclarated)
+            {
+                return new Element.Lines(new Element.String(""), (Element.Point)Evaluate(linesExpr.P1, scope), (Element.Point)Evaluate(linesExpr.P2, scope), new Element.String(""), colorStack.Top);
+            }
+            else
+            {
+                return new Element.Lines(colorStack.Top);
+            }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(linesExpr, e.Message);
+        }
+
+    }
+    public Element VisitSegmentExpr(Expr.Segment linesExpr, Scope scope)
+    {
+        try
+        {
+            if (linesExpr.FullDeclarated)
+            { return new Element.Segment(new Element.String(""), (Element.Point)Evaluate(linesExpr.P1, scope), (Element.Point)Evaluate(linesExpr.P2, scope), new Element.String(""), colorStack.Top); }
+            else { return new Element.Segment(colorStack.Top); }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(linesExpr, e.Message);
+        }
+    }
+    public Element VisitRayExpr(Expr.Ray linesExpr, Scope scope)
+    {
+        try
+        {
+            if (linesExpr.FullDeclarated)
+            { return new Element.Ray(new Element.String(""), (Element.Point)Evaluate(linesExpr.P1, scope), (Element.Point)Evaluate(linesExpr.P2, scope), new Element.String(""), colorStack.Top); }
+            else
+            { return new Element.Ray(colorStack.Top); }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(linesExpr, e.Message);
+        }
+    }
+    public Element VisitCircleExpr(Expr.Circle circleExpr, Scope scope)
+    {
+        try
+        {
+            if (circleExpr.FullDeclarated)
+            {
+                return new Element.Circle(new Element.String(""), (Element.Point)Evaluate(circleExpr.P1, scope), circleExpr.Radius, new Element.String(""), colorStack.Top);
+            }
+            else { return new Element.Circle(colorStack.Top); }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(circleExpr, e.Message);
+        }
+    }
+    public Element VisitArcExpr(Expr.Arc circleExpr, Scope scope)
+    {
+        try
+        {
+            if (circleExpr.FullDeclarated)
+            {
+                return new Element.Arc(new Element.String(""), (Element.Point)Evaluate(circleExpr.P1, scope), (Element.Point)Evaluate(circleExpr.P2, scope), (Element.Point)Evaluate(circleExpr.P3, scope), circleExpr.Radius, new Element.String(""), colorStack.Top);
+            }
+            else
+            { return new Element.Arc(colorStack.Top); }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(circleExpr, e.Message);
+        }
     }
 
-    public Element VisitCallExpr(Expr.Call callExpr, Scope scope){
+    public Element VisitCallExpr(Expr.Call callExpr, Scope scope)
+    {
         //Retrieve the declaration of the function.
-        Element.Function calledFunction = (Element.Function) scope.Get(callExpr.Id.Lexeme,callExpr.Arity);
+        Element.Function calledFunction = (Element.Function)scope.Get(callExpr.Id.Lexeme, callExpr.Arity);
         //Compute the value of the parameters.
         List<Element> parameters = new List<Element>(callExpr.Arity);
-        foreach(Expr expr in callExpr.Parameters)parameters.Add(Evaluate(expr,scope));
+        foreach (Expr expr in callExpr.Parameters) parameters.Add(Evaluate(expr, scope));
         //Create a new scope for the function.
-        Scope functionScope = Scope.RequestScopeForFunction(calledFunction.Arguments,parameters,scope);
+        Scope functionScope = Scope.RequestScopeForFunction(calledFunction.Arguments, parameters, scope);
         //Excecute the body of the function on the new scope.
         ++callStackCounter;
-        if(callStackCounter > callStackSize)throw new RuntimeException(callExpr,$"Stack overflow. Last called function was {callExpr.Id.Lexeme}");
-        Element result = Evaluate(calledFunction.Body,functionScope);
+        if (callStackCounter > callStackSize) throw new RuntimeException(callExpr, $"Stack overflow. Last called function was {callExpr.Id.Lexeme}");
+        Element result = Evaluate(calledFunction.Body, functionScope);
         --callStackCounter;
         return result;
     }

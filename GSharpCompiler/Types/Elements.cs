@@ -630,20 +630,24 @@ public abstract class Element
         }
     }
     ///<summary>Represents a family of functions.</summary>
-    internal class FunctionList : Element, IList<Element.Function>{
+    internal class FunctionList : Element, IList<Element.Function>
+    {
         public List<Element.Function> functions;
-        public FunctionList():base(ElementType.FUNCTION_LIST){
+        public FunctionList() : base(ElementType.FUNCTION_LIST)
+        {
             functions = new List<Element.Function>();
         }
         ///<summary>Determines wheter a function in the list has the given arity.</summary>
-        public bool ContainsArity(int arity){
-            if(arity < 0)throw new ArgumentException("Arity must be non-negative");
-            foreach(Element.Function function in functions)if(function.Arity == arity)return true;
+        public bool ContainsArity(int arity)
+        {
+            if (arity < 0) throw new ArgumentException("Arity must be non-negative");
+            foreach (Element.Function function in functions) if (function.Arity == arity) return true;
             return false;
         }
-        public Function GetFunction(int arity){
-            if(arity < 0)throw new ArgumentException("Arity must be non-negative");
-            foreach(Element.Function function in functions)if(function.Arity == arity)return function;
+        public Function GetFunction(int arity)
+        {
+            if (arity < 0) throw new ArgumentException("Arity must be non-negative");
+            foreach (Element.Function function in functions) if (function.Arity == arity) return function;
             throw new InvalidOperationException("A function with the provided arity was not found");
         }
         public Function this[int index] { get => functions[index]; set => functions[index] = value; }
@@ -708,35 +712,39 @@ public abstract class Element
         }
     }
     ///<summary>Represents a function.</summary>
-    internal class Function : Element{
+    internal class Function : Element
+    {
         ///<summary>The arguments of the function.</summary>
-        public List<Element.String> Arguments {get; private set;}
+        public List<Element.String> Arguments { get; private set; }
         ///<summary>The body of the function.</summary>
-        public Expr Body {get; private set;}
-        public Function(List<Token> arguments,Expr body):base(ElementType.FUNCTION){
+        public Expr Body { get; private set; }
+        public Function(List<Token> arguments, Expr body) : base(ElementType.FUNCTION)
+        {
             Body = body;
             Arguments = new List<Element.String>(arguments.Count);
-            foreach(Token identifier in arguments)Arguments.Add(new Element.String(identifier.Lexeme));
+            foreach (Token identifier in arguments) Arguments.Add(new Element.String(identifier.Lexeme));
         }
         public override Number EqualTo(Element other)
         {
             throw new NotImplementedException("Cannot test equality on Function");
         }
         ///<summary>The arity of the function.</summary>
-        public int Arity {get => Arguments.Count;}
+        public int Arity { get => Arguments.Count; }
         ///<summary>Create a body-less function with the given arity.</summary>
-        public static Element.Function MakeFunction(int arity){
-            if(arity < 0)throw new ArgumentException("Arity must be a non-negative integer");
-            List<Token> arguments = new  List<Token>(arity);
-            for(int i=0;i<arity;++i)arguments.Add(DUMMY);
-            return new Element.Function(arguments,Expr.EMPTY);
+        public static Element.Function MakeFunction(int arity)
+        {
+            if (arity < 0) throw new ArgumentException("Arity must be a non-negative integer");
+            List<Token> arguments = new List<Token>(arity);
+            for (int i = 0; i < arity; ++i) arguments.Add(DUMMY);
+            return new Element.Function(arguments, Expr.EMPTY);
         }
         ///<summary>Create a function corresponding to the given function declaration.</summary>
-        public static Element.Function MakeFunction(Stmt.Declaration.Function funcDecl){
-            return new Element.Function(funcDecl.Arguments,funcDecl.Body);
+        public static Element.Function MakeFunction(Stmt.Declaration.Function funcDecl)
+        {
+            return new Element.Function(funcDecl.Arguments, funcDecl.Body);
         }
         ///<summary>A dummy token for creating functions that wont be used.</summary>
-        private static Token DUMMY = new Token(TokenType.EOF,"",null,-1,-1,new char[]{'D','U','M','M','Y'});
+        private static Token DUMMY = new Token(TokenType.EOF, "", null, -1, -1, new char[] { 'D', 'U', 'M', 'M', 'Y' });
     }
     //Represents a point on a 2D rectangular coordinate system.
     public class Point : Element, IDrawable
@@ -755,6 +763,15 @@ public abstract class Element
             x = _x;
             y = _y;
             Color = color;
+        }
+        public Point(Color color) : base(ElementType.POINT)
+        {
+            name = new String();
+            comment = new String();
+            x = new Element.Number(Utils.RandomCoordinate());
+            y = new Element.Number(Utils.RandomCoordinate());
+            Color = color;
+
         }
         public Point() : base(ElementType.POINT)
         {
@@ -813,6 +830,14 @@ public abstract class Element
             p2 = _p2;
             Color = color;
         }
+        public Lines(Color color) : base(ElementType.LINE)
+        {
+            name = new String();
+            comment = new String();
+            p1 = new Element.Point();
+            p2 = new Element.Point();
+            Color = color;
+        }
 
         public override string ToString()
         {
@@ -852,6 +877,14 @@ public abstract class Element
             comment = _comment;
             p1 = _p1;
             p2 = _p2;
+            Color = color;
+        }
+        public Segment(Color color) : base(ElementType.SEGMENT)
+        {
+            name = new String();
+            comment = new String();
+            p1 = new Element.Point();
+            p2 = new Element.Point();
             Color = color;
         }
 
@@ -895,6 +928,15 @@ public abstract class Element
             p2 = _p2;
             Color = color;
         }
+        public Ray(Color color) : base(ElementType.RAY)
+        {
+            name = new String();
+            comment = new String();
+            p1 = new Element.Point();
+            p2 = new Element.Point();
+            Color = color;
+
+        }
 
         public override string ToString()
         {
@@ -932,11 +974,20 @@ public abstract class Element
         {
             name = _name;
             comment = _comment;
-             p1= _p1;
+            p1 = _p1;
             radius = _radius;
             Color = color;
         }
-        
+        public Circle(Color color) : base(ElementType.CIRCLE)
+        {
+            p1 = new Element.Point();
+            name = new String();
+            comment = new String();
+            radius = new Element.Number(Utils.RandomCoordinate());
+            Color = color;
+
+        }
+
 
         public override string ToString()
         {
@@ -976,13 +1027,23 @@ public abstract class Element
         {
             name = _name;
             comment = _comment;
-             p1= _p1;
-             p2= _p2;
-             p3= _p3;
+            p1 = _p1;
+            p2 = _p2;
+            p3 = _p3;
             radius = _radius;
             Color = color;
         }
-        
+        public Arc(Color color) : base(ElementType.ARC)
+        {
+            p1 = new Element.Point();
+            p2 = new Element.Point();
+            p3 = new Element.Point();
+            radius = new Element.Number(Utils.RandomCoordinate());
+            name = new String();
+            comment = new String();
+            Color = color;
+        }
+
 
         public override string ToString()
         {
@@ -991,7 +1052,7 @@ public abstract class Element
         public override Number EqualTo(Element other)
         {
             if (other.Type != this.Type) return Element.FALSE;
-            if (((Element.Arc)other).p1 == this.p1 &&((Element.Arc)other).p2 == this.p2 &&((Element.Arc)other).p3 == this.p3 && ((Element.Arc)other).radius == this.radius) return Element.TRUE;
+            if (((Element.Arc)other).p1 == this.p1 && ((Element.Arc)other).p2 == this.p2 && ((Element.Arc)other).p3 == this.p3 && ((Element.Arc)other).radius == this.radius) return Element.TRUE;
             return Element.FALSE;
         }
         public static Element operator+(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
