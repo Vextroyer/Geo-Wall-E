@@ -27,7 +27,7 @@ public static class Compiler
     {
         //Use default flags
         if(flags == null)flags = new Flags();
-
+        Utils.SetMaxCoordinate(flags.MaxCoordinate);
         List<Error> errors = new List<Error>();
         List<IDrawable> elements = new List<IDrawable>();
 
@@ -109,10 +109,19 @@ public static class Compiler
                 else maxErrorCount = 1;
             }
         }
+        ///<summary>Maximum coordinates to generate points.</summary>
+        public int MaxCoordinate {
+            get => maxCoordinate;
+            set{
+                if(value > 0)maxCoordinate = value;
+            }
+        }
+        private int maxCoordinate;
         public Flags(){
             PrintDebugInfo = true; //Print debug info
             OutputStream = System.Console.Out; //Use the default console output stream.
             MaxErrorCount = 1;
+            maxCoordinate = 1000;
         }
     }
 }
