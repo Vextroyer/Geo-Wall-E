@@ -29,7 +29,8 @@ interface IVisitorExpr<T>
     public T VisitBinaryOrExpr(Expr.Binary.Or expr, Scope scope);
     public T VisitConditionalExpr(Expr.Conditional expr, Scope scope);
     public T VisitLetInExpr(Expr.LetIn expr, Scope scope);
-    public T VisitCallExpr(Expr.Call expr, Scope scope);
+    public T VisitCallExpr(Expr.Call expr,Scope scope);
+    public T VisitMeasureExpr(Expr.Measure expr,Scope scope);
     public T VisitPointExpr(Expr.Point expr, Scope scope);
     public T VisitLinesExpr(Expr.Lines expr, Scope scope);
     public T VisitSegmentExpr(Expr.Segment expr, Scope scope);
@@ -86,6 +87,20 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
             return visitor.VisitNumberExpr(this, scope);
         }
         public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
+    }
+    public class Measure : Expr{
+        ///<summary>The expression representing the first point.</summary>
+        public Expr P1 {get; private set;}
+        ///<summary>The expression representing the second point.</summary>
+        public Expr P2 {get; private set;}
+        public Measure(Token measureToken,Expr firstPoint, Expr secondPoint):base(measureToken.Line,measureToken.Offset,measureToken.ExposeFile){
+            P1 = firstPoint;
+            P2 = secondPoint;
+        }
+        public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
+        {
+            return visitor.VisitMeasureExpr(this,scope);
+        }
     }
     public class String : Expr
     {
