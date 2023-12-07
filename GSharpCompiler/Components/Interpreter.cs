@@ -40,7 +40,8 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         stmt.Accept(this, scope);
         return null;
     }
-    public object? VisitStmtList(Stmt.StmtList stmtList, Scope scope){
+    public object? VisitStmtList(Stmt.StmtList stmtList, Scope scope)
+    {
         foreach (Stmt stmt in stmtList)
         {
             Interpret(stmt, scope);
@@ -53,33 +54,58 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     }
     public object? VisitPointStmt(Stmt.Point point, Scope scope)
     {
-        scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), point.X, point.Y, point.Comment, colorStack.Top));
+        if (point.FullDeclarated)
+        {
+            scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), (Element.Number)Evaluate(point.X, scope), (Element.Number)Evaluate(point.Y, scope), point.Comment, colorStack.Top));
+        }
+        else {System.Console.WriteLine("VICTOR"); 
+            scope.SetArgument(point.Id.Lexeme, new Element.Point(colorStack.Top)); }
         return null;
     }
-      public object? VisitLinesStmt(Stmt.Lines lines, Scope scope)
+    public object? VisitLinesStmt(Stmt.Lines lines, Scope scope)
     {
-        scope.SetArgument(lines.Id.Lexeme, new Element.Lines(new Element.String(lines.Id.Lexeme), (Element.Point)Evaluate(lines.P1, scope), (Element.Point)(Evaluate(lines.P2, scope)), lines.Comment, colorStack.Top));
+        if (lines.FullDeclarated)
+        {
+            scope.SetArgument(lines.Id.Lexeme, new Element.Lines(new Element.String(lines.Id.Lexeme), (Element.Point)Evaluate(lines.P1, scope), (Element.Point)(Evaluate(lines.P2, scope)), lines.Comment, colorStack.Top));
+        }
+        else
+        {
+            scope.SetArgument(lines.Id.Lexeme, new Element.Lines(colorStack.Top));
+        }
         return null;
     }
-     public object? VisitSegmentStmt(Stmt.Segment segment, Scope scope)
+    public object? VisitSegmentStmt(Stmt.Segment segment, Scope scope)
     {
-        scope.SetArgument(segment.Id.Lexeme, new Element.Segment(new Element.String(segment.Id.Lexeme), (Element.Point)Evaluate(segment.P1, scope), (Element.Point)(Evaluate(segment.P2, scope)), segment.Comment, colorStack.Top));
+        if (segment.FullDeclarated)
+        {
+            scope.SetArgument(segment.Id.Lexeme, new Element.Segment(new Element.String(segment.Id.Lexeme), (Element.Point)Evaluate(segment.P1, scope), (Element.Point)(Evaluate(segment.P2, scope)), segment.Comment, colorStack.Top));
+        }
+        else { scope.SetArgument(segment.Id.Lexeme, new Element.Segment(colorStack.Top)); }
         return null;
     }
-     public object? VisitRayStmt(Stmt.Ray ray, Scope scope)
+    public object? VisitRayStmt(Stmt.Ray ray, Scope scope)
     {
-        scope.SetArgument(ray.Id.Lexeme, new Element.Ray(new Element.String(ray.Id.Lexeme), (Element.Point)Evaluate(ray.P1, scope), (Element.Point)(Evaluate(ray.P2, scope)), ray.Comment, colorStack.Top));
+        if (ray.FullDeclarated)
+        {
+            scope.SetArgument(ray.Id.Lexeme, new Element.Ray(new Element.String(ray.Id.Lexeme), (Element.Point)Evaluate(ray.P1, scope), (Element.Point)(Evaluate(ray.P2, scope)), ray.Comment, colorStack.Top));
+        }
+        else { scope.SetArgument(ray.Id.Lexeme, new Element.Ray(colorStack.Top)); }
         return null;
     }
     public object? VisitCircleStmt(Stmt.Circle circle, Scope scope)
     {
-        scope.SetArgument(circle.Id.Lexeme, new Element.Circle(new Element.String(circle.Id.Lexeme), (Element.Point)Evaluate(circle.P1, scope), circle.Radius, circle.Comment, colorStack.Top));
-        
+        if (circle.FullDeclarated)
+        {
+            scope.SetArgument(circle.Id.Lexeme, new Element.Circle(new Element.String(circle.Id.Lexeme), (Element.Point)Evaluate(circle.P1, scope), circle.Radius, circle.Comment, colorStack.Top));
+        }
+        else { scope.SetArgument(circle.Id.Lexeme, new Element.Circle(colorStack.Top)); }
         return null;
     }
     public object? VisitArcStmt(Stmt.Arc arc, Scope scope)
+    {if(arc.FullDeclarated)
     {
-        scope.SetArgument(arc.Id.Lexeme, new Element.Arc(new Element.String(arc.Id.Lexeme), (Element.Point)Evaluate(arc.P1, scope), (Element.Point)Evaluate(arc.P2, scope), (Element.Point)Evaluate(arc.P3, scope),arc.Radius, arc.Comment, colorStack.Top));
+        scope.SetArgument(arc.Id.Lexeme, new Element.Arc(new Element.String(arc.Id.Lexeme), (Element.Point)Evaluate(arc.P1, scope), (Element.Point)Evaluate(arc.P2, scope), (Element.Point)Evaluate(arc.P3, scope), arc.Radius, arc.Comment, colorStack.Top));
+    }else{scope.SetArgument(arc.Id.Lexeme,new Element.Arc(colorStack.Top));}
         return null;
     }
 
@@ -88,8 +114,9 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         scope.SetConstant(declaration.Id.Lexeme, Evaluate(declaration.RValue, scope));
         return null;
     }
-    public object? VisitFunctionDeclarationStmt(Stmt.Declaration.Function functionStmt, Scope scope){
-        scope.SetArgument(functionStmt.Id.Lexeme,Element.Function.MakeFunction(functionStmt));
+    public object? VisitFunctionDeclarationStmt(Stmt.Declaration.Function functionStmt, Scope scope)
+    {
+        scope.SetArgument(functionStmt.Id.Lexeme, Element.Function.MakeFunction(functionStmt));
         return null;
     }
     public object? VisitPrintStmt(Stmt.Print stmt, Scope scope)
@@ -113,8 +140,9 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         return null;
     }
 
-    public object? VisitEvalStmt(Stmt.Eval stmt, Scope scope){
-        Evaluate(stmt.Expr,scope);
+    public object? VisitEvalStmt(Stmt.Eval stmt, Scope scope)
+    {
+        Evaluate(stmt.Expr, scope);
         return null;
     }
 
@@ -126,7 +154,8 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     {
         return expr.Accept(this, scope);
     }
-    public Element VisitEmptyExpr(Expr.Empty expr,Scope scope){
+    public Element VisitEmptyExpr(Expr.Empty expr, Scope scope)
+    {
         return Element.UNDEFINED;
     }
 
@@ -151,140 +180,253 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         return IsNotTruty(rValue);
     }
 
-    public Element VisitUnaryMinusExpr(Expr.Unary.Minus unaryMinus, Scope scope){
-        Element rValue = Evaluate(unaryMinus._Expr,scope);
-        if(unaryMinus.RequiresRuntimeCheck && rValue is not Element.Number)throw new RuntimeException(unaryMinus,$"Applied `-` operator to element of type {rValue.Type}");
+    public Element VisitUnaryMinusExpr(Expr.Unary.Minus unaryMinus, Scope scope)
+    {
+        Element rValue = Evaluate(unaryMinus._Expr, scope);
+        if (unaryMinus.RequiresRuntimeCheck && rValue is not Element.Number) throw new RuntimeException(unaryMinus, $"Applied `-` operator to element of type {rValue.Type}");
         return -(rValue as Element.Number)!;
     }
 
-    public Element VisitBinaryPowerExpr(Expr.Binary.Power powerExpr, Scope scope){
-        Element left = Evaluate(powerExpr.Left,scope);
-        if(powerExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(powerExpr,$"Left operand of `^` is of type {left.Type}");
-        Element right = Evaluate(powerExpr.Right,scope);
-        if(powerExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(powerExpr,$"Right operand of `^` is of type {right.Type}");
+    public Element VisitBinaryPowerExpr(Expr.Binary.Power powerExpr, Scope scope)
+    {
+        Element left = Evaluate(powerExpr.Left, scope);
+        if (powerExpr.RequiresRuntimeCheck && left is not Element.Number) throw new RuntimeException(powerExpr, $"Left operand of `^` is of type {left.Type}");
+        Element right = Evaluate(powerExpr.Right, scope);
+        if (powerExpr.RequiresRuntimeCheck && right is not Element.Number) throw new RuntimeException(powerExpr, $"Right operand of `^` is of type {right.Type}");
         return (left as Element.Number)! ^ (right as Element.Number)!;
     }
 
-    public Element VisitBinaryProductExpr(Expr.Binary.Product productExpr, Scope scope){
-        Element left = Evaluate(productExpr.Left,scope);
-        if(productExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(productExpr,$"Left operand of `*` is of type {left.Type}");
-        Element right = Evaluate(productExpr.Right,scope);
-        if(productExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(productExpr,$"Right operand of `*` is of type {right.Type}");
+    public Element VisitBinaryProductExpr(Expr.Binary.Product productExpr, Scope scope)
+    {
+        Element left = Evaluate(productExpr.Left, scope);
+        if (productExpr.RequiresRuntimeCheck && left is not Element.Number) throw new RuntimeException(productExpr, $"Left operand of `*` is of type {left.Type}");
+        Element right = Evaluate(productExpr.Right, scope);
+        if (productExpr.RequiresRuntimeCheck && right is not Element.Number) throw new RuntimeException(productExpr, $"Right operand of `*` is of type {right.Type}");
         return (left as Element.Number)! * (right as Element.Number)!;
     }
 
-    public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope scope){
-        Element left = Evaluate(divisionExpr.Left,scope);
-        if(divisionExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(divisionExpr,$"Left operand of `/` is of type {left.Type}");
-        Element right = Evaluate(divisionExpr.Right,scope);
-        if(divisionExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(divisionExpr,$"Right operand of `/` is of type {right.Type}");
-        if((right as Element.Number)!.Value == 0.0f)throw new RuntimeException(divisionExpr,"Division by 0");
+    public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope scope)
+    {
+        Element left = Evaluate(divisionExpr.Left, scope);
+        if (divisionExpr.RequiresRuntimeCheck && left is not Element.Number) throw new RuntimeException(divisionExpr, $"Left operand of `/` is of type {left.Type}");
+        Element right = Evaluate(divisionExpr.Right, scope);
+        if (divisionExpr.RequiresRuntimeCheck && right is not Element.Number) throw new RuntimeException(divisionExpr, $"Right operand of `/` is of type {right.Type}");
+        if ((right as Element.Number)!.Value == 0.0f) throw new RuntimeException(divisionExpr, "Division by 0");
         return (left as Element.Number)! / (right as Element.Number)!;
     }
 
-    public Element VisitBinaryModulusExpr(Expr.Binary.Modulus modulusExpr, Scope scope){
-        Element left = Evaluate(modulusExpr.Left,scope);
-        if(modulusExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(modulusExpr,$"Left operand of `%` is of type {left.Type}");
-        Element right = Evaluate(modulusExpr.Right,scope);
-        if(modulusExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(modulusExpr,$"Right operand of `%` is of type {right.Type}");
-        if((right as Element.Number)!.Value == 0.0f)throw new RuntimeException(modulusExpr,"Division by 0");
+    public Element VisitBinaryModulusExpr(Expr.Binary.Modulus modulusExpr, Scope scope)
+    {
+        Element left = Evaluate(modulusExpr.Left, scope);
+        if (modulusExpr.RequiresRuntimeCheck && left is not Element.Number) throw new RuntimeException(modulusExpr, $"Left operand of `%` is of type {left.Type}");
+        Element right = Evaluate(modulusExpr.Right, scope);
+        if (modulusExpr.RequiresRuntimeCheck && right is not Element.Number) throw new RuntimeException(modulusExpr, $"Right operand of `%` is of type {right.Type}");
+        if ((right as Element.Number)!.Value == 0.0f) throw new RuntimeException(modulusExpr, "Division by 0");
         return (left as Element.Number)! % (right as Element.Number)!;
     }
 
-    public Element VisitBinarySumExpr(Expr.Binary.Sum sumExpr, Scope scope){
-        Element left = Evaluate(sumExpr.Left,scope);
-        if(sumExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(sumExpr,$"Left operand of `+` is of type {left.Type}");
-        Element right = Evaluate(sumExpr.Right,scope);
-        if(sumExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(sumExpr,$"Right operand of `+` is of type {right.Type}");
+    public Element VisitBinarySumExpr(Expr.Binary.Sum sumExpr, Scope scope)
+    {
+        Element left = Evaluate(sumExpr.Left, scope);
+        if (sumExpr.RequiresRuntimeCheck && left is not Element.Number) throw new RuntimeException(sumExpr, $"Left operand of `+` is of type {left.Type}");
+        Element right = Evaluate(sumExpr.Right, scope);
+        if (sumExpr.RequiresRuntimeCheck && right is not Element.Number) throw new RuntimeException(sumExpr, $"Right operand of `+` is of type {right.Type}");
         return (left as Element.Number)! + (right as Element.Number)!;
     }
 
-    public Element VisitBinaryDifferenceExpr(Expr.Binary.Difference differenceExpr, Scope scope){
-        Element left = Evaluate(differenceExpr.Left,scope);
-        if(differenceExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(differenceExpr,$"Left operand of `-` is of type {left.Type}");
-        Element right = Evaluate(differenceExpr.Right,scope);
-        if(differenceExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(differenceExpr,$"Right operand of `-` is of type {right.Type}");
+    public Element VisitBinaryDifferenceExpr(Expr.Binary.Difference differenceExpr, Scope scope)
+    {
+        Element left = Evaluate(differenceExpr.Left, scope);
+        if (differenceExpr.RequiresRuntimeCheck && left is not Element.Number) throw new RuntimeException(differenceExpr, $"Left operand of `-` is of type {left.Type}");
+        Element right = Evaluate(differenceExpr.Right, scope);
+        if (differenceExpr.RequiresRuntimeCheck && right is not Element.Number) throw new RuntimeException(differenceExpr, $"Right operand of `-` is of type {right.Type}");
         return (left as Element.Number)! - (right as Element.Number)!;
     }
 
-    public Element VisitBinaryLessExpr(Expr.Binary.Less lessExpr, Scope scope){
-        Element left = Evaluate(lessExpr.Left,scope);
-        if(lessExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(lessExpr,$"Left operand of `<` is of type {left.Type}");
-        Element right = Evaluate(lessExpr.Right,scope);
-        if(lessExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(lessExpr,$"Right operand of `<` is of type {right.Type}");
+    public Element VisitBinaryLessExpr(Expr.Binary.Less lessExpr, Scope scope)
+    {
+        Element left = Evaluate(lessExpr.Left, scope);
+        if (lessExpr.RequiresRuntimeCheck && left is not Element.Number) throw new RuntimeException(lessExpr, $"Left operand of `<` is of type {left.Type}");
+        Element right = Evaluate(lessExpr.Right, scope);
+        if (lessExpr.RequiresRuntimeCheck && right is not Element.Number) throw new RuntimeException(lessExpr, $"Right operand of `<` is of type {right.Type}");
         return (left as Element.Number)! < (right as Element.Number)!;
     }
 
-    public Element VisitBinaryLessEqualExpr(Expr.Binary.LessEqual lessEqualExpr, Scope scope){
-        Element left = Evaluate(lessEqualExpr.Left,scope);
-        if(lessEqualExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(lessEqualExpr,$"Left operand of `<=` is of type {left.Type}");
-        Element right = Evaluate(lessEqualExpr.Right,scope);
-        if(lessEqualExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(lessEqualExpr,$"Right operand of `<=` is of type {right.Type}");
+    public Element VisitBinaryLessEqualExpr(Expr.Binary.LessEqual lessEqualExpr, Scope scope)
+    {
+        Element left = Evaluate(lessEqualExpr.Left, scope);
+        if (lessEqualExpr.RequiresRuntimeCheck && left is not Element.Number) throw new RuntimeException(lessEqualExpr, $"Left operand of `<=` is of type {left.Type}");
+        Element right = Evaluate(lessEqualExpr.Right, scope);
+        if (lessEqualExpr.RequiresRuntimeCheck && right is not Element.Number) throw new RuntimeException(lessEqualExpr, $"Right operand of `<=` is of type {right.Type}");
         return (left as Element.Number)! <= (right as Element.Number)!;
     }
 
-    public Element VisitBinaryGreaterExpr(Expr.Binary.Greater greaterExpr, Scope scope){
-        Element left = Evaluate(greaterExpr.Left,scope);
-        if(greaterExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(greaterExpr,$"Left operand of `>` is of type {left.Type}");
-        Element right = Evaluate(greaterExpr.Right,scope);
-        if(greaterExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(greaterExpr,$"Right operand of `>` is of type {right.Type}");
+    public Element VisitBinaryGreaterExpr(Expr.Binary.Greater greaterExpr, Scope scope)
+    {
+        Element left = Evaluate(greaterExpr.Left, scope);
+        if (greaterExpr.RequiresRuntimeCheck && left is not Element.Number) throw new RuntimeException(greaterExpr, $"Left operand of `>` is of type {left.Type}");
+        Element right = Evaluate(greaterExpr.Right, scope);
+        if (greaterExpr.RequiresRuntimeCheck && right is not Element.Number) throw new RuntimeException(greaterExpr, $"Right operand of `>` is of type {right.Type}");
         return (left as Element.Number)! > (right as Element.Number)!;
     }
 
-    public Element VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual greaterEqualExpr, Scope scope){
-        Element left = Evaluate(greaterEqualExpr.Left,scope);
-        if(greaterEqualExpr.RequiresRuntimeCheck && left is not Element.Number)throw new RuntimeException(greaterEqualExpr,$"Left operand of `>=` is of type {left.Type}");
-        Element right = Evaluate(greaterEqualExpr.Right,scope);
-        if(greaterEqualExpr.RequiresRuntimeCheck && right is not Element.Number)throw new RuntimeException(greaterEqualExpr,$"Right operand of `>=` is of type {right.Type}");
+    public Element VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual greaterEqualExpr, Scope scope)
+    {
+        Element left = Evaluate(greaterEqualExpr.Left, scope);
+        if (greaterEqualExpr.RequiresRuntimeCheck && left is not Element.Number) throw new RuntimeException(greaterEqualExpr, $"Left operand of `>=` is of type {left.Type}");
+        Element right = Evaluate(greaterEqualExpr.Right, scope);
+        if (greaterEqualExpr.RequiresRuntimeCheck && right is not Element.Number) throw new RuntimeException(greaterEqualExpr, $"Right operand of `>=` is of type {right.Type}");
         return (left as Element.Number)! >= (right as Element.Number)!;
     }
 
-    public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope scope){
-        Element left = Evaluate(equalEqualExpr.Left,scope);
-        Element right = Evaluate(equalEqualExpr.Right,scope);
+    public Element VisitBinaryEqualEqualExpr(Expr.Binary.EqualEqual equalEqualExpr, Scope scope)
+    {
+        Element left = Evaluate(equalEqualExpr.Left, scope);
+        Element right = Evaluate(equalEqualExpr.Right, scope);
         return left.EqualTo(right);
     }
 
-    public Element VisitBinaryNotEqualExpr(Expr.Binary.NotEqual notEqualExpr, Scope scope){
-        Element left = Evaluate(notEqualExpr.Left,scope);
-        Element right = Evaluate(notEqualExpr.Right,scope);
+    public Element VisitBinaryNotEqualExpr(Expr.Binary.NotEqual notEqualExpr, Scope scope)
+    {
+        Element left = Evaluate(notEqualExpr.Left, scope);
+        Element right = Evaluate(notEqualExpr.Right, scope);
         return left.NotEqualTo(right);
     }
 
-    public Element VisitBinaryAndExpr(Expr.Binary.And andExpr, Scope scope){
-        if(IsTruthy(Evaluate(andExpr.Left,scope)) == Element.FALSE)return Element.FALSE;//Shortcircuit
-        return IsTruthy(Evaluate(andExpr.Right,scope));
+    public Element VisitBinaryAndExpr(Expr.Binary.And andExpr, Scope scope)
+    {
+        if (IsTruthy(Evaluate(andExpr.Left, scope)) == Element.FALSE) return Element.FALSE;//Shortcircuit
+        return IsTruthy(Evaluate(andExpr.Right, scope));
     }
 
-    public Element VisitBinaryOrExpr(Expr.Binary.Or orExpr, Scope scope){
-        if(IsTruthy(Evaluate(orExpr.Left,scope)) == Element.TRUE)return Element.TRUE;//Shortcircuit
-        return IsTruthy(Evaluate(orExpr.Right,scope));
+    public Element VisitBinaryOrExpr(Expr.Binary.Or orExpr, Scope scope)
+    {
+        if (IsTruthy(Evaluate(orExpr.Left, scope)) == Element.TRUE) return Element.TRUE;//Shortcircuit
+        return IsTruthy(Evaluate(orExpr.Right, scope));
     }
 
-    public Element VisitConditionalExpr(Expr.Conditional conditionalExpr, Scope scope){
+    public Element VisitConditionalExpr(Expr.Conditional conditionalExpr, Scope scope)
+    {
         //This could lead to security holes, because if the conditional is declared inside a function then it would not be checked for having the same return type for both operands.
-        if( IsTruthy(Evaluate(conditionalExpr.Condition,scope)) == Element.TRUE ) return Evaluate(conditionalExpr.ThenBranchExpr,scope);
-        return Evaluate(conditionalExpr.ElseBranchExpr,scope);
+        if (IsTruthy(Evaluate(conditionalExpr.Condition, scope)) == Element.TRUE) return Evaluate(conditionalExpr.ThenBranchExpr, scope);
+        return Evaluate(conditionalExpr.ElseBranchExpr, scope);
     }
 
-    public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope scope){
+    public Element VisitLetInExpr(Expr.LetIn letInExpr, Scope scope)
+    {
         Scope letInScope = new Scope(scope);
-        foreach(Stmt stmt in letInExpr.LetStmts)Interpret(stmt,letInScope);
-        return Evaluate(letInExpr.InExpr,letInScope);
+        foreach (Stmt stmt in letInExpr.LetStmts) Interpret(stmt, letInScope);
+        return Evaluate(letInExpr.InExpr, letInScope);
+    }
+    public Element VisitPointExpr(Expr.Point pointExpr, Scope scope)
+    {
+        try
+        {
+            if (pointExpr.FullDeclarated)
+            {
+                return new Element.Point(new Element.String(""), (Element.Number)Evaluate(pointExpr.X, scope), (Element.Number)Evaluate(pointExpr.Y, scope), new Element.String(""), colorStack.Top);
+            }
+            else
+            {
+                return new Element.Point(colorStack.Top);
+            }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(pointExpr, e.Message);
+        }
+    }
+    public Element VisitLinesExpr(Expr.Lines linesExpr, Scope scope)
+    {
+        try
+        {
+            if (linesExpr.FullDeclarated)
+            {
+                return new Element.Lines(new Element.String(""), (Element.Point)Evaluate(linesExpr.P1, scope), (Element.Point)Evaluate(linesExpr.P2, scope), new Element.String(""), colorStack.Top);
+            }
+            else
+            {
+                return new Element.Lines(colorStack.Top);
+            }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(linesExpr, e.Message);
+        }
+
+    }
+    public Element VisitSegmentExpr(Expr.Segment linesExpr, Scope scope)
+    {
+        try
+        {
+            if (linesExpr.FullDeclarated)
+            { return new Element.Segment(new Element.String(""), (Element.Point)Evaluate(linesExpr.P1, scope), (Element.Point)Evaluate(linesExpr.P2, scope), new Element.String(""), colorStack.Top); }
+            else { return new Element.Segment(colorStack.Top); }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(linesExpr, e.Message);
+        }
+    }
+    public Element VisitRayExpr(Expr.Ray linesExpr, Scope scope)
+    {
+        try
+        {
+            if (linesExpr.FullDeclarated)
+            { return new Element.Ray(new Element.String(""), (Element.Point)Evaluate(linesExpr.P1, scope), (Element.Point)Evaluate(linesExpr.P2, scope), new Element.String(""), colorStack.Top); }
+            else
+            { return new Element.Ray(colorStack.Top); }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(linesExpr, e.Message);
+        }
+    }
+    public Element VisitCircleExpr(Expr.Circle circleExpr, Scope scope)
+    {
+        try
+        {
+            if (circleExpr.FullDeclarated)
+            {
+                return new Element.Circle(new Element.String(""), (Element.Point)Evaluate(circleExpr.P1, scope), circleExpr.Radius, new Element.String(""), colorStack.Top);
+            }
+            else { return new Element.Circle(colorStack.Top); }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(circleExpr, e.Message);
+        }
+    }
+    public Element VisitArcExpr(Expr.Arc circleExpr, Scope scope)
+    {
+        try
+        {
+            if (circleExpr.FullDeclarated)
+            {
+                return new Element.Arc(new Element.String(""), (Element.Point)Evaluate(circleExpr.P1, scope), (Element.Point)Evaluate(circleExpr.P2, scope), (Element.Point)Evaluate(circleExpr.P3, scope), circleExpr.Radius, new Element.String(""), colorStack.Top);
+            }
+            else
+            { return new Element.Arc(colorStack.Top); }
+        }
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(circleExpr, e.Message);
+        }
     }
 
-    public Element VisitCallExpr(Expr.Call callExpr, Scope scope){
+    public Element VisitCallExpr(Expr.Call callExpr, Scope scope)
+    {
         //Retrieve the declaration of the function.
-        Element.Function calledFunction = (Element.Function) scope.Get(callExpr.Id.Lexeme,callExpr.Arity);
+        Element.Function calledFunction = (Element.Function)scope.Get(callExpr.Id.Lexeme, callExpr.Arity);
         //Compute the value of the parameters.
         List<Element> parameters = new List<Element>(callExpr.Arity);
-        foreach(Expr expr in callExpr.Parameters)parameters.Add(Evaluate(expr,scope));
+        foreach (Expr expr in callExpr.Parameters) parameters.Add(Evaluate(expr, scope));
         //Create a new scope for the function.
-        Scope functionScope = Scope.RequestScopeForFunction(calledFunction.Arguments,parameters,scope);
+        Scope functionScope = Scope.RequestScopeForFunction(calledFunction.Arguments, parameters, scope);
         //Excecute the body of the function on the new scope.
         ++callStackCounter;
-        if(callStackCounter > callStackSize)throw new RuntimeException(callExpr,$"Stack overflow. Last called function was {callExpr.Id.Lexeme}");
-        Element result = Evaluate(calledFunction.Body,functionScope);
+        if (callStackCounter > callStackSize) throw new RuntimeException(callExpr, $"Stack overflow. Last called function was {callExpr.Id.Lexeme}");
+        Element result = Evaluate(calledFunction.Body, functionScope);
         --callStackCounter;
         return result;
     }
