@@ -34,6 +34,9 @@ static class Utils{
 
     //Random point generation
     private static Random random = new Random();//Stores a random for future usage.
+    public static void SetMaxCoordinate(int maxCoordinate){
+        MaxPointCoordinate = maxCoordinate;
+    }
     private static int MaxPointCoordinate = 1000;//Represents the maximum absolute value of point coordinates
     ///<summary>Generate an integer on the range [-MaxPointCoordinate,MaxPointCoordinate]</summary>
     public static int RandomCoordinate(){
