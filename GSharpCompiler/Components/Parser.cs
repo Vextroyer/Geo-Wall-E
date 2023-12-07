@@ -709,9 +709,27 @@ class Parser : GSharpCompilerComponent
                 Expr expr = ParseExpression();
                 Consume(TokenType.RIGHT_PAREN, "Expected `)`");
                 return expr;
+            // case TokenType.LEFT_BRACE: //Sequence
+            //     return ParseSequenceExpr();
             default: return Expr.EMPTY;//The empty expression
         }
     }
+    // private Expr ParseSequenceExpr(){
+    //     Consume(TokenType.LEFT_BRACE);
+    //     Expr firstExpr = ParseExpression();
+    //     if(firstExpr != Expr.EMPTY){
+    //         //non-empty sequence
+    //         if(Peek.Type == TokenType.THREE_DOTS){
+    //         }
+    //         else{
+                
+    //         }
+    //     }
+    //     else{
+    //         //Empty sequence
+    //     }
+    //     Consume(TokenType.RIGHT_BRACE,"Expected `}` after sequence elements");
+    // }
     #endregion Expression parsing
 
     #region  Auxiliary Methods

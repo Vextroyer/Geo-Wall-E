@@ -38,3 +38,5 @@ f() = let
       in a;
 
 print f();
+
+Hacer sistema de tipos como objetos.

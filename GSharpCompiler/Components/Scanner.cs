@@ -75,6 +75,8 @@ class Scanner : GSharpCompilerComponent
             case '"': ScanString(); break;
             case '(': AddToken(TokenType.LEFT_PAREN); break;
             case ')': AddToken(TokenType.RIGHT_PAREN); break; 
+            case '{': AddToken(TokenType.LEFT_BRACE); break;
+            case '}': AddToken(TokenType.RIGHT_BRACE); break;
             case '/': 
                 if(Match('/')) ScanComment();
                 else AddToken(TokenType.SLASH); 
@@ -123,12 +125,20 @@ class Scanner : GSharpCompilerComponent
                     break;
                 }
                 else if(c == '.'){
-                    OnErrorFound(line,ComputeOffset,new string(fileName),"Expected digit before `.`");
+                    if(!TryParseThreeDots())OnErrorFound(line,ComputeOffset,new string(fileName),"Expected digit before `.`");
                     break;
                 }
                 OnErrorFound(line,ComputeOffset,new string(fileName),"Unrecognized character");
                 break;
         }
+    }
+    private bool TryParseThreeDots(){
+        if(Peek == '.' && PeekNext == '.' && current + 2 < source.Length && source[current + 2]=='.'){
+            Advance();Advance();Advance();//Consume the three dots
+            AddToken(TokenType.THREE_DOTS);
+            return true;
+        }
+        return false;
     }
     //Scan a string literal, the previous character was a quote '"'
     //Consume characters until it hits another quote. If the end is reached then a quote is missing.
