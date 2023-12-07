@@ -29,26 +29,50 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
     {
         return $"point({stmt.Id.Lexeme},{stmt.Comment},{stmt.X},{stmt.Y})";
     }
+    public string VisitPointExpr(Expr.Point expr, Scope scope)
+    {
+        return $"point({expr.X},{expr.Y})";
+    }
     public string VisitLinesStmt(Stmt.Lines stmt, Scope scope)
     {
         //return $"line({stmt.Id.Lexeme},{stmt.Comment},{VisitVariableExpr((Expr.Variable)stmt.P1,scope)},{VisitVariableExpr((Expr.Variable)stmt.P2,scope)})";
         return $"line({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{Print(stmt.P2)})";
     }
+     public string VisitLinesExpr(Expr.Lines expr, Scope scope)
+    {
+        return $"line({Print(expr.P1)},{Print(expr.P2)}";
+    }
     public string VisitRayStmt(Stmt.Ray stmt, Scope scope)
     {
         return $"ray({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{Print(stmt.P2)})";
+    }
+    public string VisitRayExpr(Expr.Ray stmt, Scope scope)
+    {
+        return $"ray({Print(stmt.P1)},{Print(stmt.P2)})";
     }
     public string VisitSegmentStmt(Stmt.Segment stmt, Scope scope)
     {
         return $"segment({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{Print(stmt.P2)})";
     }
+    public string VisitSegmentExpr(Expr.Segment stmt, Scope scope)
+    {
+        return $"({Print(stmt.P1)},{Print(stmt.P2)})";
+    }
     public string VisitCircleStmt(Stmt.Circle stmt, Scope scope)
     {
         return $"circle({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{stmt.Radius})";
     }
+    public string VisitCircleExpr(Expr.Circle stmt, Scope scope)
+    {
+        return $"({Print(stmt.P1)},{stmt.Radius})";
+    }
     public string VisitArcStmt(Stmt.Arc stmt, Scope scope)
     {
         return $"arc({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{Print(stmt.P2)},{Print(stmt.P3)},{stmt.Radius})";
+    }
+    public string VisitArcExpr(Expr.Arc stmt, Scope scope)
+    {
+        return $"arc({Print(stmt.P1)},{Print(stmt.P2)},{Print(stmt.P3)},{stmt.Radius})";
     }
     public string VisitConstantDeclarationStmt(Stmt.Declaration.Constant stmt, Scope scope)
     {
@@ -210,5 +234,8 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
             }
             return ret;
         }
+    }
+    public string VisitMeasureExpr(Expr.Measure expr,Scope scope){
+        return $"measure({Print(expr.P1)},{Print(expr.P2)})";
     }
 }

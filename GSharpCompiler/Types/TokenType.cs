@@ -50,8 +50,8 @@ enum TokenType{
     CIRCLE,
     //The `ARC` keyword
     ARC,
-
-
+    //The `measure` keyword.
+    MEASURE,
     //Colors
     COLOR,COLOR_BLACK,COLOR_BLUE,COLOR_CYAN,COLOR_GRAY,COLOR_GREEN,
     COLOR_RED,COLOR_MAGENTA,COLOR_WHITE,COLOR_YELLOW,RESTORE,
