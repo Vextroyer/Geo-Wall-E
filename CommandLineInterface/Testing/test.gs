@@ -124,10 +124,10 @@ print let
 
 
 print let
-        point p1 "Iam p1";
+        point p1;
         a = let
-                point p2 "Iam p2";
-                point p1 "Iam p1 inside let in";
+                point p2;
+                point p1;
             in 5;
       in a;  
 

@@ -285,7 +285,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         Element rValue = Check(unaryMinusExpr._Expr, scope);
         if(rValue.Type!=ElementType.RUNTIME_DEFINED){
             try{
-                if( (-rValue).Type == ElementType.NUMBER )unaryMinusExpr.RequiresRuntimeCheck = false;
+                if( OperationTable.Operate("-",rValue).Type == ElementType.NUMBER )unaryMinusExpr.RequiresRuntimeCheck = false;
             }catch(InvalidOperationException e){
                 try{
                     OnErrorFound(unaryMinusExpr,e.Message);
@@ -305,7 +305,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         Element right = Check(productExpr.Right,scope);
         if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
             try{
-                switch((left * right).Type){
+                switch(OperationTable.Operate("*",left,right).Type){
                     case ElementType.NUMBER:
                         productExpr.RequiresRuntimeCheck = false;
                         return Element.NUMBER;
@@ -328,7 +328,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
             try{
                 try{
-                    switch((left / right).Type){
+                    switch(OperationTable.Operate("/",left,right).Type){
                         case ElementType.NUMBER:
                             divisionExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
@@ -353,7 +353,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         Element right = Check(sumExpr.Right,scope);
         if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
             try{
-                switch((left + right).Type){
+                switch(OperationTable.Operate("+",left,right).Type){
                     case ElementType.NUMBER:
                         sumExpr.RequiresRuntimeCheck = false;
                         return Element.NUMBER;
@@ -375,7 +375,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         Element right = Check(differenceExpr.Right,scope);
         if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
             try{
-                switch((left - right).Type){
+                switch(OperationTable.Operate("-",left,right).Type){
                     case ElementType.NUMBER:
                         differenceExpr.RequiresRuntimeCheck = false;
                         return Element.NUMBER;
@@ -398,7 +398,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
             try{
                 try{
-                    switch((left < right).Type){
+                    switch(OperationTable.Operate("<",left,right).Type){
                         case ElementType.NUMBER:
                             lessExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
@@ -419,7 +419,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
             try{
                 try{
-                    switch((left <= right).Type){
+                    switch(OperationTable.Operate("<",left,right).Type){
                         case ElementType.NUMBER:
                             lessEqualExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
@@ -440,7 +440,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
             try{
                 try{
-                    switch((left > right).Type){
+                    switch(OperationTable.Operate(">",left,right).Type){
                         case ElementType.NUMBER:
                             greaterExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
@@ -461,7 +461,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
             try{
                 try{
-                    switch((left >= right).Type){
+                    switch((OperationTable.Operate(">=",left,right)).Type){
                         case ElementType.NUMBER:
                             greaterEqualExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;

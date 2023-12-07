@@ -28,7 +28,7 @@ f(x) = if x == 1 then 1 else let point p; print p; draw p; in f(x - 1);
 
 print f(10);
 
-Add operations tables, data structure.
+Add operations tables, data structure. Make that declaring a delegate who dont return Element or operates over a non-element gives error.
 Redesign equality comparisons.
 
 Interpreter fails on this case

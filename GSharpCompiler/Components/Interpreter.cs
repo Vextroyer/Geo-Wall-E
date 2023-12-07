@@ -176,99 +176,120 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
 
     public Element VisitUnaryNotExpr(Expr.Unary.Not unaryNot, Scope scope)
     {
-        return  !Evaluate(unaryNot._Expr, scope);
+        return  OperationTable.Operate("!",Evaluate(unaryNot._Expr,scope));
     }
 
 
     public Element VisitUnaryMinusExpr(Expr.Unary.Minus expr, Scope scope){
+        Element rvalue = Evaluate(expr._Expr,scope);
         try{
-            return -Evaluate(expr._Expr,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+            return OperationTable.Operate("-",rvalue);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `-` on {rvalue.Type}");
         }
     }
 
     public Element VisitBinaryPowerExpr(Expr.Binary.Power expr, Scope scope){
+        Element left = Evaluate(expr.Left,scope);
+        Element right = Evaluate(expr.Right,scope);
         try{
-            return Evaluate(expr.Left,scope) ^ Evaluate(expr.Right,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+            return OperationTable.Operate("^",left,right);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `^` on {left.Type} and {right.Type}");
         }
     }
 
     public Element VisitBinaryProductExpr(Expr.Binary.Product expr, Scope scope){
+        Element left = Evaluate(expr.Left,scope);
+        Element right = Evaluate(expr.Right,scope);
         try{
-            return Evaluate(expr.Left,scope) * Evaluate(expr.Right,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+            return OperationTable.Operate("*",left,right);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `*` on {left.Type} and {right.Type}");
         }
     }
 
     public Element VisitBinaryDivisionExpr(Expr.Binary.Division expr, Scope scope){
+        Element left = Evaluate(expr.Left,scope);
+        Element right = Evaluate(expr.Right,scope);
         try{
-            return Evaluate(expr.Left,scope) / Evaluate(expr.Right,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+            return OperationTable.Operate("/",left,right);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `/` on {left.Type} and {right.Type}");
         }catch(DivideByZeroException){
             throw new RuntimeException(expr,"Division by 0");
         }
     }
 
     public Element VisitBinaryModulusExpr(Expr.Binary.Modulus expr, Scope scope){
-       try{
-            return Evaluate(expr.Left,scope) % Evaluate(expr.Right,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+        Element left = Evaluate(expr.Left,scope);
+        Element right = Evaluate(expr.Right,scope);
+        try{
+            return OperationTable.Operate("%",left,right);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `%` on {left.Type} and {right.Type}");
         }catch(DivideByZeroException){
             throw new RuntimeException(expr,"Division by 0");
         }
     }
 
     public Element VisitBinarySumExpr(Expr.Binary.Sum expr, Scope scope){
+        Element left = Evaluate(expr.Left,scope);
+        Element right = Evaluate(expr.Right,scope);
         try{
-            return Evaluate(expr.Left,scope) + Evaluate(expr.Right,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+            return OperationTable.Operate("+",left,right);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `+` on {left.Type} and {right.Type}");
         }
     }
 
     public Element VisitBinaryDifferenceExpr(Expr.Binary.Difference expr, Scope scope){
+        Element left = Evaluate(expr.Left,scope);
+        Element right = Evaluate(expr.Right,scope);
         try{
-            return Evaluate(expr.Left,scope) - Evaluate(expr.Right,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+            return OperationTable.Operate("-",left,right);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `-` on {left.Type} and {right.Type}");
         }
     }
 
     public Element VisitBinaryLessExpr(Expr.Binary.Less expr, Scope scope){
+        Element left = Evaluate(expr.Left,scope);
+        Element right = Evaluate(expr.Right,scope);
         try{
-            return Evaluate(expr.Left,scope) < Evaluate(expr.Right,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+            return OperationTable.Operate("<",left,right);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `<` on {left.Type} and {right.Type}");
         }
     }
 
     public Element VisitBinaryLessEqualExpr(Expr.Binary.LessEqual expr, Scope scope){
+        Element left = Evaluate(expr.Left,scope);
+        Element right = Evaluate(expr.Right,scope);
         try{
-            return Evaluate(expr.Left,scope) <= Evaluate(expr.Right,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+            return OperationTable.Operate("<=",left,right);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `<=` on {left.Type} and {right.Type}");
         }
     }
 
     public Element VisitBinaryGreaterExpr(Expr.Binary.Greater expr, Scope scope){
+        Element left = Evaluate(expr.Left,scope);
+        Element right = Evaluate(expr.Right,scope);
         try{
-            return Evaluate(expr.Left,scope) > Evaluate(expr.Right,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+            return OperationTable.Operate(">",left,right);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `>` on {left.Type} and {right.Type}");
         }
     }
 
     public Element VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual expr, Scope scope){
+        Element left = Evaluate(expr.Left,scope);
+        Element right = Evaluate(expr.Right,scope);
         try{
-            return Evaluate(expr.Left,scope) >= Evaluate(expr.Right,scope);
-        }catch(InvalidOperationException e){
-            throw new RuntimeException(expr,e.Message);
+            return OperationTable.Operate(">=",left,right);
+        }catch(InvalidOperationException){
+            throw new RuntimeException(expr,$"Cant apply operation `>=` on {left.Type} and {right.Type}");
         }
     }
 
