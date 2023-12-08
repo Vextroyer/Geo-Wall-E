@@ -93,87 +93,87 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public object? VisitSegmentStmt(Stmt.Segment segmentStmt, Scope scope)
     {
+        try
+        {
+            if (segmentStmt.FullDeclarated)
+            {
+                CheckLineDeclaration(segmentStmt, scope);//Check that expressions contained in the line Stmt are points
+            }
             try
             {
-                if (segmentStmt.FullDeclarated)
-                {
-                    CheckLineDeclaration(segmentStmt, scope);//Check that expressions contained in the line Stmt are points
-                }
-                try
-                {
-                    scope.SetArgument(segmentStmt.Id.Lexeme, Element.SEGMENT);
-                }
-                catch (ScopeException e)
-                {
-                    OnErrorFound(segmentStmt, e.Message);
-                }
+                scope.SetArgument(segmentStmt.Id.Lexeme, Element.SEGMENT);
             }
-            catch (RecoveryModeException)
+            catch (ScopeException e)
             {
-                //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+                OnErrorFound(segmentStmt, e.Message);
             }
+        }
+        catch (RecoveryModeException)
+        {
+            //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+        }
         return null;
     }
     public object? VisitRayStmt(Stmt.Ray rayStmt, Scope scope)
     {
-      
+
+        try
+        {
+            if (rayStmt.FullDeclarated)
+            {
+                CheckLineDeclaration(rayStmt, scope);//Check that expressions contained in the line Stmt are points
+            }
             try
             {
-                if (rayStmt.FullDeclarated)
-                {
-                    CheckLineDeclaration(rayStmt, scope);//Check that expressions contained in the line Stmt are points
-                }
-                try
-                {
-                    scope.SetArgument(rayStmt.Id.Lexeme, Element.RAY);
-                }
-                catch (ScopeException e)
-                {
-                    OnErrorFound(rayStmt, e.Message);
-                }
+                scope.SetArgument(rayStmt.Id.Lexeme, Element.RAY);
             }
-            catch (RecoveryModeException)
+            catch (ScopeException e)
             {
-                //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+                OnErrorFound(rayStmt, e.Message);
             }
+        }
+        catch (RecoveryModeException)
+        {
+            //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+        }
         return null;
     }
     public object? VisitCircleStmt(Stmt.Circle circleStmt, Scope scope)
     {
+        try
+        {
             try
             {
-                try
-                {
-                    scope.SetArgument(circleStmt.Id.Lexeme, Element.CIRCLE);
-                }
-                catch (ScopeException e)
-                {
-                    OnErrorFound(circleStmt, e.Message);
-                }
+                scope.SetArgument(circleStmt.Id.Lexeme, Element.CIRCLE);
             }
-            catch (RecoveryModeException)
+            catch (ScopeException e)
             {
-                //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+                OnErrorFound(circleStmt, e.Message);
             }
+        }
+        catch (RecoveryModeException)
+        {
+            //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+        }
         return null;
     }
     public object? VisitArcStmt(Stmt.Arc arcStmt, Scope scope)
     {
+        try
+        {
             try
             {
-                try
-                {
-                    scope.SetArgument(arcStmt.Id.Lexeme, Element.ARC);
-                }
-                catch (ScopeException e)
-                {
-                    OnErrorFound(arcStmt, e.Message);
-                }
+                scope.SetArgument(arcStmt.Id.Lexeme, Element.ARC);
             }
-            catch (RecoveryModeException)
+            catch (ScopeException e)
             {
-                //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+                OnErrorFound(arcStmt, e.Message);
             }
+        }
+        catch (RecoveryModeException)
+        {
+            //If a redeclaration is detected then the variable remains with it older type and the checking continues.
+        }
         return null;
     }
     public object? VisitConstantDeclarationStmt(Stmt.Declaration.Constant declStmt, Scope scope)
@@ -283,13 +283,19 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         //Check the right hand expr.
         //Rule # 7
         Element rValue = Check(unaryMinusExpr._Expr, scope);
-        if(rValue.Type!=ElementType.RUNTIME_DEFINED){
-            try{
-                if( (-rValue).Type == ElementType.NUMBER )unaryMinusExpr.RequiresRuntimeCheck = false;
-            }catch(InvalidOperationException e){
-                try{
-                    OnErrorFound(unaryMinusExpr,e.Message);
-                }catch(RecoveryModeException){}
+        if (rValue.Type != ElementType.RUNTIME_DEFINED)
+        {
+            try
+            {
+                if ((-rValue).Type == ElementType.NUMBER) unaryMinusExpr.RequiresRuntimeCheck = false;
+            }
+            catch (InvalidOperationException e)
+            {
+                try
+                {
+                    OnErrorFound(unaryMinusExpr, e.Message);
+                }
+                catch (RecoveryModeException) { }
             }
         }
         return Element.NUMBER;
@@ -301,11 +307,14 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public Element VisitBinaryProductExpr(Expr.Binary.Product productExpr, Scope scope)
     {
-        Element left = Check(productExpr.Left,scope);
-        Element right = Check(productExpr.Right,scope);
-        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
-            try{
-                switch((left * right).Type){
+        Element left = Check(productExpr.Left, scope);
+        Element right = Check(productExpr.Right, scope);
+        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
+        {
+            try
+            {
+                switch ((left * right).Type)
+                {
                     case ElementType.NUMBER:
                         productExpr.RequiresRuntimeCheck = false;
                         return Element.NUMBER;
@@ -315,30 +324,39 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
                     default:
                         throw new Exception("Invalid excecution path reached.");
                 }
-            }catch(InvalidOperationException e){
-                OnErrorFound(productExpr,e.Message);
+            }
+            catch (InvalidOperationException e)
+            {
+                OnErrorFound(productExpr, e.Message);
             }
         }
         return Element.RUNTIME_DEFINED;//This could be a number or a measure
     }
     public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope scope)
     {
-        Element left = Check(divisionExpr.Left,scope);
-        Element right = Check(divisionExpr.Right,scope);
-        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
-            try{
-                try{
-                    switch((left / right).Type){
+        Element left = Check(divisionExpr.Left, scope);
+        Element right = Check(divisionExpr.Right, scope);
+        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
+        {
+            try
+            {
+                try
+                {
+                    switch ((left / right).Type)
+                    {
                         case ElementType.NUMBER:
                             divisionExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
                         default:
                             throw new Exception("Invalid excecution path reached.");
                     }
-                }catch(InvalidOperationException e){
-                    OnErrorFound(divisionExpr,e.Message);
                 }
-            }catch(RecoveryModeException){}
+                catch (InvalidOperationException e)
+                {
+                    OnErrorFound(divisionExpr, e.Message);
+                }
+            }
+            catch (RecoveryModeException) { }
         }
         return Element.NUMBER;
     }
@@ -349,11 +367,14 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public Element VisitBinarySumExpr(Expr.Binary.Sum sumExpr, Scope scope)
     {
-        Element left = Check(sumExpr.Left,scope);
-        Element right = Check(sumExpr.Right,scope);
-        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
-            try{
-                switch((left + right).Type){
+        Element left = Check(sumExpr.Left, scope);
+        Element right = Check(sumExpr.Right, scope);
+        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
+        {
+            try
+            {
+                switch ((left + right).Type)
+                {
                     case ElementType.NUMBER:
                         sumExpr.RequiresRuntimeCheck = false;
                         return Element.NUMBER;
@@ -363,19 +384,24 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
                     default:
                         throw new Exception("Invalid excecution path reached.");
                 }
-            }catch(InvalidOperationException e){
-                OnErrorFound(sumExpr,e.Message);
+            }
+            catch (InvalidOperationException e)
+            {
+                OnErrorFound(sumExpr, e.Message);
             }
         }
         return Element.RUNTIME_DEFINED;//This could be a number or a measure
     }
     public Element VisitBinaryDifferenceExpr(Expr.Binary.Difference differenceExpr, Scope scope)
     {
-        Element left = Check(differenceExpr.Left,scope);
-        Element right = Check(differenceExpr.Right,scope);
-        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
-            try{
-                switch((left - right).Type){
+        Element left = Check(differenceExpr.Left, scope);
+        Element right = Check(differenceExpr.Right, scope);
+        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
+        {
+            try
+            {
+                switch ((left - right).Type)
+                {
                     case ElementType.NUMBER:
                         differenceExpr.RequiresRuntimeCheck = false;
                         return Element.NUMBER;
@@ -385,93 +411,123 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
                     default:
                         throw new Exception("Invalid excecution path reached.");
                 }
-            }catch(InvalidOperationException e){
-                OnErrorFound(differenceExpr,e.Message);
+            }
+            catch (InvalidOperationException e)
+            {
+                OnErrorFound(differenceExpr, e.Message);
             }
         }
         return Element.RUNTIME_DEFINED;//This could be a number or a measure
     }
     public Element VisitBinaryLessExpr(Expr.Binary.Less lessExpr, Scope scope)
     {
-        Element left = Check(lessExpr.Left,scope);
-        Element right = Check(lessExpr.Right,scope);
-        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
-            try{
-                try{
-                    switch((left < right).Type){
+        Element left = Check(lessExpr.Left, scope);
+        Element right = Check(lessExpr.Right, scope);
+        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
+        {
+            try
+            {
+                try
+                {
+                    switch ((left < right).Type)
+                    {
                         case ElementType.NUMBER:
                             lessExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
                         default:
                             throw new Exception("Invalid excecution path reached.");
                     }
-                }catch(InvalidOperationException e){
-                    OnErrorFound(lessExpr,e.Message);
                 }
-            }catch(RecoveryModeException){}
+                catch (InvalidOperationException e)
+                {
+                    OnErrorFound(lessExpr, e.Message);
+                }
+            }
+            catch (RecoveryModeException) { }
         }
         return Element.NUMBER;
     }
     public Element VisitBinaryLessEqualExpr(Expr.Binary.LessEqual lessEqualExpr, Scope scope)
     {
-        Element left = Check(lessEqualExpr.Left,scope);
-        Element right = Check(lessEqualExpr.Right,scope);
-        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
-            try{
-                try{
-                    switch((left <= right).Type){
+        Element left = Check(lessEqualExpr.Left, scope);
+        Element right = Check(lessEqualExpr.Right, scope);
+        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
+        {
+            try
+            {
+                try
+                {
+                    switch ((left <= right).Type)
+                    {
                         case ElementType.NUMBER:
                             lessEqualExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
                         default:
                             throw new Exception("Invalid excecution path reached.");
                     }
-                }catch(InvalidOperationException e){
-                    OnErrorFound(lessEqualExpr,e.Message);
                 }
-            }catch(RecoveryModeException){}
+                catch (InvalidOperationException e)
+                {
+                    OnErrorFound(lessEqualExpr, e.Message);
+                }
+            }
+            catch (RecoveryModeException) { }
         }
         return Element.NUMBER;
     }
     public Element VisitBinaryGreaterExpr(Expr.Binary.Greater greaterExpr, Scope scope)
     {
-        Element left = Check(greaterExpr.Left,scope);
-        Element right = Check(greaterExpr.Right,scope);
-        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
-            try{
-                try{
-                    switch((left > right).Type){
+        Element left = Check(greaterExpr.Left, scope);
+        Element right = Check(greaterExpr.Right, scope);
+        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
+        {
+            try
+            {
+                try
+                {
+                    switch ((left > right).Type)
+                    {
                         case ElementType.NUMBER:
                             greaterExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
                         default:
                             throw new Exception("Invalid excecution path reached.");
                     }
-                }catch(InvalidOperationException e){
-                    OnErrorFound(greaterExpr,e.Message);
                 }
-            }catch(RecoveryModeException){}
+                catch (InvalidOperationException e)
+                {
+                    OnErrorFound(greaterExpr, e.Message);
+                }
+            }
+            catch (RecoveryModeException) { }
         }
         return Element.NUMBER;
     }
     public Element VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual greaterEqualExpr, Scope scope)
     {
-        Element left = Check(greaterEqualExpr.Left,scope);
-        Element right = Check(greaterEqualExpr.Right,scope);
-        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
-            try{
-                try{
-                    switch((left >= right).Type){
+        Element left = Check(greaterEqualExpr.Left, scope);
+        Element right = Check(greaterEqualExpr.Right, scope);
+        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
+        {
+            try
+            {
+                try
+                {
+                    switch ((left >= right).Type)
+                    {
                         case ElementType.NUMBER:
                             greaterEqualExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
                         default:
                             throw new Exception("Invalid excecution path reached.");
                     }
-                }catch(InvalidOperationException e){
-                    OnErrorFound(greaterEqualExpr,e.Message);
                 }
-            }catch(RecoveryModeException){}
+                catch (InvalidOperationException e)
+                {
+                    OnErrorFound(greaterEqualExpr, e.Message);
+                }
+            }
+            catch (RecoveryModeException) { }
         }
         return Element.NUMBER;
     }
@@ -595,20 +651,27 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         //Cannot recover after the call because the return type of the call cant be determined.
         return Element.RUNTIME_DEFINED;
     }
-    public Element VisitMeasureExpr(Expr.Measure expr,Scope scope){
+    public Element VisitMeasureExpr(Expr.Measure expr, Scope scope)
+    {
         bool requiresRuntimeCheck = false;
-        try{
-            Element p1 = Check(expr.P1,scope);
-            if(p1.Type == ElementType.RUNTIME_DEFINED)requiresRuntimeCheck = true;
-            else if(p1.Type != ElementType.POINT) OnErrorFound(expr,$"Expected POINT as first parameter but {p1.Type} was found");
-        }catch(RecoveryModeException){
+        try
+        {
+            Element p1 = Check(expr.P1, scope);
+            if (p1.Type == ElementType.RUNTIME_DEFINED) requiresRuntimeCheck = true;
+            else if (p1.Type != ElementType.POINT) OnErrorFound(expr, $"Expected POINT as first parameter but {p1.Type} was found");
+        }
+        catch (RecoveryModeException)
+        {
             //Recover
         }
-        try{
-            Element p2 = Check(expr.P1,scope);
-            if(p2.Type == ElementType.RUNTIME_DEFINED)requiresRuntimeCheck = true;
-            else if(p2.Type != ElementType.POINT) OnErrorFound(expr,$"Expected POINT as second parameter but {p2.Type} was found");
-        }catch(RecoveryModeException){
+        try
+        {
+            Element p2 = Check(expr.P1, scope);
+            if (p2.Type == ElementType.RUNTIME_DEFINED) requiresRuntimeCheck = true;
+            else if (p2.Type != ElementType.POINT) OnErrorFound(expr, $"Expected POINT as second parameter but {p2.Type} was found");
+        }
+        catch (RecoveryModeException)
+        {
             //Recover
         }
         expr.RequiresRuntimeCheck = requiresRuntimeCheck;
@@ -641,7 +704,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     {
         if (linesexpr.FullDeclarated)
         {
-            System.Console.WriteLine("RAMON");
+    
             try
             {
                 Check(linesexpr.P1, scope);
@@ -659,7 +722,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             Element parametery = Check(linesexpr.P2, scope);
             if (parametery.Type != ElementType.POINT) OnErrorFound(linesexpr.P2, $"Expected `POINT` as first parameter but {parametery.Type} was found");
         }
-        System.Console.WriteLine("RAMON");
+
         return Element.LINES;
     }
     public Element VisitSegmentExpr(Expr.Segment linesexpr, Scope scope)
@@ -720,6 +783,15 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             { }
             Element parameter1 = Check(circleexpr.P1, scope);
             if (parameter1.Type != ElementType.POINT) OnErrorFound(circleexpr.P1, $"Expected `POINT` as first parameter but {parameter1.Type} was found");
+            try
+            {
+                Check(circleexpr.Radius, scope);
+            }
+            catch (RecoveryModeException)
+            { }
+            Element parameter2 = Check(circleexpr.Radius, scope);
+            if (parameter2.Type != ElementType.MEASURE) OnErrorFound(circleexpr.Radius, $"Expected `MEASURE` as first parameter but {parameter2.Type} was found");
+
             //if( circleexpr.Radius.Type != ElementType.NUMBER) OnErrorFound(circleexpr.Radius, $"Expected `NUMBER` as first parameter but {circleexpr.Radius.Type} was found");
         }
         return Element.CIRCLE;
@@ -752,6 +824,14 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             { }
             Element parameter3 = Check(circleexpr.P3, scope);
             if (parameter3.Type != ElementType.POINT) OnErrorFound(circleexpr.P3, $"Expected `POINT` as first parameter but {parameter3.Type} was found");
+            try
+            {
+                Check(circleexpr.Radius, scope);
+            }
+            catch (RecoveryModeException)
+            { }
+            Element parameter4 = Check(circleexpr.Radius, scope);
+            if (parameter4.Type != ElementType.MEASURE) OnErrorFound(circleexpr.Radius, $"Expected `MEASURE` as first parameter but {parameter4.Type} was found");
         }
         return Element.CIRCLE;
     }

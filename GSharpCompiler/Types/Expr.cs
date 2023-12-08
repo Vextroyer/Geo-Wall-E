@@ -498,9 +498,9 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
     public class Circle : Expr
     {
         public Expr P1 { get; private set; }
-        public Element.Number Radius { get; private set; }//radio  
+        public Expr Radius { get; private set; }//radio  
         public bool FullDeclarated { get; private set; }
-        public Circle(int line, int offset, char[] fileName, Expr _p1, Element.Number radius) : base(line, offset, fileName)
+        public Circle(int line, int offset, char[] fileName, Expr _p1, Expr radius) : base(line, offset, fileName)
         {
             P1 = _p1;
             Radius = radius;
@@ -510,6 +510,7 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
         {
             FullDeclarated = false;
             P1 = new Expr.Empty();
+            Radius= new Expr.Empty();
         }
         public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
         {
@@ -521,9 +522,9 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
         public Expr P1 { get; private set; }//first point
         public Expr P2 { get; private set; }//first point
         public Expr P3 { get; private set; }//first point
-        public Element.Number Radius { get; private set; }//radio 
+        public Expr Radius { get; private set; }//radio 
         public bool FullDeclarated { get; private set; }
-        public Arc(int _line, int _offset, char[] fileName, Expr _p1, Expr _p2, Expr _p3, Element.Number radius) : base(_line, _offset, fileName)
+        public Arc(int _line, int _offset, char[] fileName, Expr _p1, Expr _p2, Expr _p3, Expr radius) : base(_line, _offset, fileName)
         {
 
             P1 = _p1;
@@ -539,6 +540,7 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
             P1 = new Expr.Empty();
             P2 = new Expr.Empty();
             P3 = new Expr.Empty();
+            Radius=new Expr.Empty();
 
             FullDeclarated = false;
 

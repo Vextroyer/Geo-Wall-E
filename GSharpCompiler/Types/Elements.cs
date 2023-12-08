@@ -10,6 +10,7 @@ public interface IDrawable
 {
     public ElementType Type { get; }
     public Color Color { get; }
+    public Element.String Comment { get; set; }
 }
 
 public enum ElementType
@@ -43,8 +44,8 @@ public abstract class Element
     public static Element.Lines LINES = new Element.Lines(STRING, POINT, POINT, STRING, Color.BLACK);
     public static Element.Segment SEGMENT = new Element.Segment(STRING, POINT, POINT, STRING, Color.BLACK);
     public static Element.Ray RAY = new Element.Ray(STRING, POINT, POINT, STRING, Color.BLACK);
-    public static Element.Circle CIRCLE = new Element.Circle(STRING, POINT, NUMBER, STRING, Color.BLACK);
-    public static Element.Arc ARC = new Element.Arc(STRING, POINT,POINT,POINT, NUMBER, STRING, Color.BLACK);
+    public static Element.Circle CIRCLE = new Element.Circle(STRING, POINT, MEASURE, STRING, Color.BLACK);
+    public static Element.Arc ARC = new Element.Arc(STRING, POINT, POINT, POINT, MEASURE, STRING, Color.BLACK);
     public static Element.Measure MEASURE = new Element.Measure(1);
     ///<summary>Represents the undefined type. Use this instead of declaring new Undefined objects.</summary>
     public static Element.Undefined UNDEFINED = new Element.Undefined();
@@ -57,8 +58,10 @@ public abstract class Element
 
     #region operators
     //Upcast and operate
-    public static Element operator+(Element a,Element b){
-        switch(a.Type){
+    public static Element operator +(Element a, Element b)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return (a as Element.Arc)! + b;
             case ElementType.CIRCLE:
@@ -84,8 +87,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator-(Element a,Element b){
-        switch(a.Type){
+    public static Element operator -(Element a, Element b)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return (a as Element.Arc)! - b;
             case ElementType.CIRCLE:
@@ -111,8 +116,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator*(Element a,Element b){
-        switch(a.Type){
+    public static Element operator *(Element a, Element b)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return (a as Element.Arc)! * b;
             case ElementType.CIRCLE:
@@ -138,8 +145,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator/(Element a,Element b){
-        switch(a.Type){
+    public static Element operator /(Element a, Element b)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return (a as Element.Arc)! / b;
             case ElementType.CIRCLE:
@@ -165,8 +174,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator%(Element a,Element b){
-        switch(a.Type){
+    public static Element operator %(Element a, Element b)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return (a as Element.Arc)! % b;
             case ElementType.CIRCLE:
@@ -192,8 +203,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator^(Element a,Element b){
-        switch(a.Type){
+    public static Element operator ^(Element a, Element b)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return (a as Element.Arc)! ^ b;
             case ElementType.CIRCLE:
@@ -219,8 +232,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator>(Element a,Element b){
-        switch(a.Type){
+    public static Element operator >(Element a, Element b)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return (a as Element.Arc)! > b;
             case ElementType.CIRCLE:
@@ -246,8 +261,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator<(Element a,Element b){
-        switch(a.Type){
+    public static Element operator <(Element a, Element b)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return (a as Element.Arc)! < b;
             case ElementType.CIRCLE:
@@ -273,8 +290,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator>=(Element a,Element b){
-        switch(a.Type){
+    public static Element operator >=(Element a, Element b)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return (a as Element.Arc)! >= b;
             case ElementType.CIRCLE:
@@ -300,8 +319,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator<=(Element a,Element b){
-        switch(a.Type){
+    public static Element operator <=(Element a, Element b)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return (a as Element.Arc)! <= b;
             case ElementType.CIRCLE:
@@ -327,8 +348,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator-(Element a){
-        switch(a.Type){
+    public static Element operator -(Element a)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return -(a as Element.Arc)!;
             case ElementType.CIRCLE:
@@ -354,8 +377,10 @@ public abstract class Element
             default: throw new NotImplementedException("No operations allowed for this type");
         }
     }
-    public static Element operator!(Element a){
-        switch(a.Type){
+    public static Element operator !(Element a)
+    {
+        switch (a.Type)
+        {
             case ElementType.ARC:
                 return !(a as Element.Arc)!;
             case ElementType.CIRCLE:
@@ -395,21 +420,22 @@ public abstract class Element
         return Element.TRUE;
     }
     ///<summary>Elements whose type deduction is defered to runtime.</summary>
-    public class RuntimeDefined : Element{
-        public RuntimeDefined():base(ElementType.RUNTIME_DEFINED){}
-        public override Number EqualTo(Element other){throw new InvalidOperationException($"Operation not defined for type {this.Type}");}
-        public static Element.RuntimeDefined operator+(Element.RuntimeDefined a,Element b){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator-(Element.RuntimeDefined a,Element b){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator*(Element.RuntimeDefined a,Element b){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator/(Element.RuntimeDefined a,Element b){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator%(Element.RuntimeDefined a,Element b){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator^(Element.RuntimeDefined a,Element b){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator>(Element.RuntimeDefined a,Element b){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator<(Element.RuntimeDefined a,Element b){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator>=(Element.RuntimeDefined a,Element b){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator<=(Element.RuntimeDefined a,Element b){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator-(Element.RuntimeDefined a){return Element.RUNTIME_DEFINED;}
-        public static Element.RuntimeDefined operator!(Element.RuntimeDefined a){return Element.RUNTIME_DEFINED;}
+    public class RuntimeDefined : Element
+    {
+        public RuntimeDefined() : base(ElementType.RUNTIME_DEFINED) { }
+        public override Number EqualTo(Element other) { throw new InvalidOperationException($"Operation not defined for type {this.Type}"); }
+        public static Element.RuntimeDefined operator +(Element.RuntimeDefined a, Element b) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator -(Element.RuntimeDefined a, Element b) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator *(Element.RuntimeDefined a, Element b) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator /(Element.RuntimeDefined a, Element b) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator %(Element.RuntimeDefined a, Element b) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator ^(Element.RuntimeDefined a, Element b) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator >(Element.RuntimeDefined a, Element b) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator <(Element.RuntimeDefined a, Element b) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator >=(Element.RuntimeDefined a, Element b) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator <=(Element.RuntimeDefined a, Element b) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator -(Element.RuntimeDefined a) { return Element.RUNTIME_DEFINED; }
+        public static Element.RuntimeDefined operator !(Element.RuntimeDefined a) { return Element.RUNTIME_DEFINED; }
     }
     ///<summary>Represents the undefined type.</summary>
     public class Undefined : Element
@@ -420,18 +446,18 @@ public abstract class Element
             if (other.Type == this.Type) return TRUE;
             return FALSE;
         }
-        public static Element operator+(Element.Undefined a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Undefined a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator*(Element.Undefined a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator/(Element.Undefined a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator%(Element.Undefined a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator^(Element.Undefined a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>(Element.Undefined a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<(Element.Undefined a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>=(Element.Undefined a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<=(Element.Undefined a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Undefined a){throw new InvalidOperationException($"Operation not defined for type {a.Type}");}
-        public static Element operator!(Element.Undefined a){return TRUE;}
+        public static Element operator +(Element.Undefined a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Undefined a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator *(Element.Undefined a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator /(Element.Undefined a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator %(Element.Undefined a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator ^(Element.Undefined a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >(Element.Undefined a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <(Element.Undefined a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >=(Element.Undefined a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <=(Element.Undefined a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Undefined a) { throw new InvalidOperationException($"Operation not defined for type {a.Type}"); }
+        public static Element operator !(Element.Undefined a) { return TRUE; }
     }
 
     //Represents a real number.
@@ -456,135 +482,165 @@ public abstract class Element
         public override Number EqualTo(Element other)
         {
             if (other.Type != this.Type) return Element.FALSE;
-            if(Utils.Compare(this.Value,(other as Element.Number)!.Value) == 0)return Element.TRUE;
+            if (Utils.Compare(this.Value, (other as Element.Number)!.Value) == 0) return Element.TRUE;
             return Element.FALSE;
         }
-        public static Element operator+(Element.Number a,Element b){
+        public static Element operator +(Element.Number a, Element b)
+        {
             Element.Number other = GetAsNumber(b);
             return new Element.Number(a.Value + other.Value);
         }
-        public static Element operator-(Element.Number a,Element b){
+        public static Element operator -(Element.Number a, Element b)
+        {
             Element.Number other = GetAsNumber(b);
             return new Element.Number(a.Value - other.Value);
         }
-        public static Element operator*(Element.Number a,Element b){
-            switch(b.Type){
+        public static Element operator *(Element.Number a, Element b)
+        {
+            switch (b.Type)
+            {
                 case ElementType.NUMBER:
                     return new Element.Number(a.Value * (b as Element.Number)!.Value);
                 case ElementType.MEASURE:
                     return new Element.Measure(Math.Abs(a.Value) * (b as Element.Measure)!.Value);
-                default : throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");
+                default: throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");
             }
         }
-        public static Element operator/(Element.Number a,Element b){
+        public static Element operator /(Element.Number a, Element b)
+        {
             Element.Number other = GetAsNumber(b);
-            if(Utils.IsZero(other.Value))throw new DivideByZeroException();
+            if (Utils.IsZero(other.Value)) throw new DivideByZeroException();
             return new Element.Number(a.Value / other.Value);
         }
-        public static Element operator%(Element.Number a,Element b){
+        public static Element operator %(Element.Number a, Element b)
+        {
             Element.Number other = GetAsNumber(b);
-            if(Utils.IsZero(other.Value))throw new DivideByZeroException();
+            if (Utils.IsZero(other.Value)) throw new DivideByZeroException();
             return new Element.Number(a.Value % other.Value);
         }
-        public static Element operator^(Element.Number a,Element b){
+        public static Element operator ^(Element.Number a, Element b)
+        {
             Element.Number other = GetAsNumber(b);
-            return new Element.Number(float.Pow(a.Value,other.Value));
+            return new Element.Number(float.Pow(a.Value, other.Value));
         }
-        public static Element operator>(Element.Number a,Element b){
+        public static Element operator >(Element.Number a, Element b)
+        {
             Element.Number other = GetAsNumber(b);
-            if(a.Value > other.Value)return TRUE;
+            if (a.Value > other.Value) return TRUE;
             return FALSE;
         }
-        public static Element operator<(Element.Number a,Element b){
+        public static Element operator <(Element.Number a, Element b)
+        {
             Element.Number other = GetAsNumber(b);
-            if(a.Value < other.Value)return TRUE;
+            if (a.Value < other.Value) return TRUE;
             return FALSE;
         }
-        public static Element operator>=(Element.Number a,Element b){
+        public static Element operator >=(Element.Number a, Element b)
+        {
             Element.Number other = GetAsNumber(b);
-            if(a.Value >= other.Value)return TRUE;
+            if (a.Value >= other.Value) return TRUE;
             return FALSE;
         }
-        public static Element operator<=(Element.Number a,Element b){
+        public static Element operator <=(Element.Number a, Element b)
+        {
             Element.Number other = GetAsNumber(b);
-            if(a.Value <= other.Value)return TRUE;
+            if (a.Value <= other.Value) return TRUE;
             return FALSE;
         }
-        public static Element operator-(Element.Number a){
-            return new Element.Number(- a.Value);
+        public static Element operator -(Element.Number a)
+        {
+            return new Element.Number(-a.Value);
         }
-        public static Element operator!(Element.Number a){
-            if(Utils.IsZero(a.Value))return TRUE;
+        public static Element operator !(Element.Number a)
+        {
+            if (Utils.IsZero(a.Value)) return TRUE;
             return FALSE;
         }
-        private static Element.Number GetAsNumber(Element b){
-            if(b.Type == ElementType.NUMBER)return (b as Element.Number)!;
+        private static Element.Number GetAsNumber(Element b)
+        {
+            if (b.Type == ElementType.NUMBER) return (b as Element.Number)!;
             throw new InvalidOperationException($"Operation not defined for types {Element.NUMBER.Type} and {b.Type}");
         }
     }
     ///<summary>Represents measures.</summary>
-    public class Measure : Element{
-        public float Value {get; private set;}
-        public Measure(float value):base(ElementType.MEASURE){
+    public class Measure : Element
+    {
+        public float Value { get; private set; }
+        public Measure(float value) : base(ElementType.MEASURE)
+        {
             //Sanitize the input. A measure is always non negative.
             Value = Math.Abs(value);
         }
+        public Measure() : base(ElementType.MEASURE)
+        {
+            Value = Math.Abs(Utils.RandomCoordinate());
+        }
         public override Number EqualTo(Element other)
         {
-            if(other.Type != this.Type)return Element.FALSE;
-            if(Utils.Compare(this.Value,(other as Element.Measure)!.Value) == 0)return Element.TRUE;
+            if (other.Type != this.Type) return Element.FALSE;
+            if (Utils.Compare(this.Value, (other as Element.Measure)!.Value) == 0) return Element.TRUE;
             return Element.FALSE;
         }
         public override string ToString()
         {
             return Value.ToString() + 'u';
         }
-        public static Element operator+(Element.Measure a,Element b){
+        public static Element operator +(Element.Measure a, Element b)
+        {
             Element.Measure other = GetAsMeasure(b);
             return new Element.Measure(a.Value + other.Value);
         }
-        public static Element operator-(Element.Measure a,Element b){
+        public static Element operator -(Element.Measure a, Element b)
+        {
             Element.Measure other = GetAsMeasure(b);
             return new Element.Measure(float.Abs(a.Value - other.Value));
         }
-        public static Element operator*(Element.Measure a,Element b){
-            if(b.Type == ElementType.NUMBER)return new Element.Measure(a.Value * float.Abs(float.Truncate((b as Element.Number)!.Value)));
+        public static Element operator *(Element.Measure a, Element b)
+        {
+            if (b.Type == ElementType.NUMBER) return new Element.Measure(a.Value * float.Abs(float.Truncate((b as Element.Number)!.Value)));
             throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");
         }
-        public static Element operator/(Element.Measure a,Element b){
+        public static Element operator /(Element.Measure a, Element b)
+        {
             Element.Measure other = GetAsMeasure(b);
-            if(Utils.IsZero(other.Value))throw new DivideByZeroException();
+            if (Utils.IsZero(other.Value)) throw new DivideByZeroException();
             return new Element.Number(a.Value / other.Value);
         }
-        public static Element operator%(Element.Measure a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator^(Element.Measure a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>(Element.Measure a,Element b){
+        public static Element operator %(Element.Measure a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator ^(Element.Measure a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >(Element.Measure a, Element b)
+        {
             Element.Measure other = GetAsMeasure(b);
-            if(Utils.Compare(a.Value,other.Value) > 0)return TRUE;
+            if (Utils.Compare(a.Value, other.Value) > 0) return TRUE;
             return FALSE;
         }
-        public static Element operator<(Element.Measure a,Element b){
+        public static Element operator <(Element.Measure a, Element b)
+        {
             Element.Measure other = GetAsMeasure(b);
-            if(Utils.Compare(a.Value,other.Value) < 0)return TRUE;
+            if (Utils.Compare(a.Value, other.Value) < 0) return TRUE;
             return FALSE;
         }
-        public static Element operator>=(Element.Measure a,Element b){
+        public static Element operator >=(Element.Measure a, Element b)
+        {
             Element.Measure other = GetAsMeasure(b);
-            if(Utils.Compare(a.Value,other.Value) >= 0)return TRUE;
+            if (Utils.Compare(a.Value, other.Value) >= 0) return TRUE;
             return FALSE;
         }
-        public static Element operator<=(Element.Measure a,Element b){
+        public static Element operator <=(Element.Measure a, Element b)
+        {
             Element.Measure other = GetAsMeasure(b);
-            if(Utils.Compare(a.Value,other.Value) <= 0)return TRUE;
+            if (Utils.Compare(a.Value, other.Value) <= 0) return TRUE;
             return FALSE;
         }
-        public static Element operator-(Element.Measure a){throw new InvalidOperationException($"Operation not defined for type {a.Type}");}
-        public static Element operator!(Element.Measure a){
-            if(Utils.IsZero(a.Value))return TRUE;
+        public static Element operator -(Element.Measure a) { throw new InvalidOperationException($"Operation not defined for type {a.Type}"); }
+        public static Element operator !(Element.Measure a)
+        {
+            if (Utils.IsZero(a.Value)) return TRUE;
             return FALSE;
         }
-        private static Element.Measure GetAsMeasure(Element b){
-            if(b.Type == ElementType.MEASURE)return (b as Element.Measure)!;
+        private static Element.Measure GetAsMeasure(Element b)
+        {
+            if (b.Type == ElementType.MEASURE) return (b as Element.Measure)!;
             throw new InvalidOperationException($"Operation not defined for types {Element.MEASURE.Type} and {b.Type}");
         }
     }
@@ -613,19 +669,20 @@ public abstract class Element
             if (((Element.String)other).value == this.value) return Element.TRUE;
             return Element.FALSE;
         }
-        public static Element operator+(Element.String a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.String a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator*(Element.String a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator/(Element.String a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator%(Element.String a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator^(Element.String a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>(Element.String a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<(Element.String a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>=(Element.String a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<=(Element.String a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.String a){throw new InvalidOperationException($"Operation not defined for type {a.Type}");}
-        public static Element operator!(Element.String a){
-            if(a.Value == "")return TRUE;
+        public static Element operator +(Element.String a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.String a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator *(Element.String a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator /(Element.String a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator %(Element.String a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator ^(Element.String a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >(Element.String a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <(Element.String a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >=(Element.String a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <=(Element.String a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.String a) { throw new InvalidOperationException($"Operation not defined for type {a.Type}"); }
+        public static Element operator !(Element.String a)
+        {
+            if (a.Value == "") return TRUE;
             return FALSE;
         }
     }
@@ -750,7 +807,7 @@ public abstract class Element
     public class Point : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment{get; set;}
         public Element.Number x;
         public Element.Number y;
 
@@ -759,7 +816,7 @@ public abstract class Element
         public Point(Element.String _name, Element.Number _x, Element.Number _y, Element.String _comment, Color color) : base(ElementType.POINT)
         {
             name = _name;
-            comment = _comment;
+            Comment = _comment;
             x = _x;
             y = _y;
             Color = color;
@@ -767,7 +824,7 @@ public abstract class Element
         public Point(Color color) : base(ElementType.POINT)
         {
             name = new String();
-            comment = new String();
+            Comment = new String();
             x = new Element.Number(Utils.RandomCoordinate());
             y = new Element.Number(Utils.RandomCoordinate());
             Color = color;
@@ -776,7 +833,7 @@ public abstract class Element
         public Point() : base(ElementType.POINT)
         {
             name = new String();
-            comment = new String();
+            Comment = new String();
             x = new Element.Number(Utils.RandomCoordinate());
             y = new Element.Number(Utils.RandomCoordinate());
             Color = Color.BLACK;
@@ -785,7 +842,7 @@ public abstract class Element
 
         public override string ToString()
         {
-            return $"{name}({x},{y}){comment}";
+            return $"{name}({x},{y}){Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -793,30 +850,31 @@ public abstract class Element
             if (((Element.Point)other).x == this.x && ((Element.Point)other).y == this.y) return Element.TRUE;
             return Element.FALSE;
         }
-        public static Element.Measure Distance(Element.Point p1,Element.Point p2){
+        public static Element.Measure Distance(Element.Point p1, Element.Point p2)
+        {
             float xSquare = ((p1.x - p2.x) as Element.Number)!.Value;
             xSquare *= xSquare;
             float ySquare = ((p1.y - p2.y) as Element.Number)!.Value;
             ySquare *= ySquare;
             return new Element.Measure(float.Sqrt(xSquare + ySquare));
         }
-        public static Element operator+(Element.Point a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Point a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator*(Element.Point a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator/(Element.Point a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator%(Element.Point a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator^(Element.Point a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>(Element.Point a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<(Element.Point a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>=(Element.Point a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<=(Element.Point a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Point a){throw new InvalidOperationException($"Operation not defined for type {a.Type}");}
-        public static Element operator!(Element.Point a){return FALSE;}
+        public static Element operator +(Element.Point a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Point a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator *(Element.Point a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator /(Element.Point a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator %(Element.Point a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator ^(Element.Point a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >(Element.Point a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <(Element.Point a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >=(Element.Point a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <=(Element.Point a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Point a) { throw new InvalidOperationException($"Operation not defined for type {a.Type}"); }
+        public static Element operator !(Element.Point a) { return FALSE; }
     }
     public class Lines : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment {get;set;}
         public Element.Point p1;
         public Element.Point p2;
 
@@ -825,7 +883,7 @@ public abstract class Element
         public Lines(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.LINE)
         {
             name = _name;
-            comment = _comment;
+            Comment = _comment;
             p1 = _p1;
             p2 = _p2;
             Color = color;
@@ -833,7 +891,7 @@ public abstract class Element
         public Lines(Color color) : base(ElementType.LINE)
         {
             name = new String();
-            comment = new String();
+            Comment = new String();
             p1 = new Element.Point();
             p2 = new Element.Point();
             Color = color;
@@ -841,7 +899,7 @@ public abstract class Element
 
         public override string ToString()
         {
-            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){comment}";
+            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -849,23 +907,23 @@ public abstract class Element
             if (((Element.Lines)other).p1 == this.p1 && ((Element.Lines)other).p2 == this.p2) return Element.TRUE;
             return Element.FALSE;
         }
-        public static Element operator+(Element.Lines a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Lines a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator*(Element.Lines a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator/(Element.Lines a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator%(Element.Lines a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator^(Element.Lines a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>(Element.Lines a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<(Element.Lines a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>=(Element.Lines a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<=(Element.Lines a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Lines a){throw new InvalidOperationException($"Operation not defined for type {a.Type}");}
-        public static Element operator!(Element.Lines a){return FALSE;}
+        public static Element operator +(Element.Lines a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Lines a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator *(Element.Lines a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator /(Element.Lines a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator %(Element.Lines a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator ^(Element.Lines a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >(Element.Lines a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <(Element.Lines a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >=(Element.Lines a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <=(Element.Lines a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Lines a) { throw new InvalidOperationException($"Operation not defined for type {a.Type}"); }
+        public static Element operator !(Element.Lines a) { return FALSE; }
     }
     public class Segment : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment {get;set;}
         public Element.Point p1;
         public Element.Point p2;
 
@@ -874,7 +932,7 @@ public abstract class Element
         public Segment(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.SEGMENT)
         {
             name = _name;
-            comment = _comment;
+           Comment = _comment;
             p1 = _p1;
             p2 = _p2;
             Color = color;
@@ -882,7 +940,7 @@ public abstract class Element
         public Segment(Color color) : base(ElementType.SEGMENT)
         {
             name = new String();
-            comment = new String();
+            Comment = new String();
             p1 = new Element.Point();
             p2 = new Element.Point();
             Color = color;
@@ -890,7 +948,7 @@ public abstract class Element
 
         public override string ToString()
         {
-            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){comment}";
+            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -898,23 +956,23 @@ public abstract class Element
             if (((Element.Segment)other).p1 == this.p1 && ((Element.Segment)other).p2 == this.p2) return Element.TRUE;
             return Element.FALSE;
         }
-        public static Element operator+(Element.Segment a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Segment a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator*(Element.Segment a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator/(Element.Segment a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator%(Element.Segment a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator^(Element.Segment a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>(Element.Segment a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<(Element.Segment a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>=(Element.Segment a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<=(Element.Segment a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Segment a){throw new InvalidOperationException($"Operation not defined for type {a.Type}");}
-        public static Element operator!(Element.Segment a){return FALSE;}
+        public static Element operator +(Element.Segment a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Segment a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator *(Element.Segment a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator /(Element.Segment a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator %(Element.Segment a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator ^(Element.Segment a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >(Element.Segment a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <(Element.Segment a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >=(Element.Segment a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <=(Element.Segment a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Segment a) { throw new InvalidOperationException($"Operation not defined for type {a.Type}"); }
+        public static Element operator !(Element.Segment a) { return FALSE; }
     }
     public class Ray : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment{get;set;}
         public Element.Point p1;
         public Element.Point p2;
 
@@ -923,7 +981,7 @@ public abstract class Element
         public Ray(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.RAY)
         {
             name = _name;
-            comment = _comment;
+            Comment = _comment;
             p1 = _p1;
             p2 = _p2;
             Color = color;
@@ -931,7 +989,7 @@ public abstract class Element
         public Ray(Color color) : base(ElementType.RAY)
         {
             name = new String();
-            comment = new String();
+            Comment = new String();
             p1 = new Element.Point();
             p2 = new Element.Point();
             Color = color;
@@ -940,7 +998,7 @@ public abstract class Element
 
         public override string ToString()
         {
-            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){comment}";
+            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -948,32 +1006,32 @@ public abstract class Element
             if (((Element.Ray)other).p1 == this.p1 && ((Element.Ray)other).p2 == this.p2) return Element.TRUE;
             return Element.FALSE;
         }
-        public static Element operator+(Element.Ray a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Ray a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator*(Element.Ray a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator/(Element.Ray a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator%(Element.Ray a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator^(Element.Ray a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>(Element.Ray a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<(Element.Ray a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>=(Element.Ray a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<=(Element.Ray a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Ray a){throw new InvalidOperationException($"Operation not defined for type {a.Type}");}
-        public static Element operator!(Element.Ray a){return FALSE;}
+        public static Element operator +(Element.Ray a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Ray a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator *(Element.Ray a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator /(Element.Ray a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator %(Element.Ray a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator ^(Element.Ray a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >(Element.Ray a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <(Element.Ray a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >=(Element.Ray a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <=(Element.Ray a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Ray a) { throw new InvalidOperationException($"Operation not defined for type {a.Type}"); }
+        public static Element operator !(Element.Ray a) { return FALSE; }
     }
     public class Circle : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment {get;set;}
         public Element.Point p1;
-        public Element.Number radius;
+        public Element.Measure radius;
 
         public Color Color { get; private set; }
 
-        public Circle(Element.String _name, Element.Point _p1, Element.Number _radius, Element.String _comment, Color color) : base(ElementType.CIRCLE)
+        public Circle(Element.String _name, Element.Point _p1, Element.Measure _radius, Element.String _comment, Color color) : base(ElementType.CIRCLE)
         {
             name = _name;
-            comment = _comment;
+            Comment = _comment;
             p1 = _p1;
             radius = _radius;
             Color = color;
@@ -982,8 +1040,8 @@ public abstract class Element
         {
             p1 = new Element.Point();
             name = new String();
-            comment = new String();
-            radius = new Element.Number(Utils.RandomCoordinate());
+            Comment = new String();
+            radius = new Element.Measure();
             Color = color;
 
         }
@@ -991,7 +1049,7 @@ public abstract class Element
 
         public override string ToString()
         {
-            return $"{name}({p1.x},{p1.y}){radius}{comment}";
+            return $"{name}({p1.x},{p1.y}){radius}{Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -999,34 +1057,34 @@ public abstract class Element
             if (((Element.Circle)other).p1 == this.p1 && ((Element.Circle)other).radius == this.radius) return Element.TRUE;
             return Element.FALSE;
         }
-        public static Element operator+(Element.Circle a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Circle a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator*(Element.Circle a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator/(Element.Circle a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator%(Element.Circle a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator^(Element.Circle a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>(Element.Circle a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<(Element.Circle a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>=(Element.Circle a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<=(Element.Circle a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Circle a){throw new InvalidOperationException($"Operation not defined for type {a.Type}");}
-        public static Element operator!(Element.Circle a){return FALSE;}
+        public static Element operator +(Element.Circle a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Circle a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator *(Element.Circle a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator /(Element.Circle a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator %(Element.Circle a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator ^(Element.Circle a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >(Element.Circle a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <(Element.Circle a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >=(Element.Circle a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <=(Element.Circle a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Circle a) { throw new InvalidOperationException($"Operation not defined for type {a.Type}"); }
+        public static Element operator !(Element.Circle a) { return FALSE; }
     }
     public class Arc : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment{get;set;}
         public Element.Point p1;
         public Element.Point p2;
         public Element.Point p3;
-        public Element.Number radius;
+        public Element.Measure radius;
 
         public Color Color { get; private set; }
 
-        public Arc(Element.String _name, Element.Point _p1, Element.Point _p2, Element.Point _p3, Element.Number _radius, Element.String _comment, Color color) : base(ElementType.ARC)
+        public Arc(Element.String _name, Element.Point _p1, Element.Point _p2, Element.Point _p3, Element.Measure _radius, Element.String _comment, Color color) : base(ElementType.ARC)
         {
             name = _name;
-            comment = _comment;
+            Comment = _comment;
             p1 = _p1;
             p2 = _p2;
             p3 = _p3;
@@ -1038,16 +1096,16 @@ public abstract class Element
             p1 = new Element.Point();
             p2 = new Element.Point();
             p3 = new Element.Point();
-            radius = new Element.Number(Utils.RandomCoordinate());
+            radius = new Element.Measure();
             name = new String();
-            comment = new String();
+            Comment = new String();
             Color = color;
         }
 
 
         public override string ToString()
         {
-            return $"{name}({p1.x},{p1.y})({p2.x},{p2.y})({p3.x},{p3.y}){radius}{comment}";
+            return $"{name}({p1.x},{p1.y})({p2.x},{p2.y})({p3.x},{p3.y}){radius}{Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -1055,17 +1113,17 @@ public abstract class Element
             if (((Element.Arc)other).p1 == this.p1 && ((Element.Arc)other).p2 == this.p2 && ((Element.Arc)other).p3 == this.p3 && ((Element.Arc)other).radius == this.radius) return Element.TRUE;
             return Element.FALSE;
         }
-        public static Element operator+(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator*(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator/(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator%(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator^(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator>=(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator<=(Element.Arc a,Element b){throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}");}
-        public static Element operator-(Element.Arc a){throw new InvalidOperationException($"Operation not defined for type {a.Type}");}
-        public static Element operator!(Element.Arc a){return FALSE;}
+        public static Element operator +(Element.Arc a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Arc a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator *(Element.Arc a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator /(Element.Arc a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator %(Element.Arc a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator ^(Element.Arc a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >(Element.Arc a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <(Element.Arc a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator >=(Element.Arc a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator <=(Element.Arc a, Element b) { throw new InvalidOperationException($"Operation not defined for types {a.Type} and {b.Type}"); }
+        public static Element operator -(Element.Arc a) { throw new InvalidOperationException($"Operation not defined for type {a.Type}"); }
+        public static Element operator !(Element.Arc a) { return FALSE; }
     }
 };
