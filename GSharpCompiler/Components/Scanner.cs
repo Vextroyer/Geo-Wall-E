@@ -133,8 +133,8 @@ class Scanner : GSharpCompilerComponent
         }
     }
     private bool TryParseThreeDots(){
-        if(Peek == '.' && PeekNext == '.' && current + 2 < source.Length && source[current + 2]=='.'){
-            Advance();Advance();Advance();//Consume the three dots
+        if(Peek == '.' && PeekNext == '.'){
+            Advance();Advance();//Consume the three dots
             AddToken(TokenType.THREE_DOTS);
             return true;
         }
