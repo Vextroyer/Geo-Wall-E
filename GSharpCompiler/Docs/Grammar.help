@@ -39,8 +39,9 @@ VariableOrCallExpr = CallExpr | VariableExpr | PrimaryExpr;
     CallExpr = (ID '(' Parameters ')') | MeasureCall;
         Parameters = (Expr , (',' Expr)* )? ;
     MeasureCall = 'measure' '(' Expr ',' Expr ')' ;
-PrimaryExpr = NUMBER | STRING | GroupedExpr | EMPTY;
+PrimaryExpr = NUMBER | STRING | GroupedExpr | SequenceExpr |EMPTY;
     GroupedExpr = '(' Expr ')';
+    SequenceExpr = '{' (Expr (',' Expr)* )? | (Expr '...' Expr?) '}';
 
 
 <!-- Expr = 'point' ('(' NUMBER ',' NUMBER ')') ; //Point expression -->

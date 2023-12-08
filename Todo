@@ -28,7 +28,7 @@ f(x) = if x == 1 then 1 else let point p; print p; draw p; in f(x - 1);
 
 print f(10);
 
-Add operations tables, data structure.
+Make that declaring a delegate who dont return Element or operates over a non-element gives error.
 Redesign equality comparisons.
 
 Interpreter fails on this case
@@ -38,3 +38,12 @@ f() = let
       in a;
 
 print f();
+
+Hacer sistema de tipos como objetos.
+
+Fix bug :
+point p1;
+point p2;
+point p3;
+m = measure(p1,p2);
+print {point(2,3),arc(p1,p2,p3,m)};)

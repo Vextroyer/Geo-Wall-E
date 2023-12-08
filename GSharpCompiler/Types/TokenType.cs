@@ -7,6 +7,9 @@ enum TokenType{
     //Operators.
     EQUAL,BANG,MINUS,CARET,STAR,SLASH,PERCENT,PLUS,LESS,LESS_EQUAL,GREATER,GREATER_EQUAL,EQUAL_EQUAL,BANG_EQUAL,
 
+    //Sequences
+    LEFT_BRACE,RIGHT_BRACE,THREE_DOTS,
+
     //If-then-else expression.
     IF,THEN,ELSE,AND,OR,
 

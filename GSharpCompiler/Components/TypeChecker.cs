@@ -287,7 +287,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         {
             try
             {
-                if ((-rValue).Type == ElementType.NUMBER) unaryMinusExpr.RequiresRuntimeCheck = false;
+                if( OperationTable.Operate("-",rValue).Type == ElementType.NUMBER )unaryMinusExpr.RequiresRuntimeCheck = false;
             }
             catch (InvalidOperationException e)
             {
@@ -307,14 +307,11 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public Element VisitBinaryProductExpr(Expr.Binary.Product productExpr, Scope scope)
     {
-        Element left = Check(productExpr.Left, scope);
-        Element right = Check(productExpr.Right, scope);
-        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
-        {
-            try
-            {
-                switch ((left * right).Type)
-                {
+        Element left = Check(productExpr.Left,scope);
+        Element right = Check(productExpr.Right,scope);
+        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
+            try{
+                switch(OperationTable.Operate("*",left,right).Type{
                     case ElementType.NUMBER:
                         productExpr.RequiresRuntimeCheck = false;
                         return Element.NUMBER;
@@ -334,16 +331,12 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public Element VisitBinaryDivisionExpr(Expr.Binary.Division divisionExpr, Scope scope)
     {
-        Element left = Check(divisionExpr.Left, scope);
-        Element right = Check(divisionExpr.Right, scope);
-        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
-        {
-            try
-            {
-                try
-                {
-                    switch ((left / right).Type)
-                    {
+        Element left = Check(divisionExpr.Left,scope);
+        Element right = Check(divisionExpr.Right,scope);
+        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
+            try{
+                try{
+                    switch(OperationTable.Operate("/",left,right).Type){
                         case ElementType.NUMBER:
                             divisionExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
@@ -367,14 +360,11 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public Element VisitBinarySumExpr(Expr.Binary.Sum sumExpr, Scope scope)
     {
-        Element left = Check(sumExpr.Left, scope);
-        Element right = Check(sumExpr.Right, scope);
-        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
-        {
-            try
-            {
-                switch ((left + right).Type)
-                {
+        Element left = Check(sumExpr.Left,scope);
+        Element right = Check(sumExpr.Right,scope);
+        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
+            try{
+                switch(OperationTable.Operate("+",left,right).Type){
                     case ElementType.NUMBER:
                         sumExpr.RequiresRuntimeCheck = false;
                         return Element.NUMBER;
@@ -394,14 +384,11 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public Element VisitBinaryDifferenceExpr(Expr.Binary.Difference differenceExpr, Scope scope)
     {
-        Element left = Check(differenceExpr.Left, scope);
-        Element right = Check(differenceExpr.Right, scope);
-        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
-        {
-            try
-            {
-                switch ((left - right).Type)
-                {
+        Element left = Check(differenceExpr.Left,scope);
+        Element right = Check(differenceExpr.Right,scope);
+        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
+            try{
+                switch(OperationTable.Operate("-",left,right).Type){
                     case ElementType.NUMBER:
                         differenceExpr.RequiresRuntimeCheck = false;
                         return Element.NUMBER;
@@ -421,16 +408,12 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public Element VisitBinaryLessExpr(Expr.Binary.Less lessExpr, Scope scope)
     {
-        Element left = Check(lessExpr.Left, scope);
-        Element right = Check(lessExpr.Right, scope);
-        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
-        {
-            try
-            {
-                try
-                {
-                    switch ((left < right).Type)
-                    {
+        Element left = Check(lessExpr.Left,scope);
+        Element right = Check(lessExpr.Right,scope);
+        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
+            try{
+                try{
+                    switch(OperationTable.Operate("<",left,right).Type){
                         case ElementType.NUMBER:
                             lessExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
@@ -449,16 +432,12 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public Element VisitBinaryLessEqualExpr(Expr.Binary.LessEqual lessEqualExpr, Scope scope)
     {
-        Element left = Check(lessEqualExpr.Left, scope);
-        Element right = Check(lessEqualExpr.Right, scope);
-        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
-        {
-            try
-            {
-                try
-                {
-                    switch ((left <= right).Type)
-                    {
+        Element left = Check(lessEqualExpr.Left,scope);
+        Element right = Check(lessEqualExpr.Right,scope);
+        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
+            try{
+                try{
+                    switch(OperationTable.Operate("<",left,right).Type){
                         case ElementType.NUMBER:
                             lessEqualExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
@@ -477,16 +456,12 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public Element VisitBinaryGreaterExpr(Expr.Binary.Greater greaterExpr, Scope scope)
     {
-        Element left = Check(greaterExpr.Left, scope);
-        Element right = Check(greaterExpr.Right, scope);
-        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
-        {
-            try
-            {
-                try
-                {
-                    switch ((left > right).Type)
-                    {
+        Element left = Check(greaterExpr.Left,scope);
+        Element right = Check(greaterExpr.Right,scope);
+        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
+            try{
+                try{
+                    switch(OperationTable.Operate(">",left,right).Type){
                         case ElementType.NUMBER:
                             greaterExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
@@ -505,16 +480,12 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public Element VisitBinaryGreaterEqualExpr(Expr.Binary.GreaterEqual greaterEqualExpr, Scope scope)
     {
-        Element left = Check(greaterEqualExpr.Left, scope);
-        Element right = Check(greaterEqualExpr.Right, scope);
-        if (left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED)
-        {
-            try
-            {
-                try
-                {
-                    switch ((left >= right).Type)
-                    {
+        Element left = Check(greaterEqualExpr.Left,scope);
+        Element right = Check(greaterEqualExpr.Right,scope);
+        if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
+            try{
+                try{
+                    switch((OperationTable.Operate(">=",left,right)).Type){
                         case ElementType.NUMBER:
                             greaterEqualExpr.RequiresRuntimeCheck = false;
                             return Element.NUMBER;
@@ -834,5 +805,9 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
             if (parameter4.Type != ElementType.MEASURE) OnErrorFound(circleexpr.Radius, $"Expected `MEASURE` as first parameter but {parameter4.Type} was found");
         }
         return Element.CIRCLE;
+    }
+
+    public Element VisitSequenceExpr(Expr.Sequence expr, Scope scope){
+        return Element.RUNTIME_DEFINED;
     }
 }

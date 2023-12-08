@@ -3,6 +3,8 @@ Expressions are instructions that represents values.
 On this case expressions represent elements.
 */
 
+using System.Collections;
+
 namespace GSharpCompiler;
 
 interface IVisitorExpr<T>
@@ -37,6 +39,7 @@ interface IVisitorExpr<T>
     public T VisitRayExpr(Expr.Ray expr, Scope scope);
     public T VisitCircleExpr(Expr.Circle expr, Scope scope);
     public T VisitArcExpr(Expr.Arc expr, Scope scope);
+    public T VisitSequenceExpr(Expr.Sequence expr, Scope scope);
 }
 interface IVisitableExpr
 {
@@ -553,4 +556,36 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
         }
     }
 
+    ///<summary>Sequence expressions.</summary>
+    public class Sequence : Expr, IEnumerable<Expr>{
+        public Expr First {get => Expressions[0];}
+        public Expr Second {get => Expressions[1];}
+        ///<summary>Does this sequence has three dots.</summary>
+        public bool HasTreeDots {get; private set;}
+        ///<summary>The elements of the sequence</summary>
+        public List<Expr> Expressions {get; private set;}
+        ///<summary>Is this sequence empty.</summary>
+        public bool IsEmpty {get => Expressions.Count == 0;}
+        public int Count => Expressions.Count;
+        
+        public Sequence(int line,int offset,char[] fileName,bool hasTreeDots,List<Expr> sequence):base(line,offset,fileName){
+            HasTreeDots = hasTreeDots;
+            Expressions = sequence;
+            if(HasTreeDots && (sequence.Count == 0 || sequence.Count > 2))throw new Exception($"Tried to form a dotted sequence with {sequence.Count} elements");
+        }
+        public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
+        {
+            return visitor.VisitSequenceExpr(this,scope);
+        }
+
+        IEnumerator<Expr> IEnumerable<Expr>.GetEnumerator()
+        {
+            return ((IEnumerable<Expr>)Expressions).GetEnumerator();
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return ((IEnumerable)Expressions).GetEnumerator();
+        }
+    }
 }

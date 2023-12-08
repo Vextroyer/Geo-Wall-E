@@ -27,11 +27,11 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
 
     public string VisitPointStmt(Stmt.Point stmt, Scope scope)
     {
-        return $"point({stmt.Id.Lexeme},{stmt.Comment},{stmt.X},{stmt.Y})";
+        return $"point({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.X)},{Print(stmt.Y)})";
     }
     public string VisitPointExpr(Expr.Point expr, Scope scope)
     {
-        return $"point({expr.X},{expr.Y})";
+        return $"point({Print(expr.X)},{Print(expr.Y)})";
     }
     public string VisitLinesStmt(Stmt.Lines stmt, Scope scope)
     {
@@ -237,5 +237,8 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
     }
     public string VisitMeasureExpr(Expr.Measure expr,Scope scope){
         return $"measure({Print(expr.P1)},{Print(expr.P2)})";
+    }
+    public string VisitSequenceExpr(Expr.Sequence expr, Scope scope){
+        return "sequence";
     }
 }
