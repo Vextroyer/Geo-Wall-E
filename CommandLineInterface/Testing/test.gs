@@ -256,3 +256,9 @@ point(3,-456.3) p1;
 point(-265,2) p2;
 point(12,5) p3;
 in {p1,p2,p3};
+
+print {1 ... 3};
+
+print let
+f(x) = if x <= 0 then 1 else f(x-1) + f(x-2);
+in {f(2) ... f(6)};

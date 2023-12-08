@@ -556,12 +556,15 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
 
     ///<summary>Sequence expressions.</summary>
     public class Sequence : Expr, IEnumerable<Expr>{
+        public Expr First {get => Expressions[0];}
+        public Expr Second {get => Expressions[1];}
         ///<summary>Does this sequence has three dots.</summary>
         public bool HasTreeDots {get; private set;}
         ///<summary>The elements of the sequence</summary>
         public List<Expr> Expressions {get; private set;}
         ///<summary>Is this sequence empty.</summary>
         public bool IsEmpty {get => Expressions.Count == 0;}
+        public int Count => Expressions.Count;
         
         public Sequence(int line,int offset,char[] fileName,bool hasTreeDots,List<Expr> sequence):base(line,offset,fileName){
             HasTreeDots = hasTreeDots;

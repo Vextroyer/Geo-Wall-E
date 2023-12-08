@@ -459,7 +459,17 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     ///<summary>Build a sequence from a sequence expr.</summary>
     public Element VisitSequenceExpr(Expr.Sequence sequence,Scope scope){
         if(sequence.HasTreeDots){
-            throw new NotImplementedException();
+            Element start = Evaluate(sequence.First,scope);
+            if(start.Type != ElementType.NUMBER)throw new RuntimeException(sequence.First,$"Dotted sequece contains {start.Type} but can only contain NUMBER");
+            float startValue = (start as Element.Number)!.Value;
+            if(sequence.Count == 2){
+                Element end = Evaluate(sequence.Second,scope);
+                if(end.Type != ElementType.NUMBER)throw new RuntimeException(sequence.Second,$"Dotted sequece contains {end.Type} but can only contain NUMBER");
+                float endValue = (end as Element.Number)!.Value;
+                if(startValue > endValue)throw new RuntimeException(sequence,$"Sequence range is inverted : [{startValue} , {endValue}]");
+                return new Element.Sequence.Interval(startValue,endValue);
+            }
+            return new Element.Sequence.Interval(startValue,float.PositiveInfinity);
         }
         ElementType? type = null;
         List<Element> elements = new List<Element>();

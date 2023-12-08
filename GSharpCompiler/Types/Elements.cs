@@ -528,11 +528,75 @@ public abstract class Element
         public abstract IEnumerator<Element> GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        // public abstract Element Current {get;}
-        // public abstract bool MoveNext();
-        // public abstract void Reset();
-        // public abstract void Dispose();
-        // object IEnumerator.Current {get => Current;}
+        ///<summary>A sequence of numbers</summary>
+        public class Interval : Sequence{
+            public float Min {get; private set;}
+            public float Max {get; private set;}
+            public override bool IsFinite => !float.IsPositiveInfinity(Max);
+            public override bool IsEmpty => false;
+            public override Number EqualTo(Element other)
+            {
+                throw new NotImplementedException();
+            }
+            public override Element Count {
+                get {
+                    if(IsFinite)return new Element.Number(Max - Min + 1);
+                    return Element.UNDEFINED;
+                }
+            }
+            public Interval(float min,float max){
+                if(float.IsInfinity(min))throw new Exception("Cannot create a interval with infite minimum value");
+                if(float.IsNegativeInfinity(max))throw new Exception("Maximum cannot be negative infinity");
+                if(min > max)throw new Exception("Interval order is exchanged");
+                Min = float.Truncate(min);
+                Max = float.Truncate(max);
+            }
+            public override string ToString()
+            {
+                if(!IsFinite)return "Infinite Sequence";
+                System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
+                stringBuilder.Append('{');
+                for(float i = Min;i <= Max;++i){
+                    stringBuilder.Append(i);
+                    if(i < Max)stringBuilder.Append(',');
+                }
+                stringBuilder.Append('}');
+                return stringBuilder.ToString();
+            }
+            class IntervalEnumerator : IEnumerator<Element>
+            {
+                float Min;
+                float Max;
+                float current;
+                bool Finite;
+                public IntervalEnumerator(float min,float max,bool finite){
+                    Min = min;
+                    Max = max;
+                    Finite = finite;
+                    Reset();
+                }
+                public Element Current => new Element.Number(current);
+
+                object IEnumerator.Current => Current;
+
+                public void Dispose()
+                {
+                    
+                }
+
+                public bool MoveNext()
+                {
+                    if(!Finite)return true;
+                    return current <= Max;
+                }
+
+                public void Reset()
+                {
+                    current = Min;
+                }
+            }
+            public override IEnumerator<Element> GetEnumerator() => new IntervalEnumerator(Min,Max,IsFinite);
+        }
 
         ///<summary>A finite sequence of Element.</summary>
         public class Listing : Sequence {
