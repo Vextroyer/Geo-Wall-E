@@ -416,6 +416,8 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
         }
         public Point(int line, int offset, char[] fileName) : base(line, offset, fileName)
         {
+            X=Expr.EMPTY;
+            Y=Expr.EMPTY;
             FullDeclarated = false;
         }
         public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
