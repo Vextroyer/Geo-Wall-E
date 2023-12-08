@@ -58,7 +58,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         {
             scope.SetArgument(point.Id.Lexeme, new Element.Point(new Element.String(point.Id.Lexeme), (Element.Number)Evaluate(point.X, scope), (Element.Number)Evaluate(point.Y, scope), point.Comment, colorStack.Top));
         }
-        else {System.Console.WriteLine("VICTOR"); 
+        else {
             scope.SetArgument(point.Id.Lexeme, new Element.Point(colorStack.Top)); }
         return null;
     }
@@ -96,7 +96,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     {
         if (circle.FullDeclarated)
         {
-            scope.SetArgument(circle.Id.Lexeme, new Element.Circle(new Element.String(circle.Id.Lexeme), (Element.Point)Evaluate(circle.P1, scope), circle.Radius, circle.Comment, colorStack.Top));
+            scope.SetArgument(circle.Id.Lexeme, new Element.Circle(new Element.String(circle.Id.Lexeme), (Element.Point)Evaluate(circle.P1, scope),(Element.Measure)Evaluate(circle.Radius,scope), circle.Comment, colorStack.Top));
         }
         else { scope.SetArgument(circle.Id.Lexeme, new Element.Circle(colorStack.Top)); }
         return null;
@@ -104,7 +104,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     public object? VisitArcStmt(Stmt.Arc arc, Scope scope)
     {if(arc.FullDeclarated)
     {
-        scope.SetArgument(arc.Id.Lexeme, new Element.Arc(new Element.String(arc.Id.Lexeme), (Element.Point)Evaluate(arc.P1, scope), (Element.Point)Evaluate(arc.P2, scope), (Element.Point)Evaluate(arc.P3, scope), arc.Radius, arc.Comment, colorStack.Top));
+        scope.SetArgument(arc.Id.Lexeme, new Element.Arc(new Element.String(arc.Id.Lexeme), (Element.Point)Evaluate(arc.P1, scope), (Element.Point)Evaluate(arc.P2, scope), (Element.Point)Evaluate(arc.P3, scope), (Element.Measure)Evaluate(arc.Radius,scope), arc.Comment, colorStack.Top));
     }else{scope.SetArgument(arc.Id.Lexeme,new Element.Arc(colorStack.Top));}
         return null;
     }
@@ -135,6 +135,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     public object? VisitDrawStmt(Stmt.Draw stmt, Scope scope)
     {
         IDrawable drawableElement = (IDrawable)Evaluate(stmt._Expr, scope);
+        drawableElement.Comment=stmt.Comment;
         drawables.Add(drawableElement);
         // Esto lleva arreglo futuro
         return null;
@@ -400,7 +401,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         {
             if (circleExpr.FullDeclarated)
             {
-                return new Element.Circle(new Element.String(""), (Element.Point)Evaluate(circleExpr.P1, scope), circleExpr.Radius, new Element.String(""), colorStack.Top);
+                return new Element.Circle(new Element.String(""), (Element.Point)Evaluate(circleExpr.P1, scope), (Element.Measure)Evaluate(circleExpr.Radius,scope), new Element.String(""), colorStack.Top);
             }
             else { return new Element.Circle(colorStack.Top); }
         }
@@ -415,7 +416,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         {
             if (circleExpr.FullDeclarated)
             {
-                return new Element.Arc(new Element.String(""), (Element.Point)Evaluate(circleExpr.P1, scope), (Element.Point)Evaluate(circleExpr.P2, scope), (Element.Point)Evaluate(circleExpr.P3, scope), circleExpr.Radius, new Element.String(""), colorStack.Top);
+                return new Element.Arc(new Element.String(""), (Element.Point)Evaluate(circleExpr.P1, scope), (Element.Point)Evaluate(circleExpr.P2, scope), (Element.Point)Evaluate(circleExpr.P3, scope), (Element.Measure)Evaluate(circleExpr.Radius,scope), new Element.String(""), colorStack.Top);
             }
             else
             { return new Element.Arc(colorStack.Top); }

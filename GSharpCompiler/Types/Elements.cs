@@ -10,6 +10,7 @@ public interface IDrawable
 {
     public ElementType Type { get; }
     public Color Color { get; }
+    public Element.String Comment { get; set; }
 }
 
 public enum ElementType{
@@ -43,8 +44,8 @@ public abstract class Element
     public static Element.Lines LINES = new Element.Lines(STRING, POINT, POINT, STRING, Color.BLACK);
     public static Element.Segment SEGMENT = new Element.Segment(STRING, POINT, POINT, STRING, Color.BLACK);
     public static Element.Ray RAY = new Element.Ray(STRING, POINT, POINT, STRING, Color.BLACK);
-    public static Element.Circle CIRCLE = new Element.Circle(STRING, POINT, NUMBER, STRING, Color.BLACK);
-    public static Element.Arc ARC = new Element.Arc(STRING, POINT,POINT,POINT, NUMBER, STRING, Color.BLACK);
+    public static Element.Circle CIRCLE = new Element.Circle(STRING, POINT, MEASURE, STRING, Color.BLACK);
+    public static Element.Arc ARC = new Element.Arc(STRING, POINT, POINT, POINT, MEASURE, STRING, Color.BLACK);
     public static Element.Measure MEASURE = new Element.Measure(1);
     ///<summary>Represents the undefined type. Use this instead of declaring new Undefined objects.</summary>
     public static Element.Undefined UNDEFINED = new Element.Undefined();
@@ -55,7 +56,7 @@ public abstract class Element
     public static Element.RuntimeDefined RUNTIME_DEFINED = new Element.RuntimeDefined();
     #endregion constants
 
-        protected Element(ElementType type)
+    protected Element(ElementType type)
     {
         Type = type;
     }
@@ -104,21 +105,27 @@ public abstract class Element
         public override Number EqualTo(Element other)
         {
             if (other.Type != this.Type) return Element.FALSE;
-            if(Utils.Compare(this.Value,(other as Element.Number)!.Value) == 0)return Element.TRUE;
+            if (Utils.Compare(this.Value, (other as Element.Number)!.Value) == 0) return Element.TRUE;
             return Element.FALSE;
         }
     }
     ///<summary>Represents measures.</summary>
-    public class Measure : Element{
-        public float Value {get; private set;}
-        public Measure(float value):base(ElementType.MEASURE){
+    public class Measure : Element
+    {
+        public float Value { get; private set; }
+        public Measure(float value) : base(ElementType.MEASURE)
+        {
             //Sanitize the input. A measure is always non negative.
             Value = Math.Abs(value);
         }
+        public Measure() : base(ElementType.MEASURE)
+        {
+            Value = Math.Abs(Utils.RandomCoordinate());
+        }
         public override Number EqualTo(Element other)
         {
-            if(other.Type != this.Type)return Element.FALSE;
-            if(Utils.Compare(this.Value,(other as Element.Measure)!.Value) == 0)return Element.TRUE;
+            if (other.Type != this.Type) return Element.FALSE;
+            if (Utils.Compare(this.Value, (other as Element.Measure)!.Value) == 0) return Element.TRUE;
             return Element.FALSE;
         }
         public override string ToString()
@@ -273,7 +280,7 @@ public abstract class Element
     public class Point : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment{get; set;}
         public Element.Number x;
         public Element.Number y;
 
@@ -282,7 +289,7 @@ public abstract class Element
         public Point(Element.String _name, Element.Number _x, Element.Number _y, Element.String _comment, Color color) : base(ElementType.POINT)
         {
             name = _name;
-            comment = _comment;
+            Comment = _comment;
             x = _x;
             y = _y;
             Color = color;
@@ -290,7 +297,7 @@ public abstract class Element
         public Point(Color color) : base(ElementType.POINT)
         {
             name = new String();
-            comment = new String();
+            Comment = new String();
             x = new Element.Number(Utils.RandomCoordinate());
             y = new Element.Number(Utils.RandomCoordinate());
             Color = color;
@@ -299,7 +306,7 @@ public abstract class Element
         public Point() : base(ElementType.POINT)
         {
             name = new String();
-            comment = new String();
+            Comment = new String();
             x = new Element.Number(Utils.RandomCoordinate());
             y = new Element.Number(Utils.RandomCoordinate());
             Color = Color.BLACK;
@@ -308,7 +315,7 @@ public abstract class Element
 
         public override string ToString()
         {
-            return $"{name}({x},{y}){comment}";
+            return $"{name}({x},{y}){Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -327,7 +334,7 @@ public abstract class Element
     public class Lines : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment {get;set;}
         public Element.Point p1;
         public Element.Point p2;
 
@@ -336,7 +343,7 @@ public abstract class Element
         public Lines(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.LINE)
         {
             name = _name;
-            comment = _comment;
+            Comment = _comment;
             p1 = _p1;
             p2 = _p2;
             Color = color;
@@ -344,7 +351,7 @@ public abstract class Element
         public Lines(Color color) : base(ElementType.LINE)
         {
             name = new String();
-            comment = new String();
+            Comment = new String();
             p1 = new Element.Point();
             p2 = new Element.Point();
             Color = color;
@@ -352,7 +359,7 @@ public abstract class Element
 
         public override string ToString()
         {
-            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){comment}";
+            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -364,7 +371,7 @@ public abstract class Element
     public class Segment : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment {get;set;}
         public Element.Point p1;
         public Element.Point p2;
 
@@ -373,7 +380,7 @@ public abstract class Element
         public Segment(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.SEGMENT)
         {
             name = _name;
-            comment = _comment;
+           Comment = _comment;
             p1 = _p1;
             p2 = _p2;
             Color = color;
@@ -381,7 +388,7 @@ public abstract class Element
         public Segment(Color color) : base(ElementType.SEGMENT)
         {
             name = new String();
-            comment = new String();
+            Comment = new String();
             p1 = new Element.Point();
             p2 = new Element.Point();
             Color = color;
@@ -389,7 +396,7 @@ public abstract class Element
 
         public override string ToString()
         {
-            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){comment}";
+            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -401,7 +408,7 @@ public abstract class Element
     public class Ray : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment{get;set;}
         public Element.Point p1;
         public Element.Point p2;
 
@@ -410,7 +417,7 @@ public abstract class Element
         public Ray(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.RAY)
         {
             name = _name;
-            comment = _comment;
+            Comment = _comment;
             p1 = _p1;
             p2 = _p2;
             Color = color;
@@ -418,7 +425,7 @@ public abstract class Element
         public Ray(Color color) : base(ElementType.RAY)
         {
             name = new String();
-            comment = new String();
+            Comment = new String();
             p1 = new Element.Point();
             p2 = new Element.Point();
             Color = color;
@@ -427,7 +434,7 @@ public abstract class Element
 
         public override string ToString()
         {
-            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){comment}";
+            return $"{name}(({p1.x},{p1.y}),({p2.x},{p2.y})){Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -439,16 +446,16 @@ public abstract class Element
     public class Circle : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment {get;set;}
         public Element.Point p1;
-        public Element.Number radius;
+        public Element.Measure radius;
 
         public Color Color { get; private set; }
 
-        public Circle(Element.String _name, Element.Point _p1, Element.Number _radius, Element.String _comment, Color color) : base(ElementType.CIRCLE)
+        public Circle(Element.String _name, Element.Point _p1, Element.Measure _radius, Element.String _comment, Color color) : base(ElementType.CIRCLE)
         {
             name = _name;
-            comment = _comment;
+            Comment = _comment;
             p1 = _p1;
             radius = _radius;
             Color = color;
@@ -457,8 +464,8 @@ public abstract class Element
         {
             p1 = new Element.Point();
             name = new String();
-            comment = new String();
-            radius = new Element.Number(Utils.RandomCoordinate());
+            Comment = new String();
+            radius = new Element.Measure();
             Color = color;
 
         }
@@ -466,7 +473,7 @@ public abstract class Element
 
         public override string ToString()
         {
-            return $"{name}({p1.x},{p1.y}){radius}{comment}";
+            return $"{name}({p1.x},{p1.y}){radius}{Comment}";
         }
         public override Number EqualTo(Element other)
         {
@@ -478,18 +485,18 @@ public abstract class Element
     public class Arc : Element, IDrawable
     {
         public Element.String name;
-        public Element.String comment;
+        public Element.String Comment{get;set;}
         public Element.Point p1;
         public Element.Point p2;
         public Element.Point p3;
-        public Element.Number radius;
+        public Element.Measure radius;
 
         public Color Color { get; private set; }
 
-        public Arc(Element.String _name, Element.Point _p1, Element.Point _p2, Element.Point _p3, Element.Number _radius, Element.String _comment, Color color) : base(ElementType.ARC)
+        public Arc(Element.String _name, Element.Point _p1, Element.Point _p2, Element.Point _p3, Element.Measure _radius, Element.String _comment, Color color) : base(ElementType.ARC)
         {
             name = _name;
-            comment = _comment;
+            Comment = _comment;
             p1 = _p1;
             p2 = _p2;
             p3 = _p3;
@@ -501,16 +508,16 @@ public abstract class Element
             p1 = new Element.Point();
             p2 = new Element.Point();
             p3 = new Element.Point();
-            radius = new Element.Number(Utils.RandomCoordinate());
+            radius = new Element.Measure();
             name = new String();
-            comment = new String();
+            Comment = new String();
             Color = color;
         }
 
 
         public override string ToString()
         {
-            return $"{name}({p1.x},{p1.y})({p2.x},{p2.y})({p3.x},{p3.y}){radius}{comment}";
+            return $"{name}({p1.x},{p1.y})({p2.x},{p2.y})({p3.x},{p3.y}){radius}{Comment}";
         }
         public override Number EqualTo(Element other)
         {

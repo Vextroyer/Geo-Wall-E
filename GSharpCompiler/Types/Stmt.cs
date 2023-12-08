@@ -57,7 +57,7 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
     public class Point : Stmt
     {
         public Token Id { get; private set; }//The name of the point will be used as identifier.
-        public Element.String Comment { get; private set; }//A comment associated to the point.
+        public Element.String Comment { get; set; }//A comment associated to the point.
 
         public Expr X { get; private set; }//X coordinate
         public Expr Y { get; private set; }//Y coordinate
@@ -72,7 +72,7 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
         }
         public Point(int _line, int _offset, char[] fileName, Token _id) : base(_line, _offset, fileName)
         {
-            Id=_id;
+            Id = _id;
             FullDeclarated = false;
         }
 
@@ -99,9 +99,9 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
             Comment = _comment;
             FullDeclarated = true;
         }
-        public Lines(int _line, int _offset, char[] fileName,Token _id) : base(_line, _offset, fileName)
+        public Lines(int _line, int _offset, char[] fileName, Token _id) : base(_line, _offset, fileName)
         {
-            Id=_id;
+            Id = _id;
             P1 = new Expr.Empty();
             P2 = new Expr.Empty();
             FullDeclarated = false;
@@ -121,9 +121,9 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
             FullDeclarated = true;
 
         }
-        public Segment(int _line, int _offset, char[] fileName,Token _id) : base(_line, _offset, fileName,_id)
+        public Segment(int _line, int _offset, char[] fileName, Token _id) : base(_line, _offset, fileName, _id)
         {
-            Id=_id;
+            Id = _id;
             FullDeclarated = false;
             P1 = new Expr.Empty();
             P2 = new Expr.Empty();
@@ -141,9 +141,9 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
         {
             FullDeclarated = true;
         }
-        public Ray(int _line, int _offset, char[] fileName,Token _id) : base(_line, _offset, fileName,_id)
+        public Ray(int _line, int _offset, char[] fileName, Token _id) : base(_line, _offset, fileName, _id)
         {
-            Id=_id;
+            Id = _id;
             FullDeclarated = false;
             P1 = new Expr.Empty();
             P2 = new Expr.Empty();
@@ -160,22 +160,23 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
         public Element.String Comment { get; private set; }//A comment associated to the line.
 
         public Expr P1 { get; private set; }//first point
-        public Element.Number Radius { get; private set; }//radio 
+        public Expr Radius { get; private set; }//radio 
         public bool FullDeclarated { get; private set; }
-        public Circle(int _line, int _offset, char[] fileName, Token _id, Expr _p1, Element.Number radius, Element.String _comment) : base(_line, _offset, fileName)
+        public Circle(int _line, int _offset, char[] fileName, Token _id, Expr _p1, Expr radius, Element.String _comment) : base(_line, _offset, fileName)
         {
             Id = _id;
             P1 = _p1;
             Radius = radius;
             Comment = _comment;
-            FullDeclarated=true;
+            FullDeclarated = true;
         }
-        public Circle(int _line, int _offset, char[] fileName,Token _id) : base(_line, _offset, fileName)
+        public Circle(int _line, int _offset, char[] fileName, Token _id) : base(_line, _offset, fileName)
         {
             Id = _id;
             P1 = new Expr.Empty();
-            FullDeclarated=false;
-            
+            Radius = new Expr.Empty();
+            FullDeclarated = false;
+
         }
 
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -191,9 +192,9 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
         public Expr P1 { get; private set; }//first point
         public Expr P2 { get; private set; }//first point
         public Expr P3 { get; private set; }//first point
-        public Element.Number Radius { get; private set; }//radio 
+        public Expr Radius { get; private set; }//radio 
         public bool FullDeclarated { get; private set; }
-        public Arc(int _line, int _offset, char[] fileName, Token _id, Expr _p1, Expr _p2, Expr _p3, Element.Number radius, Element.String _comment) : base(_line, _offset, fileName)
+        public Arc(int _line, int _offset, char[] fileName, Token _id, Expr _p1, Expr _p2, Expr _p3, Expr radius, Element.String _comment) : base(_line, _offset, fileName)
         {
             Id = _id;
             P1 = _p1;
@@ -201,7 +202,7 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
             P3 = _p3;
             Radius = radius;
             Comment = _comment;
-            FullDeclarated=true;
+            FullDeclarated = true;
         }
         public Arc(int _line, int _offset, char[] fileName, Token _id) : base(_line, _offset, fileName)
         {
@@ -209,8 +210,9 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
             P1 = new Expr.Empty();
             P2 = new Expr.Empty();
             P3 = new Expr.Empty();
-            FullDeclarated=false;
-           
+            Radius = new Expr.Empty();
+            FullDeclarated = false;
+
         }
 
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
@@ -267,10 +269,12 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
     public class Draw : Stmt
     {
         public Expr _Expr { get; private set; }
+        public Element.String Comment { get; private set; }
 
-        public Draw(int line, int offset, char[] fileName, Expr _expr) : base(line, offset, fileName)
+        public Draw(int line, int offset, char[] fileName, Expr _expr,Element.String comment) : base(line, offset, fileName)
         {
             _Expr = _expr;
+            Comment=comment;
         }
 
         public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
