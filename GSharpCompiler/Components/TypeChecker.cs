@@ -311,7 +311,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         Element right = Check(productExpr.Right,scope);
         if(left.Type != ElementType.RUNTIME_DEFINED && right.Type != ElementType.RUNTIME_DEFINED){
             try{
-                switch(OperationTable.Operate("*",left,right).Type{
+                switch(OperationTable.Operate("*",left,right).Type){
                     case ElementType.NUMBER:
                         productExpr.RequiresRuntimeCheck = false;
                         return Element.NUMBER;
