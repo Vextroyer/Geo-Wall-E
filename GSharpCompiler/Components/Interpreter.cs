@@ -456,6 +456,21 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
             return Element.Point.Distance(p1,p2);
         }
     }
+    ///<summary>Build a sequence from a sequence expr.</summary>
+    public Element VisitSequenceExpr(Expr.Sequence sequence,Scope scope){
+        if(sequence.HasTreeDots){
+            throw new NotImplementedException();
+        }
+        ElementType? type = null;
+        List<Element> elements = new List<Element>();
+        foreach(Expr expr in sequence){
+            Element element = Evaluate(expr,scope);
+            if(type == null)type = element.Type;
+            if(type != element.Type)throw new RuntimeException(sequence,$"Sequence has elements of type {type} and {element.Type}. Only one type is allowed.");
+            elements.Add(element);
+        }
+        return new Element.Sequence.Listing(elements);
+    }
     #endregion Interpret expressions
 
     //Determine if the given element is true or false. Undefined and 0 are false, everything else is true.

@@ -231,3 +231,28 @@ print let
 print let
         fact(n) = if(n <= 0) then 1 else n * fact(n - 1);
       in fact(5);
+
+print measure(point(0,0),point(0,1));
+print measure(point(0,0),point(1,0));
+print measure(point(1,0),point(0,0));
+print measure(point(0,1),point(0,0));
+
+print let
+        point(3,7) p1;
+        point(6,3) p2;
+        m = measure(p1,p2);
+      in m;
+
+print {1,2,3};
+print {3,2,1};
+
+print let
+        f(x) = 2 ^ x;
+        seq = {f(0),f(1),f(2),f(3)};
+      in seq;
+
+print let
+point(3,-456.3) p1;
+point(-265,2) p2;
+point(12,5) p3;
+in {p1,p2,p3};

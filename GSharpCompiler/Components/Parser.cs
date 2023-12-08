@@ -468,13 +468,13 @@ class Parser : GSharpCompilerComponent
     {
         Token pointToken = Consume(TokenType.POINT);
 
-        Consume(TokenType.LEFT_PAREN);
+        Consume(TokenType.LEFT_PAREN,"Expected `(` on call to `point`");
         if (Peek.Type != TokenType.RIGHT_PAREN)
         {
             Expr x = ParseExpression();
             Consume(TokenType.COMMA, "Expected comma `,`");
             Expr y = ParseExpression();
-            Consume(TokenType.RIGHT_PAREN, "Expected `)`");
+            Consume(TokenType.RIGHT_PAREN, "Expected `)` on call to `point`");
 
             return new Expr.Point(pointToken.Line, pointToken.Offset, pointToken.ExposeFile, x, y);
 
@@ -560,7 +560,7 @@ class Parser : GSharpCompilerComponent
     {
         Token arcToken = Consume(TokenType.ARC, "Expected `arc` keyword");
 
-        Consume(TokenType.LEFT_PAREN);
+        Consume(TokenType.LEFT_PAREN,"Expected `(` after call to `arc`");
         if (Peek.Type != TokenType.RIGHT_PAREN)
         {
             Expr p1 = ParseExpression();
@@ -709,27 +709,43 @@ class Parser : GSharpCompilerComponent
                 Expr expr = ParseExpression();
                 Consume(TokenType.RIGHT_PAREN, "Expected `)`");
                 return expr;
-            // case TokenType.LEFT_BRACE: //Sequence
-            //     return ParseSequenceExpr();
+            case TokenType.LEFT_BRACE: //Sequence
+                return ParseSequenceExpr();
             default: return Expr.EMPTY;//The empty expression
         }
     }
-    // private Expr ParseSequenceExpr(){
-    //     Consume(TokenType.LEFT_BRACE);
-    //     Expr firstExpr = ParseExpression();
-    //     if(firstExpr != Expr.EMPTY){
-    //         //non-empty sequence
-    //         if(Peek.Type == TokenType.THREE_DOTS){
-    //         }
-    //         else{
-                
-    //         }
-    //     }
-    //     else{
-    //         //Empty sequence
-    //     }
-    //     Consume(TokenType.RIGHT_BRACE,"Expected `}` after sequence elements");
-    // }
+    private Expr ParseSequenceExpr(){
+        Token leftBraceToken = Consume(TokenType.LEFT_BRACE);
+        List<Expr> expressions = new List<Expr>();//The expressions on the sequence.
+        bool hasThreeDots = false;
+        if(Peek.Type != TokenType.RIGHT_BRACE){
+            if(Peek.Type == TokenType.THREE_DOTS)OnErrorFound(Peek,"Cannot start sequence declaration with `...`");
+            Expr expr = ParseExpression();
+            ErrorIfEmpty(expr,leftBraceToken,"Expected non-empty expression on sequence declaration");
+            expressions.Add(expr);
+            if(Match(TokenType.THREE_DOTS)){
+                hasThreeDots = true;//Consme the three dots
+                if(Match(TokenType.RIGHT_BRACE))return new Expr.Sequence(leftBraceToken.Line,leftBraceToken.Offset,leftBraceToken.ExposeFile,hasThreeDots,expressions);
+                expr = ParseExpression();
+                ErrorIfEmpty(expr,Peek,"Expected non-empty expression after `...`");
+                expressions.Add(expr);
+                Consume(TokenType.RIGHT_BRACE,"Expected `}` after sequence elements");
+                return new Expr.Sequence(leftBraceToken.Line,leftBraceToken.Offset,leftBraceToken.ExposeFile,hasThreeDots,expressions);
+            }
+            if(Peek.Type!=TokenType.RIGHT_BRACE){
+                Consume(TokenType.COMMA,"Expected `,` after expression");
+                //Since now encountering any three dots is an error
+                do{
+                    if(Peek.Type == TokenType.THREE_DOTS)OnErrorFound(Peek,"Three dots can only be used on sequence declarations of the form {Expr ...} or {Expr ... Expr}");
+                    expr = ParseExpression();
+                    ErrorIfEmpty(expr,Peek,"Expected non-empty expression on sequence declaration");
+                    expressions.Add(expr);
+                }while(Match(TokenType.COMMA));
+            }
+        }
+        Consume(TokenType.RIGHT_BRACE,"Expected `}` after sequence elements");
+        return new Expr.Sequence(leftBraceToken.Line,leftBraceToken.Offset,leftBraceToken.ExposeFile,hasThreeDots,expressions);
+    }
     #endregion Expression parsing
 
     #region  Auxiliary Methods

@@ -25,7 +25,8 @@ public enum ElementType{
     ARC,
     FUNCTION_LIST,
     FUNCTION,
-    RUNTIME_DEFINED
+    RUNTIME_DEFINED,
+    SEQUENCE
 }
 
 //Base class for all elements that exist during runtime.
@@ -518,4 +519,49 @@ public abstract class Element
             return Element.FALSE;
         }
     }
-};
+    ///<summary>Base class for sequences.</summary>
+    public abstract class Sequence : Element , IEnumerable<Element>{
+        protected Sequence():base(ElementType.SEQUENCE){}
+        public abstract Element Count {get;}
+        public abstract bool IsFinite {get;}
+        public abstract bool IsEmpty {get;}
+        public abstract IEnumerator<Element> GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        // public abstract Element Current {get;}
+        // public abstract bool MoveNext();
+        // public abstract void Reset();
+        // public abstract void Dispose();
+        // object IEnumerator.Current {get => Current;}
+
+        ///<summary>A finite sequence of Element.</summary>
+        public class Listing : Sequence {
+            ///<summary>The elements of the sequence.</summary>
+            List<Element> sequence;
+            public Listing(List<Element> elements){
+                sequence= elements;
+            }
+            public override bool IsFinite => true;
+            public override bool IsEmpty => sequence.Count == 0;
+            public override Element.Number Count =>  new Element.Number(sequence.Count);
+            public override Number EqualTo(Element other)
+            {
+                throw new NotImplementedException();
+            }
+            public override IEnumerator<Element> GetEnumerator(){
+                return sequence.GetEnumerator();
+            }
+            public override string ToString()
+            {
+                System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
+                stringBuilder.Append('{');
+                for(int i=0;i<sequence.Count;++i){
+                    stringBuilder.Append(sequence[i].ToString());
+                    if(i < sequence.Count - 1)stringBuilder.Append(',');
+                }
+                stringBuilder.Append('}');
+                return stringBuilder.ToString();
+            }
+        }
+    }
+}

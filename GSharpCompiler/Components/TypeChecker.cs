@@ -755,4 +755,8 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         }
         return Element.CIRCLE;
     }
+
+    public Element VisitSequenceExpr(Expr.Sequence expr, Scope scope){
+        return Element.RUNTIME_DEFINED;
+    }
 }
