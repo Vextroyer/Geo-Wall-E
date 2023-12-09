@@ -1,8 +1,0 @@
-point(0,0)p1;
-point(0,50)p2;
-point(90,70)p3;
-arc(p1,p2,p3,measure(p3,p2))a1;
-draw p1;
-draw p2;
-draw p3;
-draw a1;

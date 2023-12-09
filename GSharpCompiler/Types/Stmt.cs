@@ -72,6 +72,9 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
         }
         public Point(int _line, int _offset, char[] fileName, Token _id) : base(_line, _offset, fileName)
         {
+            X=Expr.EMPTY;
+            Y=Expr.EMPTY;
+            Comment=Element.STRING;
             Id = _id;
             FullDeclarated = false;
         }
