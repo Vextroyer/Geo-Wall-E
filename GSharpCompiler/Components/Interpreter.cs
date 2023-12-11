@@ -482,6 +482,21 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         }
         return new Element.Sequence.Listing(elements);
     }
+    public Element VisitIntersectExpr(Expr.Intersect intersect,Scope scope)
+    {
+        Element element1 = Evaluate(intersect.FirstExpression,scope);//aqui faltan try y catch probablemente
+        Element element2 = Evaluate(intersect.SecondExpression,scope);
+        if (Utils.IsDraweable(element1)&&Utils.IsDraweable(element2))
+        {
+            Element elements = Utils.Intercept(element1,element2);
+            return elements;
+        }
+        else 
+        {
+            throw new RuntimeException(intersect,$"Only Draweables elements can be intercepted");
+        }
+    }
+
     #endregion Interpret expressions
 
     //Determine if the given element is true or false. Undefined and 0 are false, everything else is true.

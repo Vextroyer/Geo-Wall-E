@@ -648,6 +648,10 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         expr.RequiresRuntimeCheck = requiresRuntimeCheck;
         return Element.MEASURE;
     }
+    public Element VisitIntersectExpr(Expr.Intersect expr, Scope scope)
+    {
+     return Element.RUNTIME_DEFINED; 
+    }
     public Element VisitPointExpr(Expr.Point pointExpr, Scope scope)
     {
         if (pointExpr.FullDeclarated)

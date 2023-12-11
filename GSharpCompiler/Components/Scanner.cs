@@ -35,6 +35,7 @@ class Scanner : GSharpCompilerComponent
         {"eval",TokenType.EVAL},
         {"import",TokenType.IMPORT},
         {"measure",TokenType.MEASURE},
+        {"intersect",TokenType.INTERSECT},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},

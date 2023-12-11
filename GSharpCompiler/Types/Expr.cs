@@ -31,8 +31,8 @@ interface IVisitorExpr<T>
     public T VisitBinaryOrExpr(Expr.Binary.Or expr, Scope scope);
     public T VisitConditionalExpr(Expr.Conditional expr, Scope scope);
     public T VisitLetInExpr(Expr.LetIn expr, Scope scope);
-    public T VisitCallExpr(Expr.Call expr,Scope scope);
-    public T VisitMeasureExpr(Expr.Measure expr,Scope scope);
+    public T VisitCallExpr(Expr.Call expr, Scope scope);
+    public T VisitMeasureExpr(Expr.Measure expr, Scope scope);
     public T VisitPointExpr(Expr.Point expr, Scope scope);
     public T VisitLinesExpr(Expr.Lines expr, Scope scope);
     public T VisitSegmentExpr(Expr.Segment expr, Scope scope);
@@ -40,6 +40,7 @@ interface IVisitorExpr<T>
     public T VisitCircleExpr(Expr.Circle expr, Scope scope);
     public T VisitArcExpr(Expr.Arc expr, Scope scope);
     public T VisitSequenceExpr(Expr.Sequence expr, Scope scope);
+    public T VisitIntersectExpr(Expr.Intersect expr,Scope scope);
 }
 interface IVisitableExpr
 {
@@ -91,18 +92,20 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
         }
         public override bool RequiresRuntimeCheck { get => false; set => base.RequiresRuntimeCheck = false; }
     }
-    public class Measure : Expr{
+    public class Measure : Expr
+    {
         ///<summary>The expression representing the first point.</summary>
-        public Expr P1 {get; private set;}
+        public Expr P1 { get; private set; }
         ///<summary>The expression representing the second point.</summary>
-        public Expr P2 {get; private set;}
-        public Measure(Token measureToken,Expr firstPoint, Expr secondPoint):base(measureToken.Line,measureToken.Offset,measureToken.ExposeFile){
+        public Expr P2 { get; private set; }
+        public Measure(Token measureToken, Expr firstPoint, Expr secondPoint) : base(measureToken.Line, measureToken.Offset, measureToken.ExposeFile)
+        {
             P1 = firstPoint;
             P2 = secondPoint;
         }
         public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
         {
-            return visitor.VisitMeasureExpr(this,scope);
+            return visitor.VisitMeasureExpr(this, scope);
         }
     }
     public class String : Expr
@@ -416,8 +419,8 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
         }
         public Point(int line, int offset, char[] fileName) : base(line, offset, fileName)
         {
-            X=Expr.EMPTY;
-            Y=Expr.EMPTY;
+            X = Expr.EMPTY;
+            Y = Expr.EMPTY;
             FullDeclarated = false;
         }
         public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
@@ -515,7 +518,7 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
         {
             FullDeclarated = false;
             P1 = new Expr.Empty();
-            Radius= new Expr.Empty();
+            Radius = new Expr.Empty();
         }
         public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
         {
@@ -545,7 +548,7 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
             P1 = new Expr.Empty();
             P2 = new Expr.Empty();
             P3 = new Expr.Empty();
-            Radius=new Expr.Empty();
+            Radius = new Expr.Empty();
 
             FullDeclarated = false;
 
@@ -559,25 +562,27 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
     }
 
     ///<summary>Sequence expressions.</summary>
-    public class Sequence : Expr, IEnumerable<Expr>{
-        public Expr First {get => Expressions[0];}
-        public Expr Second {get => Expressions[1];}
+    public class Sequence : Expr, IEnumerable<Expr>
+    {
+        public Expr First { get => Expressions[0]; }
+        public Expr Second { get => Expressions[1]; }
         ///<summary>Does this sequence has three dots.</summary>
-        public bool HasTreeDots {get; private set;}
+        public bool HasTreeDots { get; private set; }
         ///<summary>The elements of the sequence</summary>
-        public List<Expr> Expressions {get; private set;}
+        public List<Expr> Expressions { get; private set; }
         ///<summary>Is this sequence empty.</summary>
-        public bool IsEmpty {get => Expressions.Count == 0;}
+        public bool IsEmpty { get => Expressions.Count == 0; }
         public int Count => Expressions.Count;
-        
-        public Sequence(int line,int offset,char[] fileName,bool hasTreeDots,List<Expr> sequence):base(line,offset,fileName){
+
+        public Sequence(int line, int offset, char[] fileName, bool hasTreeDots, List<Expr> sequence) : base(line, offset, fileName)
+        {
             HasTreeDots = hasTreeDots;
             Expressions = sequence;
-            if(HasTreeDots && (sequence.Count == 0 || sequence.Count > 2))throw new Exception($"Tried to form a dotted sequence with {sequence.Count} elements");
+            if (HasTreeDots && (sequence.Count == 0 || sequence.Count > 2)) throw new Exception($"Tried to form a dotted sequence with {sequence.Count} elements");
         }
         public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
         {
-            return visitor.VisitSequenceExpr(this,scope);
+            return visitor.VisitSequenceExpr(this, scope);
         }
 
         IEnumerator<Expr> IEnumerable<Expr>.GetEnumerator()
@@ -588,6 +593,20 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
         public IEnumerator GetEnumerator()
         {
             return ((IEnumerable)Expressions).GetEnumerator();
+        }
+    }
+    public class Intersect : Expr
+    {
+        public Expr FirstExpression { get; private set; }
+        public Expr SecondExpression { get; private set; }
+        public Intersect(int _line, int _offset, char[] fileName, Expr first, Expr second) : base(_line, _offset, fileName)
+        {
+            FirstExpression = first;
+            SecondExpression = second;
+        }
+        public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
+        {
+            return visitor.VisitIntersectExpr(this, scope);
         }
     }
 }
