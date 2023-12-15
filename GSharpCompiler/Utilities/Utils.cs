@@ -83,7 +83,7 @@ static class Utils
         if (x <= Epsilon) return true;
         return false;
     }
-    private static float Epsilon = 1e-6f;
+    public static float Epsilon = 1e-6f;
 
     //Parte de intercept
     public static bool IsDraweable(Element element1)
@@ -106,29 +106,6 @@ static class Utils
                 return false;
         }
     }
-    public static Element Intercept(Element element1, Element element2)
-    {
-        Element resultado;
-        resultado = Element.UNDEFINED;
-      
-        if (element1.Type == ElementType.POINT && element2.Type == ElementType.POINT)
-        {
-            resultado = InterceptPointPoint((Element.Point)element1, (Element.Point)element2);
-            return resultado;
-        }
-
-        return resultado;
-
-
-    }
-    public static Element InterceptPointPoint(Element.Point element1, Element.Point element2)
-    {
-        if (element1.EqualTo(element2)==Element.TRUE)
-        {
-            return new Element.Sequence.Listing(new List<Element> { element1 });
-        }
-        return new Element.Sequence.Listing(new List<Element> {});
-
-    }
+    
 
 }

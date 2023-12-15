@@ -488,7 +488,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         Element element2 = Evaluate(intersect.SecondExpression,scope);
         if (Utils.IsDraweable(element1)&&Utils.IsDraweable(element2))
         {
-            Element elements = Utils.Intercept(element1,element2);
+            Element elements = Interceptions.Intercept(element1,element2);
             return elements;
         }
         else 
