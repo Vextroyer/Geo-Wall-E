@@ -1,3 +1,6 @@
 //Sample program to save functionalities to test.
 
-// print {2 ... 1};
+a = {2,3} + {4,5};
+print a;
+c = {1 ... 27} + a;
+print c;

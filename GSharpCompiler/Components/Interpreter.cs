@@ -23,6 +23,9 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     ///<summary>The limit of calls a program can execute without incurring on a stack overflow.</summary>
     private int callStackSize = 1000;
 
+    private Element.Sequence.Randoms randomNumbers = new Element.Sequence.Randoms();
+    private Element.Sequence.Samples randomPoints = new Element.Sequence.Samples();
+
     public Interpreter(TextWriter _outputStream)
     {
         outputStream = _outputStream;
@@ -117,6 +120,26 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     public object? VisitFunctionDeclarationStmt(Stmt.Declaration.Function functionStmt, Scope scope)
     {
         scope.SetArgument(functionStmt.Id.Lexeme, Element.Function.MakeFunction(functionStmt));
+        return null;
+    }
+    public object? VisitMatchStmt(Stmt.Declaration.Match stmt,Scope scope){
+        Element.Sequence sequence = (Element.Sequence)Evaluate(stmt.Sequence,scope);
+        Element.Sequence.SequenceEnumerator enumerator = (Element.Sequence.SequenceEnumerator) sequence.GetEnumerator();
+        //For each identifier except the last one, which is the rest.
+        for(int i=0;i<stmt.Identifiers.Count - 1;++i){
+            //Element to be retrieved from the sequence.
+            Element sequenceElement;
+            if(stmt.Identifiers[i].Lexeme == "_"){
+                enumerator.MoveNext();
+                continue;
+            }
+            if(enumerator.MoveNext()) sequenceElement = enumerator.Current;
+            else sequenceElement = Element.UNDEFINED;
+            //After retrieving the element associate it with the Id.
+            scope.SetConstant(stmt.Identifiers[i].Lexeme,sequenceElement);
+        }
+        //Declare the rest.
+        if(stmt.Identifiers[stmt.Identifiers.Count - 1].Lexeme != "_") scope.SetConstant(stmt.Identifiers[stmt.Identifiers.Count - 1].Lexeme,enumerator.Resto);
         return null;
     }
     public object? VisitPrintStmt(Stmt.Print stmt, Scope scope)
@@ -470,7 +493,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
                 if(startValue > endValue)throw new RuntimeException(sequence,$"Sequence range is inverted : [{startValue} , {endValue}]");
                 return new Element.Sequence.Interval(startValue,endValue);
             }
-            return new Element.Sequence.Interval(startValue,float.PositiveInfinity);
+            return new Element.Sequence.Interval(startValue);
         }
         ElementType? type = null;
         List<Element> elements = new List<Element>();
@@ -481,6 +504,23 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
             elements.Add(element);
         }
         return new Element.Sequence.Listing(elements);
+    }
+    public Element VisitCountExpr(Expr.Count expr,Scope scope){
+        Element evaluated = Evaluate(expr.Sequence,scope);
+        if(evaluated.Type != ElementType.SEQUENCE)throw new RuntimeException(expr,$"Expected `SEQUENCE` as parameter but {evaluated.Type} was found");
+        Element.Sequence sequence;
+        if(evaluated is Element.Sequence.Listing){
+            sequence = (evaluated as Element.Sequence.Listing)!;
+        }else{
+            sequence = (evaluated as Element.Sequence.Interval)!;
+        }
+        return sequence.Count;
+    }
+    public Element VisitSamplesExpr(Expr.Samples expr,Scope scope){
+        return this.randomPoints;
+    }
+    public Element VisitRandomsExpr(Expr.Randoms expr,Scope scope){
+        return this.randomNumbers;
     }
     #endregion Interpret expressions
 

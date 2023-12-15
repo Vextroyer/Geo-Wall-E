@@ -107,6 +107,13 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
     {
         return $"draw({Print(stmt._Expr)})";
     }
+    
+    public string VisitMatchStmt(Stmt.Declaration.Match stmt,Scope scope){
+        string ret = "";
+        foreach(Token ID in stmt.Identifiers)ret += ID.Lexeme + " ";
+        ret += Print(stmt.Sequence);
+        return ret;
+    }
 
     public string Print(Expr expr)
     {
@@ -240,5 +247,14 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
     }
     public string VisitSequenceExpr(Expr.Sequence expr, Scope scope){
         return "sequence";
+    }
+    public string VisitCountExpr(Expr.Count expr,Scope scope){
+        return $"count({Print(expr.Sequence)})";
+    }
+    public string VisitRandomsExpr(Expr.Randoms expr,Scope scope){
+        return "randoms";
+    }
+    public string VisitSamplesExpr(Expr.Samples expr,Scope scope){
+        return "samples";
     }
 }
