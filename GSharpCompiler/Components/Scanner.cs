@@ -36,6 +36,8 @@ class Scanner : GSharpCompilerComponent
         {"import",TokenType.IMPORT},
         {"measure",TokenType.MEASURE},
         {"count",TokenType.COUNT},
+        {"randoms",TokenType.RANDOMS},
+        {"samples",TokenType.SAMPLES},
         //Colors
         {"color",TokenType.COLOR},
         {"black",TokenType.COLOR_BLACK},

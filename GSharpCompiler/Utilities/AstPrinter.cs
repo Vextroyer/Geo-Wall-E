@@ -251,4 +251,10 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
     public string VisitCountExpr(Expr.Count expr,Scope scope){
         return $"count({Print(expr.Sequence)})";
     }
+    public string VisitRandomsExpr(Expr.Randoms expr,Scope scope){
+        return "randoms";
+    }
+    public string VisitSamplesExpr(Expr.Samples expr,Scope scope){
+        return "samples";
+    }
 }

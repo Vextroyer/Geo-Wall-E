@@ -702,5 +702,63 @@ public abstract class Element
                 }
             }
         }
+        ///<summary>A sequence of random numbers between 0 and 1.</summary>
+        public class Randoms : Sequence{
+            private int seed;
+            public Randoms(){
+                seed = new Random().Next();
+            }
+            public override Element Count => Element.UNDEFINED;
+            public override bool IsFinite => true;
+            public override Number EqualTo(Element other)
+            {
+                throw new NotImplementedException();
+            }
+            public override bool IsEmpty => false;
+            public override IEnumerator<Element> GetEnumerator() => new RandomsEnumerator(seed);
+
+            class RandomsEnumerator : SequenceEnumerator{
+                Random random;
+                int seed;
+                public RandomsEnumerator(int seed){
+                    this.seed = seed;
+                    random = new Random(seed);
+                }
+                public override Element Current => new Element.Number(random.NextSingle());
+                public override void Dispose(){}
+                public override void Reset() => random = new Random(seed);
+                public override bool MoveNext() => true;
+                public override Sequence Resto => throw new Exception("Cannot obtain a rest from randoms");
+            }
+        }
+        ///<summary>A sequence of random points.</summary>
+        public class Samples : Sequence{
+            private int seed;
+            public Samples(){
+                seed = new Random().Next();
+            }
+            public override Element Count => Element.UNDEFINED;
+            public override bool IsFinite => true;
+            public override Number EqualTo(Element other)
+            {
+                throw new NotImplementedException();
+            }
+            public override bool IsEmpty => false;
+            public override IEnumerator<Element> GetEnumerator() => new SamplesEnumerator(seed);
+
+            class SamplesEnumerator : SequenceEnumerator{
+                Random random;
+                int seed;
+                public SamplesEnumerator(int seed){
+                    this.seed = seed;
+                    random = new Random(seed);
+                }
+                public override Element Current => Utils.RandomPoint(random);
+                public override void Dispose(){}
+                public override void Reset() => random = new Random(seed);
+                public override bool MoveNext() => true;
+                public override Sequence Resto => throw new Exception("Cannot obtain a rest from samples");
+            }
+        }
     }
 }

@@ -23,6 +23,9 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     ///<summary>The limit of calls a program can execute without incurring on a stack overflow.</summary>
     private int callStackSize = 1000;
 
+    private Element.Sequence.Randoms randomNumbers = new Element.Sequence.Randoms();
+    private Element.Sequence.Samples randomPoints = new Element.Sequence.Samples();
+
     public Interpreter(TextWriter _outputStream)
     {
         outputStream = _outputStream;
@@ -512,6 +515,12 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
             sequence = (evaluated as Element.Sequence.Interval)!;
         }
         return sequence.Count;
+    }
+    public Element VisitSamplesExpr(Expr.Samples expr,Scope scope){
+        return this.randomPoints;
+    }
+    public Element VisitRandomsExpr(Expr.Randoms expr,Scope scope){
+        return this.randomNumbers;
     }
     #endregion Interpret expressions
 

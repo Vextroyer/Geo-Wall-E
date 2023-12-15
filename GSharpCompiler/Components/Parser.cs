@@ -672,6 +672,10 @@ class Parser : GSharpCompilerComponent
         //Parse a variable or a call
         switch (Peek.Type)
         {
+            case TokenType.RANDOMS:
+                return ParseRandomsExpr();
+            case TokenType.SAMPLES:
+                return ParseSamplesExpr();
             case TokenType.COUNT:
                 return ParseCountExpr();
             case TokenType.MEASURE:
@@ -722,6 +726,18 @@ class Parser : GSharpCompilerComponent
         ErrorIfEmpty(sequenceExpr,countToken,$"Expected non-empty expression on call to function `count`");
         Consume(TokenType.RIGHT_PAREN, "Expected `)` after parameter");
         return new Expr.Count(countToken.Line,countToken.Offset,countToken.ExposeFile,sequenceExpr);
+    }
+    private Expr ParseRandomsExpr(){
+        Token randomToken = Consume(TokenType.RANDOMS);
+        Consume(TokenType.LEFT_PAREN,$"Expected `(` after call to `randoms`");
+        Consume(TokenType.RIGHT_PAREN,$"Expected `)`");
+        return new Expr.Randoms(randomToken);
+    }
+    private Expr ParseSamplesExpr(){
+        Token samplesToken = Consume(TokenType.SAMPLES);
+        Consume(TokenType.LEFT_PAREN,$"Expected `(` after call to `randoms`");
+        Consume(TokenType.RIGHT_PAREN,$"Expected `)`");
+        return new Expr.Samples(samplesToken);
     }
     private Expr ParsePrimaryExpression()
     {

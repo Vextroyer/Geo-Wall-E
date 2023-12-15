@@ -838,4 +838,10 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         }catch(RecoveryModeException){}
         return Element.NUMBER;
     }
+    public Element VisitSamplesExpr(Expr.Samples expr,Scope scope){
+        return Element.SEQUENCE;
+    }
+    public Element VisitRandomsExpr(Expr.Randoms expr,Scope scope){
+        return Element.SEQUENCE;
+    }
 }

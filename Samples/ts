@@ -1,9 +1,7 @@
 //Sample program to save functionalities to test.
 
-print count({});
+seq = samples();
+print seq;
 
-print count({25,2});
-
-print count({2 ... 25});
-
-print count({2 ...});
+a,_ = samples();
+print a;
