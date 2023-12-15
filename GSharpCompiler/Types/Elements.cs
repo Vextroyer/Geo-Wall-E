@@ -47,6 +47,7 @@ public abstract class Element
     public static Element.Circle CIRCLE = new Element.Circle(STRING, POINT, MEASURE, STRING, Color.BLACK);
     public static Element.Arc ARC = new Element.Arc(STRING, POINT, POINT, POINT, MEASURE, STRING, Color.BLACK);
     public static Element.Measure MEASURE = new Element.Measure(1);
+    public static Element.Sequence SEQUENCE = new Element.Sequence.Listing(new List<Element>());
     ///<summary>Represents the undefined type. Use this instead of declaring new Undefined objects.</summary>
     public static Element.Undefined UNDEFINED = new Element.Undefined();
     //Boolean values are represented with numbers
@@ -80,6 +81,10 @@ public abstract class Element
         {
             if (other.Type == this.Type) return TRUE;
             return FALSE;
+        }
+        public override string ToString()
+        {
+            return "UNDEFINED";
         }
     }
 
@@ -534,6 +539,16 @@ public abstract class Element
         public abstract bool IsEmpty {get;}
         public abstract IEnumerator<Element> GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public abstract class SequenceEnumerator : IEnumerator<Element>
+        {
+            public abstract Element Current {get; }
+            object IEnumerator.Current => Current;
+            public abstract void Dispose();
+            public abstract bool MoveNext();
+            public abstract void Reset();
+            ///<summary>Returns a new sequence with the remainig elements or an empty sequence.</summary>
+            public abstract Element.Sequence Resto {get; }
+        }
 
         ///<summary>A sequence of numbers</summary>
         public class Interval : Sequence{
@@ -551,7 +566,7 @@ public abstract class Element
                     return Element.UNDEFINED;
                 }
             }
-            public Interval(float min,float max){
+            public Interval(float min,float max = float.PositiveInfinity){
                 if(float.IsInfinity(min))throw new Exception("Cannot create a interval with infite minimum value");
                 if(float.IsNegativeInfinity(max))throw new Exception("Maximum cannot be negative infinity");
                 if(min > max)throw new Exception("Interval order is exchanged");
@@ -570,11 +585,13 @@ public abstract class Element
                 stringBuilder.Append('}');
                 return stringBuilder.ToString();
             }
-            class IntervalEnumerator : IEnumerator<Element>
+            public override IEnumerator<Element> GetEnumerator() => new IntervalEnumerator(Min,Max,IsFinite);
+            class IntervalEnumerator : SequenceEnumerator
             {
                 float Min;
                 float Max;
                 float current;
+                bool HayCurrent;
                 bool Finite;
                 public IntervalEnumerator(float min,float max,bool finite){
                     Min = min;
@@ -582,27 +599,41 @@ public abstract class Element
                     Finite = finite;
                     Reset();
                 }
-                public Element Current => new Element.Number(current);
-
-                object IEnumerator.Current => Current;
-
-                public void Dispose()
-                {
-                    
+                override public Element Current {
+                    get{
+                        if(HayCurrent){
+                            return new Element.Number(current);
+                        }
+                        throw new InvalidOperationException("The enumerator doesnt have remaining elements.");
+                    }
                 }
 
-                public bool MoveNext()
+                override public void Dispose(){}
+
+                public override bool MoveNext()
                 {
-                    if(!Finite)return true;
-                    return current <= Max;
+                    if(Utils.Compare(current + 1,Max) <= 0){
+                        ++current;
+                        HayCurrent = true;
+                    }
+                    else HayCurrent = false;
+                    return HayCurrent;
                 }
 
-                public void Reset()
+                public override void Reset()
                 {
-                    current = Min;
+                    current = Min - 1;
+                    HayCurrent = false;
+                }
+                public override Sequence Resto{
+                    get{
+                        if(Finite){
+                            return new Sequence.Interval(Min,Max);
+                        }
+                        return new Sequence.Interval(current + 1);
+                    }
                 }
             }
-            public override IEnumerator<Element> GetEnumerator() => new IntervalEnumerator(Min,Max,IsFinite);
         }
 
         ///<summary>A finite sequence of Element.</summary>
@@ -620,7 +651,7 @@ public abstract class Element
                 throw new NotImplementedException();
             }
             public override IEnumerator<Element> GetEnumerator(){
-                return sequence.GetEnumerator();
+                return new ListingEnumerator(sequence);
             }
             public override string ToString()
             {
@@ -632,6 +663,198 @@ public abstract class Element
                 }
                 stringBuilder.Append('}');
                 return stringBuilder.ToString();
+            }
+            class ListingEnumerator : SequenceEnumerator{
+                List<Element> sequence;
+                bool HayCurrent;
+                int actual;
+                public ListingEnumerator(List<Element> sequence){
+                    this.sequence = sequence;
+                    Reset();
+                }
+                public override void Reset()
+                {
+                    HayCurrent = false;
+                    actual = -1;
+                }
+                public override Element Current {
+                    get{
+                        if(HayCurrent)return sequence[actual];
+                        throw new InvalidOperationException("The enumerator doesnt have remaining elements.");
+                    }
+                }
+                public override void Dispose(){}
+                public override bool MoveNext()
+                {
+                    if(actual + 1 < sequence.Count){
+                        ++actual;
+                        HayCurrent = true;
+                    }
+                    else HayCurrent = false;
+                    return HayCurrent;
+                }
+                public override Sequence Resto{
+                    get{
+                        List<Element> resto = new List<Element>();
+                        for(int i=actual+1;i<sequence.Count;++i)resto.Add(sequence[i]);
+                        return new Element.Sequence.Listing(resto);
+                    }
+                }
+            }
+        }
+        ///<summary>A sequence of random numbers between 0 and 1.</summary>
+        public class Randoms : Sequence{
+            private int seed;
+            public Randoms(){
+                seed = new Random().Next();
+            }
+            public override Element Count => Element.UNDEFINED;
+            public override bool IsFinite => true;
+            public override Number EqualTo(Element other)
+            {
+                throw new NotImplementedException();
+            }
+            public override bool IsEmpty => false;
+            public override IEnumerator<Element> GetEnumerator() => new RandomsEnumerator(seed);
+
+            class RandomsEnumerator : SequenceEnumerator{
+                Random random;
+                int seed;
+                public RandomsEnumerator(int seed){
+                    this.seed = seed;
+                    random = new Random(seed);
+                }
+                public override Element Current => new Element.Number(random.NextSingle());
+                public override void Dispose(){}
+                public override void Reset() => random = new Random(seed);
+                public override bool MoveNext() => true;
+                public override Sequence Resto => throw new Exception("Cannot obtain a rest from randoms");
+            }
+        }
+        ///<summary>A sequence of random points.</summary>
+        public class Samples : Sequence{
+            private int seed;
+            public Samples(){
+                seed = new Random().Next();
+            }
+            public override Element Count => Element.UNDEFINED;
+            public override bool IsFinite => true;
+            public override Number EqualTo(Element other)
+            {
+                throw new NotImplementedException();
+            }
+            public override bool IsEmpty => false;
+            public override IEnumerator<Element> GetEnumerator() => new SamplesEnumerator(seed);
+
+            class SamplesEnumerator : SequenceEnumerator{
+                Random random;
+                int seed;
+                public SamplesEnumerator(int seed){
+                    this.seed = seed;
+                    random = new Random(seed);
+                }
+                public override Element Current => Utils.RandomPoint(random);
+                public override void Dispose(){}
+                public override void Reset() => random = new Random(seed);
+                public override bool MoveNext() => true;
+                public override Sequence Resto => throw new Exception("Cannot obtain a rest from samples");
+            }
+        }
+        ///<summary>A sequence composed of other sequences</summary>
+        public class CompositeSequence : Sequence{
+            private List<Sequence> sequences;
+            public CompositeSequence(List<Sequence> sequences){
+                this.sequences = sequences;
+            }
+            public CompositeSequence(params Sequence[] sequences){
+                this.sequences = new List<Sequence>(sequences);
+            }
+            public override bool IsEmpty {
+                get{
+                    foreach(Sequence seq in sequences)if(!seq.IsEmpty)return true;
+                    return true;
+                }
+            }
+            public override Element Count {
+                get{
+                    float count = 0;
+                    foreach(Sequence seq in sequences){
+                        if(!seq.IsFinite)return Element.UNDEFINED;
+                        count += (seq.Count as Element.Number)!.Value;
+                    }
+                    return new Element.Number(count);
+                }
+            }
+            public override bool IsFinite {
+                get{
+                    if(Count == Element.UNDEFINED)return false;
+                    return true;
+                }
+            }
+            public override string ToString()
+            {
+                if(!IsFinite)return "infinite sequence";
+                List<Element> elements = new List<Element>();
+                foreach(Sequence sequence in sequences){
+                    foreach(Element element in sequence){
+                        elements.Add(element);
+                    }
+                }
+                
+                System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
+                stringBuilder.Append('{');
+                for(int i=0;i<elements.Count;++i){
+                    stringBuilder.Append(elements[i].ToString());
+                    if(i < elements.Count - 1)stringBuilder.Append(',');
+                }
+                stringBuilder.Append('}');
+                return stringBuilder.ToString();
+            }
+            public override Number EqualTo(Element other)
+            {
+                throw new NotImplementedException();
+            }
+            public override IEnumerator<Element> GetEnumerator()
+            {
+                return new CompositeSequenceEnumerator(sequences);
+            }
+            class CompositeSequenceEnumerator : SequenceEnumerator{
+                private List<SequenceEnumerator> enumerators;
+                private bool hayCurrent;
+                private Element current;
+                public CompositeSequenceEnumerator(List<Sequence> sequences){
+                    enumerators = new List<SequenceEnumerator>(sequences.Count);
+                    foreach(Sequence seq in sequences)enumerators.Add((seq.GetEnumerator() as SequenceEnumerator)!);
+                    current = Element.UNDEFINED;
+                    Reset();
+                }
+                public override void Reset()
+                {
+                    hayCurrent = false;
+                    current = Element.UNDEFINED;
+                }
+                public override void Dispose(){}
+                public override Sequence Resto {
+                    get{
+                        List<Sequence> resto = new List<Sequence>();
+                        foreach(SequenceEnumerator enumerator in enumerators)resto.Add(enumerator.Resto);
+                        return new Sequence.CompositeSequence(resto);
+                    }
+                }
+                public override bool MoveNext()
+                {
+                    foreach(SequenceEnumerator enumerator in enumerators){
+                        if(enumerator.MoveNext()){
+                            hayCurrent = true;
+                            current = enumerator.Current;
+                            return true;
+                        }
+                    }
+                    hayCurrent = false;
+                    current = Element.UNDEFINED;
+                    return false;
+                }
+                public override Element Current => current;
             }
         }
     }

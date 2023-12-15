@@ -41,6 +41,9 @@ interface IVisitorExpr<T>
     public T VisitArcExpr(Expr.Arc expr, Scope scope);
     public T VisitSequenceExpr(Expr.Sequence expr, Scope scope);
     public T VisitIntersectExpr(Expr.Intersect expr,Scope scope);
+    public T VisitCountExpr(Expr.Count expr,Scope scope);
+    public T VisitRandomsExpr(Expr.Randoms expr,Scope scope);
+    public T VisitSamplesExpr(Expr.Samples expr,Scope scope);
 }
 interface IVisitableExpr
 {
@@ -607,6 +610,30 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
         public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
         {
             return visitor.VisitIntersectExpr(this, scope);
+        }
+    }
+    public class Count : Expr{
+        public new Expr Sequence {get; private set;}
+        public Count(int line,int offset,char[] fileName, Expr sequence):base(line,offset,fileName){
+            Sequence = sequence;
+        }
+        public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
+        {
+            return visitor.VisitCountExpr(this,scope);
+        }
+    }
+    public class Randoms : Expr{
+        public Randoms(Token randomToken):base(randomToken.Line,randomToken.Offset,randomToken.ExposeFile){}
+        public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
+        {
+            return visitor.VisitRandomsExpr(this,scope);
+        }
+    }
+    public class Samples : Expr{
+        public Samples(Token samplesToken):base(samplesToken.Line,samplesToken.Offset,samplesToken.ExposeFile){}
+        public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
+        {
+            return visitor.VisitSamplesExpr(this,scope);
         }
     }
 }

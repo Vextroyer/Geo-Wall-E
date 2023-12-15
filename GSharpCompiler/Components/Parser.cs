@@ -299,12 +299,25 @@ class Parser : GSharpCompilerComponent
             case TokenType.LEFT_PAREN:
                 //Identifier followed by parentheses means a function declaration.
                 return ParseFunctionDeclaration();
+            case TokenType.COMMA:
+                //Identifier followed by a comma means a match statement.
+                return ParseMatchDeclaration();
             default:
                 OnErrorFound(Peek, "Identifier found on top level statement, but no declaration follows. If you intend to evaluate an expression use the `eval` keyword before the identifier.");
                 break;
         }
         //Unreachable code.
         throw new Exception("Invalid execution path reached");
+    }
+    private Stmt.Declaration.Match ParseMatchDeclaration(){
+        List<Token> ID = new List<Token>();
+        do{
+            ID.Add(Consume(TokenType.ID,$"Expected `ID` on match declaration but {Peek.Type} was found"));
+        }while(Match(TokenType.COMMA));
+        Token equal = Consume(TokenType.EQUAL,$"Expected `=` after match declaration");
+        Expr sequence = ParseExpression();
+        ErrorIfEmpty(sequence,equal,$"Expecte non-empty expression after `=` on match declaration");
+        return new Stmt.Declaration.Match(ID[0].Line,ID[0].Offset,ID[0].ExposeFile,ID,sequence);
     }
     private Stmt.Declaration.Constant ParseConstantDeclaration()
     {
@@ -675,6 +688,12 @@ class Parser : GSharpCompilerComponent
         //Parse a variable or a call
         switch (Peek.Type)
         {
+            case TokenType.RANDOMS:
+                return ParseRandomsExpr();
+            case TokenType.SAMPLES:
+                return ParseSamplesExpr();
+            case TokenType.COUNT:
+                return ParseCountExpr();
             case TokenType.MEASURE:
                 return ParseMeasureExpr();
             case TokenType.ID:
@@ -715,6 +734,26 @@ class Parser : GSharpCompilerComponent
         ErrorIfEmpty(secondPoint, Previous, "Expectedd non-empty expression as second parameter.");
         Consume(TokenType.RIGHT_PAREN, "Expected `)` after parameters");
         return new Expr.Measure(measureToken, firstPoint, secondPoint);
+    }
+    private Expr ParseCountExpr(){
+        Token countToken = Consume(TokenType.COUNT);
+        Consume(TokenType.LEFT_PAREN, $"Expected `(` after call to function `count`");
+        Expr sequenceExpr = ParseExpression();
+        ErrorIfEmpty(sequenceExpr,countToken,$"Expected non-empty expression on call to function `count`");
+        Consume(TokenType.RIGHT_PAREN, "Expected `)` after parameter");
+        return new Expr.Count(countToken.Line,countToken.Offset,countToken.ExposeFile,sequenceExpr);
+    }
+    private Expr ParseRandomsExpr(){
+        Token randomToken = Consume(TokenType.RANDOMS);
+        Consume(TokenType.LEFT_PAREN,$"Expected `(` after call to `randoms`");
+        Consume(TokenType.RIGHT_PAREN,$"Expected `)`");
+        return new Expr.Randoms(randomToken);
+    }
+    private Expr ParseSamplesExpr(){
+        Token samplesToken = Consume(TokenType.SAMPLES);
+        Consume(TokenType.LEFT_PAREN,$"Expected `(` after call to `randoms`");
+        Consume(TokenType.RIGHT_PAREN,$"Expected `)`");
+        return new Expr.Samples(samplesToken);
     }
     private Expr ParsePrimaryExpression()
     {

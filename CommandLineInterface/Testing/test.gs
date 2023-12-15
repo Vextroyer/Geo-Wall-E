@@ -262,3 +262,61 @@ print {1 ... 3};
 print let
 f(x) = if x <= 0 then 1 else f(x-1) + f(x-2);
 in {f(2) ... f(6)};
+
+eval let
+a,_= {1,2};
+print a;
+in 1;
+
+eval let
+b,c,_ = {1,2};
+print b;
+print c;
+in 1;
+
+eval let
+e,rest = {1,2};
+print rest;
+in 1;
+
+eval let
+f,g,resto = {15 ... };
+h,_ = resto;
+print h;
+in 1;
+
+eval let
+a,b,c,d,resto = {1,2};
+print a;
+print b;
+print c;
+print d;
+print resto;
+in 1;
+
+eval let
+_,t = {1,2,3};
+print t;
+in 1;
+
+print count({});
+
+print count({25,2});
+
+print count({2 ... 25});
+
+print count({2 ...});
+
+eval let
+a = {2,3} + {4,5};
+print a;
+c = {1 ... 27} + a;
+print c;
+in 1;
+
+eval let
+a,b,c = {};
+print b;
+d,e,f = b;
+print {d,e,f};
+in 1;

@@ -242,6 +242,27 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
         Check(evalStmt.Expr, scope);//Check the semantic of the expression.
         return null;
     }
+    public object? VisitMatchStmt(Stmt.Declaration.Match stmt,Scope scope){
+            Element sequence = Check(stmt.Sequence,scope);
+            try{
+                if(sequence.Type != ElementType.SEQUENCE && sequence.Type != ElementType.RUNTIME_DEFINED)OnErrorFound(stmt,$"Expected `sequence` after `=` but {sequence.Type} was found");
+            }
+            catch(RecoveryModeException){}
+            try{
+                List<Token> identifiers = stmt.Identifiers;
+                for(int i=0;i<stmt.Identifiers.Count;++i){
+                    if(identifiers[i].Lexeme == "_")continue;
+                    try
+                    {
+                        scope.SetConstant(identifiers[i].Lexeme,Element.RUNTIME_DEFINED);
+                    }
+                    catch(ScopeException e){
+                        OnErrorFound(stmt,e.Message);
+                    }
+                }
+            }catch(RecoveryModeException){}
+        return null;
+    }
     //Checking expressions
     private Element Check(Expr expr, Scope scope)
     {
@@ -371,6 +392,8 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
                     case ElementType.MEASURE:
                         sumExpr.RequiresRuntimeCheck = false;
                         return Element.MEASURE;
+                    case ElementType.SEQUENCE:
+                        return Element.SEQUENCE;
                     default:
                         throw new Exception("Invalid excecution path reached.");
                 }
@@ -812,6 +835,19 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
 
     public Element VisitSequenceExpr(Expr.Sequence expr, Scope scope){
-        return Element.RUNTIME_DEFINED;
+        return Element.SEQUENCE;
+    }
+    public Element VisitCountExpr(Expr.Count expr,Scope scope){
+        Element sequence = Check(expr.Sequence,scope);
+        try{
+            if(sequence.Type != ElementType.SEQUENCE && sequence.Type != ElementType.RUNTIME_DEFINED)OnErrorFound(expr,$"Expected `SEQUENCE` as parameter but {sequence.Type} was found");
+        }catch(RecoveryModeException){}
+        return Element.NUMBER;
+    }
+    public Element VisitSamplesExpr(Expr.Samples expr,Scope scope){
+        return Element.SEQUENCE;
+    }
+    public Element VisitRandomsExpr(Expr.Randoms expr,Scope scope){
+        return Element.SEQUENCE;
     }
 }

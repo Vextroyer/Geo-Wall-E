@@ -48,6 +48,14 @@ static class Utils
     {
         return (random.Next() % (2 * MaxPointCoordinate + 1)) - MaxPointCoordinate;
     }
+    ///<summary>Generate an integer on the range [-MaxPointCoordinate,MaxPointCoordinate]. Use a provided random.</summary>
+    public static int RandomCoordinate(Random r){
+        return (r.Next() % (2 * MaxPointCoordinate + 1)) - MaxPointCoordinate;
+    }
+    ///<summary>Generate an random point with coordinates between [-MaxPointCoordinate,MaxPointCoordinate]. Use a provided random.</summary>
+    public static Element.Point RandomPoint(Random r){
+        return new Element.Point(new Element.String(),new Element.Number(RandomCoordinate(r)),new Element.Number(RandomCoordinate(r)),new Element.String(),Color.BLACK);
+    }
 
     ///<summary>Returns the contents of a file as an string. Its used to retrieve the content of a file. Throws an error if the file cant be oppened.</summary>
     ///<param name="path">The path to the file.</summary>
