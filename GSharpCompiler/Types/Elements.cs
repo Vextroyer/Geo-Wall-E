@@ -760,5 +760,102 @@ public abstract class Element
                 public override Sequence Resto => throw new Exception("Cannot obtain a rest from samples");
             }
         }
+        ///<summary>A sequence composed of other sequences</summary>
+        public class CompositeSequence : Sequence{
+            private List<Sequence> sequences;
+            public CompositeSequence(List<Sequence> sequences){
+                this.sequences = sequences;
+            }
+            public CompositeSequence(params Sequence[] sequences){
+                this.sequences = new List<Sequence>(sequences);
+            }
+            public override bool IsEmpty {
+                get{
+                    foreach(Sequence seq in sequences)if(!seq.IsEmpty)return true;
+                    return true;
+                }
+            }
+            public override Element Count {
+                get{
+                    float count = 0;
+                    foreach(Sequence seq in sequences){
+                        if(!seq.IsFinite)return Element.UNDEFINED;
+                        count += (seq.Count as Element.Number)!.Value;
+                    }
+                    return new Element.Number(count);
+                }
+            }
+            public override bool IsFinite {
+                get{
+                    if(Count == Element.UNDEFINED)return false;
+                    return true;
+                }
+            }
+            public override string ToString()
+            {
+                if(!IsFinite)return "infinite sequence";
+                List<Element> elements = new List<Element>();
+                foreach(Sequence sequence in sequences){
+                    foreach(Element element in sequence){
+                        elements.Add(element);
+                    }
+                }
+                
+                System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
+                stringBuilder.Append('{');
+                for(int i=0;i<elements.Count;++i){
+                    stringBuilder.Append(elements[i].ToString());
+                    if(i < elements.Count - 1)stringBuilder.Append(',');
+                }
+                stringBuilder.Append('}');
+                return stringBuilder.ToString();
+            }
+            public override Number EqualTo(Element other)
+            {
+                throw new NotImplementedException();
+            }
+            public override IEnumerator<Element> GetEnumerator()
+            {
+                return new CompositeSequenceEnumerator(sequences);
+            }
+            class CompositeSequenceEnumerator : SequenceEnumerator{
+                private List<SequenceEnumerator> enumerators;
+                private bool hayCurrent;
+                private Element current;
+                public CompositeSequenceEnumerator(List<Sequence> sequences){
+                    enumerators = new List<SequenceEnumerator>(sequences.Count);
+                    foreach(Sequence seq in sequences)enumerators.Add((seq.GetEnumerator() as SequenceEnumerator)!);
+                    current = Element.UNDEFINED;
+                    Reset();
+                }
+                public override void Reset()
+                {
+                    hayCurrent = false;
+                    current = Element.UNDEFINED;
+                }
+                public override void Dispose(){}
+                public override Sequence Resto {
+                    get{
+                        List<Sequence> resto = new List<Sequence>();
+                        foreach(SequenceEnumerator enumerator in enumerators)resto.Add(enumerator.Resto);
+                        return new Sequence.CompositeSequence(resto);
+                    }
+                }
+                public override bool MoveNext()
+                {
+                    foreach(SequenceEnumerator enumerator in enumerators){
+                        if(enumerator.MoveNext()){
+                            hayCurrent = true;
+                            current = enumerator.Current;
+                            return true;
+                        }
+                    }
+                    hayCurrent = false;
+                    current = Element.UNDEFINED;
+                    return false;
+                }
+                public override Element Current => current;
+            }
+        }
     }
 }

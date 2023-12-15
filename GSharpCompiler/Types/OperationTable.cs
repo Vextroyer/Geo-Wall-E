@@ -34,6 +34,7 @@ static class OperationTable{
         #region +
         Register("+",(Element.Number a,Element.Number b) => new Element.Number(a.Value + b.Value));
         Register("+",(Element.Measure a,Element.Measure b) => new Element.Measure(a.Value + b.Value));
+        Register("+",(Element.Sequence a,Element.Sequence b) => new Element.Sequence.CompositeSequence(a,b));
         #endregion +
         #region -
         Register("-",(Element.Number a,Element.Number b) => new Element.Number(a.Value - b.Value));

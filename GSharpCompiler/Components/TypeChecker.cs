@@ -392,6 +392,8 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
                     case ElementType.MEASURE:
                         sumExpr.RequiresRuntimeCheck = false;
                         return Element.MEASURE;
+                    case ElementType.SEQUENCE:
+                        return Element.SEQUENCE;
                     default:
                         throw new Exception("Invalid excecution path reached.");
                 }

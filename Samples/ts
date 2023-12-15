@@ -1,7 +1,6 @@
 //Sample program to save functionalities to test.
 
-seq = samples();
-print seq;
-
-a,_ = samples();
+a = {2,3} + {4,5};
 print a;
+c = {1 ... 27} + a;
+print c;

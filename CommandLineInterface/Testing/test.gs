@@ -306,3 +306,10 @@ print count({25,2});
 print count({2 ... 25});
 
 print count({2 ...});
+
+eval let
+a = {2,3} + {4,5};
+print a;
+c = {1 ... 27} + a;
+print c;
+in 1;
