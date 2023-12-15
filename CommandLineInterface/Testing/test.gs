@@ -298,3 +298,11 @@ eval let
 _,t = {1,2,3};
 print t;
 in 1;
+
+print count({});
+
+print count({25,2});
+
+print count({2 ... 25});
+
+print count({2 ...});

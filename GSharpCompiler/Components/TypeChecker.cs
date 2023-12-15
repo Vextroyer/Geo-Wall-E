@@ -831,4 +831,11 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     public Element VisitSequenceExpr(Expr.Sequence expr, Scope scope){
         return Element.SEQUENCE;
     }
+    public Element VisitCountExpr(Expr.Count expr,Scope scope){
+        Element sequence = Check(expr.Sequence,scope);
+        try{
+            if(sequence.Type != ElementType.SEQUENCE && sequence.Type != ElementType.RUNTIME_DEFINED)OnErrorFound(expr,$"Expected `SEQUENCE` as parameter but {sequence.Type} was found");
+        }catch(RecoveryModeException){}
+        return Element.NUMBER;
+    }
 }

@@ -40,6 +40,7 @@ interface IVisitorExpr<T>
     public T VisitCircleExpr(Expr.Circle expr, Scope scope);
     public T VisitArcExpr(Expr.Arc expr, Scope scope);
     public T VisitSequenceExpr(Expr.Sequence expr, Scope scope);
+    public T VisitCountExpr(Expr.Count expr,Scope scope);
 }
 interface IVisitableExpr
 {
@@ -586,6 +587,16 @@ abstract class Expr : IVisitableExpr, IErrorLocalizator
         public IEnumerator GetEnumerator()
         {
             return ((IEnumerable)Expressions).GetEnumerator();
+        }
+    }
+    public class Count : Expr{
+        public new Expr Sequence {get; private set;}
+        public Count(int line,int offset,char[] fileName, Expr sequence):base(line,offset,fileName){
+            Sequence = sequence;
+        }
+        public override T Accept<T>(IVisitorExpr<T> visitor, Scope scope)
+        {
+            return visitor.VisitCountExpr(this,scope);
         }
     }
 }

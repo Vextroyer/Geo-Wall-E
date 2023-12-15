@@ -502,6 +502,17 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         }
         return new Element.Sequence.Listing(elements);
     }
+    public Element VisitCountExpr(Expr.Count expr,Scope scope){
+        Element evaluated = Evaluate(expr.Sequence,scope);
+        if(evaluated.Type != ElementType.SEQUENCE)throw new RuntimeException(expr,$"Expected `SEQUENCE` as parameter but {evaluated.Type} was found");
+        Element.Sequence sequence;
+        if(evaluated is Element.Sequence.Listing){
+            sequence = (evaluated as Element.Sequence.Listing)!;
+        }else{
+            sequence = (evaluated as Element.Sequence.Interval)!;
+        }
+        return sequence.Count;
+    }
     #endregion Interpret expressions
 
     //Determine if the given element is true or false. Undefined and 0 are false, everything else is true.

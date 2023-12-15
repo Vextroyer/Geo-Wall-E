@@ -1,3 +1,9 @@
 //Sample program to save functionalities to test.
 
-// print {2 ... 1};
+print count({});
+
+print count({25,2});
+
+print count({2 ... 25});
+
+print count({2 ...});
