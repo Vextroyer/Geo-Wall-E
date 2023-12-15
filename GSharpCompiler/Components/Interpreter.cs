@@ -123,7 +123,12 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         return null;
     }
     public object? VisitMatchStmt(Stmt.Declaration.Match stmt,Scope scope){
-        Element.Sequence sequence = (Element.Sequence)Evaluate(stmt.Sequence,scope);
+        Element evaluated = Evaluate(stmt.Sequence,scope);
+        if(evaluated.Type == ElementType.UNDEFINED){
+            foreach(Token id in stmt.Identifiers)if(id.Lexeme != "_")scope.SetConstant(id.Lexeme,Element.UNDEFINED);
+            return null;
+        }
+        Element.Sequence sequence = (evaluated as Element.Sequence)!;
         Element.Sequence.SequenceEnumerator enumerator = (Element.Sequence.SequenceEnumerator) sequence.GetEnumerator();
         //For each identifier except the last one, which is the rest.
         for(int i=0;i<stmt.Identifiers.Count - 1;++i){

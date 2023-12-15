@@ -313,3 +313,10 @@ print a;
 c = {1 ... 27} + a;
 print c;
 in 1;
+
+eval let
+a,b,c = {};
+print b;
+d,e,f = b;
+print {d,e,f};
+in 1;
