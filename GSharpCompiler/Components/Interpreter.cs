@@ -510,6 +510,20 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         }
         return new Element.Sequence.Listing(elements);
     }
+    public Element VisitIntersectExpr(Expr.Intersect intersect,Scope scope)
+    {
+        Element element1 = Evaluate(intersect.FirstExpression,scope);//aqui faltan try y catch probablemente
+        Element element2 = Evaluate(intersect.SecondExpression,scope);
+        if (Utils.IsDraweable(element1)&&Utils.IsDraweable(element2))
+        {
+            Element elements = Interceptions.Intercept(element1,element2);
+            return elements;
+        }
+        else 
+        {
+            throw new RuntimeException(intersect,$"Only Draweables elements can be intercepted");
+        }
+    }
     public Element VisitCountExpr(Expr.Count expr,Scope scope){
         Element evaluated = Evaluate(expr.Sequence,scope);
         if(evaluated.Type != ElementType.SEQUENCE)throw new RuntimeException(expr,$"Expected `SEQUENCE` as parameter but {evaluated.Type} was found");

@@ -1,0 +1,14 @@
+point (0,8) P1;
+point (0,11) P2;
+point (0,8) P3;
+point (0,10) P4;
+segment (P1,P2) L2;
+segment (P3,P4) L3;
+//circle (P4,measure(P4,P1)) L4;
+//print let x,_=intersect(P1,P2); in x;
+//print measure(P1,P2);
+//seq = {point(3,4),point(),point()};
+//print seq;
+//s = {2 ... 50};
+//print s;
+print intersect(L2,L3);

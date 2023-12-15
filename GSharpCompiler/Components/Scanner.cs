@@ -35,6 +35,7 @@ class Scanner : GSharpCompilerComponent
         {"eval",TokenType.EVAL},
         {"import",TokenType.IMPORT},
         {"measure",TokenType.MEASURE},
+        {"intersect",TokenType.INTERSECT},
         {"count",TokenType.COUNT},
         {"randoms",TokenType.RANDOMS},
         {"samples",TokenType.SAMPLES},

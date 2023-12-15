@@ -38,7 +38,7 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
         //return $"line({stmt.Id.Lexeme},{stmt.Comment},{VisitVariableExpr((Expr.Variable)stmt.P1,scope)},{VisitVariableExpr((Expr.Variable)stmt.P2,scope)})";
         return $"line({stmt.Id.Lexeme},{stmt.Comment},{Print(stmt.P1)},{Print(stmt.P2)})";
     }
-     public string VisitLinesExpr(Expr.Lines expr, Scope scope)
+    public string VisitLinesExpr(Expr.Lines expr, Scope scope)
     {
         return $"line({Print(expr.P1)},{Print(expr.P2)}";
     }
@@ -79,16 +79,19 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
         return $"{stmt.Id.Lexeme} = {Print(stmt.RValue)}";
     }
 
-    public string VisitFunctionDeclarationStmt(Stmt.Declaration.Function stmt, Scope scope){
+    public string VisitFunctionDeclarationStmt(Stmt.Declaration.Function stmt, Scope scope)
+    {
         string ret = $"function {stmt.Id.Lexeme} (";
-        for(int i=0;i<stmt.Arguments.Count;++i){
+        for (int i = 0; i < stmt.Arguments.Count; ++i)
+        {
             ret += stmt.Arguments[i].Lexeme;
-            if(i < stmt.Arguments.Count - 1)ret += ", ";
+            if (i < stmt.Arguments.Count - 1) ret += ", ";
         }
         return $"{ret}) = {Print(stmt.Body)}";
     }
 
-    public string VisitEvalStmt(Stmt.Eval stmt, Scope scope){
+    public string VisitEvalStmt(Stmt.Eval stmt, Scope scope)
+    {
         return $"eval {Print(stmt.Expr)}";
     }
 
@@ -230,22 +233,31 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
         return $"let({Print(expr.LetStmts)})\nin({Print(expr.InExpr)})";
     }
 
-    public string VisitCallExpr(Expr.Call expr,Scope scope){
+    public string VisitCallExpr(Expr.Call expr, Scope scope)
+    {
         return $"{expr.Id.Lexeme}({PrintArguments()})";
 
-        string PrintArguments(){
+        string PrintArguments()
+        {
             string ret = "";
-            for(int i=0;i<expr.Parameters.Count;++i){
+            for (int i = 0; i < expr.Parameters.Count; ++i)
+            {
                 ret += Print(expr.Parameters[i]);
-                if(i < expr.Parameters.Count - 1)ret += ',';
+                if (i < expr.Parameters.Count - 1) ret += ',';
             }
             return ret;
         }
     }
-    public string VisitMeasureExpr(Expr.Measure expr,Scope scope){
+    public string VisitMeasureExpr(Expr.Measure expr, Scope scope)
+    {
         return $"measure({Print(expr.P1)},{Print(expr.P2)})";
     }
-    public string VisitSequenceExpr(Expr.Sequence expr, Scope scope){
+    public string VisitIntersectExpr(Expr.Intersect expr, Scope scope)
+    {
+        return $"intersect({Print(expr.FirstExpression)},{Print(expr.SecondExpression)})";
+    }
+    public string VisitSequenceExpr(Expr.Sequence expr, Scope scope)
+    {
         return "sequence";
     }
     public string VisitCountExpr(Expr.Count expr,Scope scope){
