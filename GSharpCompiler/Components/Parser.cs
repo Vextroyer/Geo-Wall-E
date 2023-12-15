@@ -299,12 +299,25 @@ class Parser : GSharpCompilerComponent
             case TokenType.LEFT_PAREN:
                 //Identifier followed by parentheses means a function declaration.
                 return ParseFunctionDeclaration();
+            case TokenType.COMMA:
+                //Identifier followed by a comma means a match statement.
+                return ParseMatchDeclaration();
             default:
                 OnErrorFound(Peek, "Identifier found on top level statement, but no declaration follows. If you intend to evaluate an expression use the `eval` keyword before the identifier.");
                 break;
         }
         //Unreachable code.
         throw new Exception("Invalid execution path reached");
+    }
+    private Stmt.Declaration.Match ParseMatchDeclaration(){
+        List<Token> ID = new List<Token>();
+        do{
+            ID.Add(Consume(TokenType.ID,$"Expected `ID` on match declaration but {Peek.Type} was found"));
+        }while(Match(TokenType.COMMA));
+        Token equal = Consume(TokenType.EQUAL,$"Expected `=` after match declaration");
+        Expr sequence = ParseExpression();
+        ErrorIfEmpty(sequence,equal,$"Expecte non-empty expression after `=` on match declaration");
+        return new Stmt.Declaration.Match(ID[0].Line,ID[0].Offset,ID[0].ExposeFile,ID,sequence);
     }
     private Stmt.Declaration.Constant ParseConstantDeclaration()
     {

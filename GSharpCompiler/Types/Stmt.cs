@@ -20,6 +20,7 @@ interface IVisitorStmt<T>
     public T VisitEvalStmt(Stmt.Eval stmt, Scope scope);
     public T VisitCircleStmt(Stmt.Circle stmt, Scope scope);
     public T VisitArcStmt(Stmt.Arc stmt, Scope scope);
+    public T VisitMatchStmt(Stmt.Declaration.Match stmt,Scope scope);
 }
 interface IVisitableStmt
 {
@@ -264,6 +265,20 @@ abstract class Stmt : IVisitableStmt, IErrorLocalizator
             }
             public int Arity { get => Arguments.Count; }
         }
+        ///<summary>Match declaration.</summary>
+        public class Match : Declaration{
+        ///<summary>The sequence of the right side.</summary>
+        public Expr Sequence {get; private set;}
+            public List<Token> Identifiers {get; private set;}
+            public Match(int line,int offset,char[] fileName,List<Token> identifiers,Expr sequence):base(identifiers[0],identifiers[0].ExposeFile){
+                Identifiers = identifiers;
+                Sequence = sequence;
+            }
+            public override T Accept<T>(IVisitorStmt<T> visitor, Scope scope)
+            {
+                return visitor.VisitMatchStmt(this,scope);
+            }
+    }
     }
 
     public class Draw : Stmt

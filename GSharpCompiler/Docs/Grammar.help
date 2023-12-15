@@ -8,7 +8,8 @@ Stmt = PointStmt ';'; //Point statement
 Stmt = Declaration ';'; 
     Declaration = ID '=' Expr ';';//Declaration of a constant. Read only variable.
     Declaration = ID(Arguments) '=' Expr ';'; //Declaration of a function.
-        Arguments = (ID , (',' ID)* )?;
+        Arguments = (ID (',' ID)* )?;
+    Declaration = ID (',' ID)+ '=' Expr;//Match declaration
 
 Stmt = 'eval' Expr ';'; //The eval statemet, allow excecuting expressions as top-level statements.
 

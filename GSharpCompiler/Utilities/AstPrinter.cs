@@ -107,6 +107,13 @@ class AstPrinter : IVisitorStmt<string>, IVisitorExpr<string>
     {
         return $"draw({Print(stmt._Expr)})";
     }
+    
+    public string VisitMatchStmt(Stmt.Declaration.Match stmt,Scope scope){
+        string ret = "";
+        foreach(Token ID in stmt.Identifiers)ret += ID.Lexeme + " ";
+        ret += Print(stmt.Sequence);
+        return ret;
+    }
 
     public string Print(Expr expr)
     {

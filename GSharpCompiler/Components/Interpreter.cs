@@ -119,6 +119,26 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         scope.SetArgument(functionStmt.Id.Lexeme, Element.Function.MakeFunction(functionStmt));
         return null;
     }
+    public object? VisitMatchStmt(Stmt.Declaration.Match stmt,Scope scope){
+        Element.Sequence sequence = (Element.Sequence)Evaluate(stmt.Sequence,scope);
+        Element.Sequence.SequenceEnumerator enumerator = (Element.Sequence.SequenceEnumerator) sequence.GetEnumerator();
+        //For each identifier except the last one, which is the rest.
+        for(int i=0;i<stmt.Identifiers.Count - 1;++i){
+            //Element to be retrieved from the sequence.
+            Element sequenceElement;
+            if(stmt.Identifiers[i].Lexeme == "_"){
+                enumerator.MoveNext();
+                continue;
+            }
+            if(enumerator.MoveNext()) sequenceElement = enumerator.Current;
+            else sequenceElement = Element.UNDEFINED;
+            //After retrieving the element associate it with the Id.
+            scope.SetConstant(stmt.Identifiers[i].Lexeme,sequenceElement);
+        }
+        //Declare the rest.
+        if(stmt.Identifiers[stmt.Identifiers.Count - 1].Lexeme != "_") scope.SetConstant(stmt.Identifiers[stmt.Identifiers.Count - 1].Lexeme,enumerator.Resto);
+        return null;
+    }
     public object? VisitPrintStmt(Stmt.Print stmt, Scope scope)
     {
         if (stmt._Expr == Expr.EMPTY) outputStream.WriteLine();
@@ -470,7 +490,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
                 if(startValue > endValue)throw new RuntimeException(sequence,$"Sequence range is inverted : [{startValue} , {endValue}]");
                 return new Element.Sequence.Interval(startValue,endValue);
             }
-            return new Element.Sequence.Interval(startValue,float.PositiveInfinity);
+            return new Element.Sequence.Interval(startValue);
         }
         ElementType? type = null;
         List<Element> elements = new List<Element>();
