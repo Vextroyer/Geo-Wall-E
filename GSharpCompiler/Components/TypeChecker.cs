@@ -228,13 +228,13 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
     }
     public object? VisitDrawStmt(Stmt.Draw drawStmt, Scope scope)
     {
-        Element element = Check(drawStmt._Expr, scope);
-        //element is of class Element, but its an instance of a subclass of Element, some of which implements the interface IDrawable. Rule # 5
-        try
-        {
-            if (!(element is IDrawable)) OnErrorFound(drawStmt, $"Element of type `{element.Type}` is not drawable");
-        }
-        catch (RecoveryModeException) { }
+        // Element element = Check(drawStmt._Expr, scope);
+        // //element is of class Element, but its an instance of a subclass of Element, some of which implements the interface IDrawable. Rule # 5
+        // try
+        // {
+        //     if (!(element is IDrawable)) OnErrorFound(drawStmt, $"Element of type `{element.Type}` is not drawable");
+        // }
+        // catch (RecoveryModeException) { }
         return null;
     }
     public object? VisitEvalStmt(Stmt.Eval evalStmt, Scope scope)
