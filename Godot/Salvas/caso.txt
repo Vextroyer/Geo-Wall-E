@@ -1,0 +1,9 @@
+ray(point(22,183),point(-185,200))c1;
+print c1;
+segment(point(-25,-150),point(-36,197))s1;
+print s1;
+draw s1;
+draw c1;
+color blue;
+print intersect(c1,s1);
+draw intersect(c1,s1);

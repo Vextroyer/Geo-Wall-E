@@ -1,0 +1,8 @@
+ray(point(0,20),point(100,20))p1;
+circle(point(0,0),measure(point(0,0),point(0,50)))p2;
+point(0,80)p3;
+draw p1;
+draw p2;
+color blue;
+draw intersect(p1,p2);
+print intersect(p1,p2);

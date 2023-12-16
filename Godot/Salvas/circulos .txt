@@ -1,0 +1,11 @@
+point(100,0)p1;
+point(0,0)p2;
+circle(p1,measure(p1,p2))c1;
+circle(p2,measure(p1,p2))c2;
+print c1;
+print c2;
+draw c1;
+draw c2;
+print intersect(c1,c2);
+color blue;
+draw intersect(c1,c2);

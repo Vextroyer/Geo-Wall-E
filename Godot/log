@@ -1,0 +1,144 @@
+
+12/6/2023 4:30:01 PM
+Unable to cast object of type 'Number' to type 'Point'.
+   at GSharpCompiler.Interpreter.VisitLinesExpr(Lines linesExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 303
+   at GSharpCompiler.Expr.Lines.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 412
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 130
+   at GSharpCompiler.Interpreter.VisitDrawStmt(Draw stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 112
+   at GSharpCompiler.Stmt.Draw.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 215
+   at GSharpCompiler.Interpreter.Interpret(Stmt stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 40
+   at GSharpCompiler.Interpreter.VisitStmtList(StmtList stmtList, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 47
+   at GSharpCompiler.Stmt.StmtList.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 271
+   at GSharpCompiler.Interpreter.Interpret(Stmt stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 40
+   at GSharpCompiler.Interpreter.Interpret(Program program) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 34
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Compiler.cs:line 58
+
+12/6/2023 4:32:31 PM
+Unable to cast object of type 'Number' to type 'Point'.
+   at GSharpCompiler.Interpreter.VisitLinesExpr(Lines linesExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 303
+   at GSharpCompiler.Expr.Lines.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 412
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 130
+   at GSharpCompiler.Interpreter.VisitDrawStmt(Draw stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 112
+   at GSharpCompiler.Stmt.Draw.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 215
+   at GSharpCompiler.Interpreter.Interpret(Stmt stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 40
+   at GSharpCompiler.Interpreter.VisitStmtList(StmtList stmtList, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 47
+   at GSharpCompiler.Stmt.StmtList.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 271
+   at GSharpCompiler.Interpreter.Interpret(Stmt stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 40
+   at GSharpCompiler.Interpreter.Interpret(Program program) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 34
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Compiler.cs:line 58
+
+12/6/2023 9:40:35 PM
+Object reference not set to an instance of an object.
+   at GSharpCompiler.AstPrinter.Print(Expr expr) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 113
+   at GSharpCompiler.AstPrinter.VisitLinesExpr(Lines expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 43
+   at GSharpCompiler.Expr.Lines.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 427
+   at GSharpCompiler.AstPrinter.Print(Expr expr) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 113
+   at GSharpCompiler.AstPrinter.VisitDrawStmt(Draw stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 108
+   at GSharpCompiler.Stmt.Draw.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 215
+   at GSharpCompiler.AstPrinter.Print(Stmt stmt) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 10
+   at GSharpCompiler.Utils.PrintAst(Program program, TextWriter outputStream) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\Utils.cs:line 27
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Compiler.cs:line 46
+
+12/6/2023 9:42:15 PM
+Object reference not set to an instance of an object.
+   at GSharpCompiler.AstPrinter.Print(Expr expr) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 113
+   at GSharpCompiler.AstPrinter.VisitLinesExpr(Lines expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 43
+   at GSharpCompiler.Expr.Lines.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 427
+   at GSharpCompiler.AstPrinter.Print(Expr expr) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 113
+   at GSharpCompiler.AstPrinter.VisitDrawStmt(Draw stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 108
+   at GSharpCompiler.Stmt.Draw.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 215
+   at GSharpCompiler.AstPrinter.Print(Stmt stmt) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 10
+   at GSharpCompiler.Utils.PrintAst(Program program, TextWriter outputStream) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\Utils.cs:line 27
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Compiler.cs:line 46
+
+12/6/2023 9:45:56 PM
+Object reference not set to an instance of an object.
+   at GSharpCompiler.AstPrinter.Print(Expr expr) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 113
+   at GSharpCompiler.AstPrinter.VisitSegmentExpr(Segment stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 59
+   at GSharpCompiler.Expr.Segment.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 451
+   at GSharpCompiler.AstPrinter.Print(Expr expr) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 113
+   at GSharpCompiler.AstPrinter.VisitDrawStmt(Draw stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 108
+   at GSharpCompiler.Stmt.Draw.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 215
+   at GSharpCompiler.AstPrinter.Print(Stmt stmt) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\AstPrinter.cs:line 10
+   at GSharpCompiler.Utils.PrintAst(Program program, TextWriter outputStream) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\Utils.cs:line 27
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Compiler.cs:line 46
+
+12/7/2023 8:53:25 PM
+Object reference not set to an instance of an object.
+   at GSharpCompiler.Utils.PrintTokens(List`1 tokens, TextWriter outputStream, String file) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Utilities\Utils.cs:line 8
+   at GSharpCompiler.DependencyResolver.ScanAndResolveDependencies() in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\DependencyResolver.cs:line 29
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Compiler.cs:line 37
+
+12/15/2023 2:17:39 PM
+Redeclaration of constant `fn`
+   at GSharpCompiler.Scope.SetArgument(String varName, Element newElement) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Scope.cs:line 30
+   at GSharpCompiler.Scope.SetConstant(String varName, Element element) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Scope.cs:line 77
+   at GSharpCompiler.Interpreter.VisitConstantDeclarationStmt(Constant declaration, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 121
+   at GSharpCompiler.Stmt.Declaration.Constant.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 250
+   at GSharpCompiler.Interpreter.Interpret(Stmt stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 43
+   at GSharpCompiler.Interpreter.VisitLetInExpr(LetIn letInExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 428
+   at GSharpCompiler.Expr.LetIn.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 408
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitConditionalExpr(Conditional conditionalExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 422
+   at GSharpCompiler.Expr.Conditional.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 391
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitCallExpr(Call callExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 539
+   at GSharpCompiler.Expr.Call.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 154
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitSequenceExpr(Sequence sequence, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 582
+   at GSharpCompiler.Expr.Sequence.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 588
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitLetInExpr(LetIn letInExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 429
+   at GSharpCompiler.Expr.LetIn.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 408
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitConditionalExpr(Conditional conditionalExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 422
+   at GSharpCompiler.Expr.Conditional.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 391
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitCallExpr(Call callExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 539
+   at GSharpCompiler.Expr.Call.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 154
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitConstantDeclarationStmt(Constant declaration, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 121
+   at GSharpCompiler.Stmt.Declaration.Constant.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 250
+   at GSharpCompiler.Interpreter.Interpret(Stmt stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 43
+   at GSharpCompiler.Interpreter.VisitStmtList(StmtList stmtList, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 50
+   at GSharpCompiler.Stmt.StmtList.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 358
+   at GSharpCompiler.Interpreter.Interpret(Stmt stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 43
+   at GSharpCompiler.Interpreter.Interpret(Program program) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 37
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Compiler.cs:line 58
+
+12/15/2023 2:18:42 PM
+Redeclaration of constant `fn`
+   at GSharpCompiler.Scope.SetArgument(String varName, Element newElement) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Scope.cs:line 30
+   at GSharpCompiler.Scope.SetConstant(String varName, Element element) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Scope.cs:line 77
+   at GSharpCompiler.Interpreter.VisitConstantDeclarationStmt(Constant declaration, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 121
+   at GSharpCompiler.Stmt.Declaration.Constant.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 250
+   at GSharpCompiler.Interpreter.Interpret(Stmt stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 43
+   at GSharpCompiler.Interpreter.VisitLetInExpr(LetIn letInExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 428
+   at GSharpCompiler.Expr.LetIn.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 408
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitConditionalExpr(Conditional conditionalExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 422
+   at GSharpCompiler.Expr.Conditional.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 391
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitCallExpr(Call callExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 539
+   at GSharpCompiler.Expr.Call.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 154
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitSequenceExpr(Sequence sequence, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 582
+   at GSharpCompiler.Expr.Sequence.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 588
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitLetInExpr(LetIn letInExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 429
+   at GSharpCompiler.Expr.LetIn.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 408
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitConditionalExpr(Conditional conditionalExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 422
+   at GSharpCompiler.Expr.Conditional.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 391
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitCallExpr(Call callExpr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 539
+   at GSharpCompiler.Expr.Call.Accept[T](IVisitorExpr`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Expr.cs:line 154
+   at GSharpCompiler.Interpreter.Evaluate(Expr expr, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 203
+   at GSharpCompiler.Interpreter.VisitConstantDeclarationStmt(Constant declaration, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 121
+   at GSharpCompiler.Stmt.Declaration.Constant.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 250
+   at GSharpCompiler.Interpreter.Interpret(Stmt stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 43
+   at GSharpCompiler.Interpreter.VisitStmtList(StmtList stmtList, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 50
+   at GSharpCompiler.Stmt.StmtList.Accept[T](IVisitorStmt`1 visitor, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Types\Stmt.cs:line 358
+   at GSharpCompiler.Interpreter.Interpret(Stmt stmt, Scope scope) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 43
+   at GSharpCompiler.Interpreter.Interpret(Program program) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Interpreter.cs:line 37
+   at GSharpCompiler.Compiler.CompileFromSource(String source, String sourceFileName, Flags flags) in D:\Programcion\PROYECTO\Geo-Wall-E\GSharpCompiler\Components\Compiler.cs:line 58

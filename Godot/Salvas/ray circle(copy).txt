@@ -1,0 +1,6 @@
+circle()c1;
+ray()s1;
+draw s1;
+draw c1;
+color blue;
+draw intersect(c1,s1);

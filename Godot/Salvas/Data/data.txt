@@ -1,0 +1,3 @@
+circle()c1;
+circle()c2;
+draw intersect(c1,c2);

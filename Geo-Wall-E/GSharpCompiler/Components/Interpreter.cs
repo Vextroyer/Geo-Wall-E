@@ -174,6 +174,8 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
             foreach (Element element in (evaluated as Element.Sequence)!)
             {
                 if (!(element is IDrawable)) throw new RuntimeException(stmt, $"Cannot draw `{element.Type}`");
+                IDrawable temp = (element as IDrawable)!;
+                temp.Color=colorStack.Top;
                 drawables.Add((element as IDrawable)!);
             }
             return null;
@@ -309,7 +311,8 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         Element right = Evaluate(expr.Right, scope);
         try
         {
-            return OperationTable.Operate("+", left, right);
+            //return OperationTable.Operate("+", left, right);
+            return left + right;
         }
         catch (InvalidOperationException)
         {

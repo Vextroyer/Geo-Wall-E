@@ -1,0 +1,166 @@
+[gd_scene load_steps=12 format=3 uid="uid://caomts5jffehr"]
+
+[ext_resource type="Script" path="res://NodoPadre.cs" id="1_gl81f"]
+[ext_resource type="Script" path="res://Save.cs" id="2_b8gnf"]
+[ext_resource type="Script" path="res://Draw_Button.cs" id="2_srdjw"]
+[ext_resource type="Script" path="res://Lector_de_Codigo.cs" id="2_t542f"]
+[ext_resource type="Script" path="res://Lienzocontrol.cs" id="3_0los0"]
+[ext_resource type="Script" path="res://Lienzo.cs" id="3_4oth6"]
+[ext_resource type="Script" path="res://Menu_de_Nombre.cs" id="3_021r3"]
+[ext_resource type="Script" path="res://Accept.cs" id="4_yvifm"]
+[ext_resource type="Script" path="res://Cancel.cs" id="5_x5at3"]
+[ext_resource type="Script" path="res://Clear.cs" id="6_bhv8d"]
+[ext_resource type="Script" path="res://ClearConsole.cs" id="10_dwypd"]
+
+[node name="NodoPadre" type="Control"]
+clip_contents = true
+custom_minimum_size = Vector2(1152, 648)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_gl81f")
+metadata/_edit_use_anchors_ = true
+
+[node name="Lector_de_Codigo" type="CodeEdit" parent="."]
+layout_mode = 0
+anchor_left = 0.000868056
+anchor_top = 0.00462963
+anchor_right = 0.327257
+anchor_bottom = 0.640432
+placeholder_text = "Escriba su codigo"
+gutters_draw_executing_lines = true
+gutters_draw_line_numbers = true
+script = ExtResource("2_t542f")
+metadata/_edit_use_anchors_ = true
+
+[node name="Consola" type="TextEdit" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.697531
+anchor_right = 0.999132
+anchor_bottom = 0.993827
+placeholder_text = "CONSOLA"
+editable = false
+metadata/_edit_use_anchors_ = true
+
+[node name="Draw_Button" type="Button" parent="."]
+layout_mode = 0
+anchor_left = 0.00434028
+anchor_top = 0.641975
+anchor_right = 0.105035
+anchor_bottom = 0.695988
+offset_top = 3.05176e-05
+text = "DRAW"
+script = ExtResource("2_srdjw")
+metadata/_edit_use_anchors_ = true
+
+[node name="Lienzocontrol" type="MarginContainer" parent="."]
+clip_contents = true
+layout_mode = 0
+anchor_left = 0.330729
+anchor_top = 0.00154321
+anchor_right = 0.998264
+anchor_bottom = 0.694444
+offset_right = -0.000366211
+offset_bottom = 0.000274658
+script = ExtResource("3_0los0")
+metadata/_edit_use_anchors_ = true
+
+[node name="ColorRect" type="ColorRect" parent="Lienzocontrol"]
+layout_mode = 2
+
+[node name="Lienzo" type="Node2D" parent="Lienzocontrol/ColorRect"]
+position = Vector2(397, 222)
+script = ExtResource("3_4oth6")
+
+[node name="Save" type="Button" parent="."]
+layout_mode = 0
+anchor_left = 0.106771
+anchor_top = 0.640432
+anchor_right = 0.225694
+anchor_bottom = 0.699074
+text = "SAVE"
+script = ExtResource("2_b8gnf")
+metadata/_edit_use_anchors_ = true
+
+[node name="Menu_de_Nombre" type="Panel" parent="Save"]
+visible = false
+clip_contents = true
+layout_mode = 0
+anchor_left = 1.37226
+anchor_top = -5.26316
+anchor_right = 5.0219
+anchor_bottom = -1.31579
+offset_right = 0.000488281
+offset_bottom = 0.000175476
+script = ExtResource("3_021r3")
+metadata/_edit_use_anchors_ = true
+
+[node name="NombreDeArchivo" type="TextEdit" parent="Save/Menu_de_Nombre"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.00199814
+anchor_top = 0.02
+anchor_right = 1.002
+anchor_bottom = 0.686667
+offset_left = 0.000930846
+offset_right = -0.000915527
+grow_horizontal = 2
+placeholder_text = "NOMBRE DEL ARCHIVO"
+metadata/_edit_use_anchors_ = true
+
+[node name="Accept" type="Button" parent="Save/Menu_de_Nombre"]
+custom_minimum_size = Vector2(250, 50)
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.212
+anchor_right = 1.239
+anchor_bottom = 1.0
+offset_top = 110.2
+offset_right = -611.499
+grow_vertical = 0
+text = "ACCEPT"
+script = ExtResource("4_yvifm")
+metadata/_edit_use_anchors_ = true
+
+[node name="Cancel" type="Button" parent="Save/Menu_de_Nombre"]
+custom_minimum_size = Vector2(250, 50)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.219
+anchor_top = 0.169
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 604.5
+offset_top = 116.65
+grow_horizontal = 0
+grow_vertical = 0
+text = "CANCEL"
+script = ExtResource("5_x5at3")
+metadata/_edit_use_anchors_ = true
+
+[node name="Clear" type="Button" parent="."]
+layout_mode = 0
+anchor_left = 0.224826
+anchor_top = 0.632716
+anchor_right = 0.329861
+anchor_bottom = 0.705247
+text = "CLEAR"
+script = ExtResource("6_bhv8d")
+metadata/_edit_use_anchors_ = true
+
+[node name="ClearConsole" type="Button" parent="."]
+layout_mode = 0
+anchor_left = 0.835069
+anchor_top = 0.895062
+anchor_right = 0.996528
+anchor_bottom = 0.992284
+text = "CLEAR CONSOLE"
+script = ExtResource("10_dwypd")
+metadata/_edit_use_anchors_ = true
+
+[connection signal="item_rect_changed" from="Lienzocontrol" to="." method="_on_lienzocontrol_item_rect_changed"]

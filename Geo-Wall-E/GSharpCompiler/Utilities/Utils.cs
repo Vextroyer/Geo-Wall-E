@@ -91,7 +91,7 @@ static class Utils
         if (x <= Epsilon) return true;
         return false;
     }
-    public static float Epsilon = 1e-6f;
+    public static float Epsilon = 1e-3f;
 
     //Parte de intercept
     public static bool IsDraweable(Element element1)

@@ -9,7 +9,7 @@ namespace GSharpCompiler;
 public interface IDrawable
 {
     public ElementType Type { get; }
-    public Color Color { get; }
+    public Color Color { get;set; }
     public Element.String Comment { get; set; }
 }
 
@@ -57,6 +57,7 @@ public abstract class Element
     public static Element.RuntimeDefined RUNTIME_DEFINED = new Element.RuntimeDefined();
     #endregion constants
 
+    public static Element operator+(Element a,Element b) => OperationTable.Operate("+",a,b); 
     protected Element(ElementType type)
     {
         Type = type;
@@ -289,7 +290,7 @@ public abstract class Element
         public Element.Number x;
         public Element.Number y;
 
-        public Color Color { get; private set; }
+        public Color Color { get;  set; }
 
         public Point(Element.String _name, Element.Number _x, Element.Number _y, Element.String _comment, Color color) : base(ElementType.POINT)
         {
@@ -343,7 +344,7 @@ public abstract class Element
         public Element.Point p1;
         public Element.Point p2;
 
-        public Color Color { get; private set; }
+        public Color Color { get;  set; }
 
         public Lines(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.LINE)
         {
@@ -380,7 +381,7 @@ public abstract class Element
         public Element.Point p1;
         public Element.Point p2;
 
-        public Color Color { get; private set; }
+        public Color Color { get;  set; }
 
         public Segment(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.SEGMENT)
         {
@@ -417,7 +418,7 @@ public abstract class Element
         public Element.Point p1;
         public Element.Point p2;
 
-        public Color Color { get; private set; }
+        public Color Color { get;  set; }
 
         public Ray(Element.String _name, Element.Point _p1, Element.Point _p2, Element.String _comment, Color color) : base(ElementType.RAY)
         {
@@ -455,7 +456,7 @@ public abstract class Element
         public Element.Point p1;
         public Element.Measure radius;
 
-        public Color Color { get; private set; }
+        public Color Color { get;  set; }
 
         public Circle(Element.String _name, Element.Point _p1, Element.Measure _radius, Element.String _comment, Color color) : base(ElementType.CIRCLE)
         {
@@ -496,7 +497,7 @@ public abstract class Element
         public Element.Point p3;
         public Element.Measure radius;
 
-        public Color Color { get; private set; }
+        public Color Color { get;  set; }
 
         public Arc(Element.String _name, Element.Point _p1, Element.Point _p2, Element.Point _p3, Element.Measure _radius, Element.String _comment, Color color) : base(ElementType.ARC)
         {
