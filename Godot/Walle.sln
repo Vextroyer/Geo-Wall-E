@@ -1,0 +1,32 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Walle", "Walle.csproj", "{99317648-DCA4-4D6D-A67B-ACC704C34F04}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Geo-Wall-E", "Geo-Wall-E", "{DE162CA0-A6FB-4EE1-8BD2-8E48109D8D38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "Geo-Wall-E\Frontend\Frontend.csproj", "{A1F641C6-3D0C-4473-A76C-D304593CCAD4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		ExportDebug|Any CPU = ExportDebug|Any CPU
+		ExportRelease|Any CPU = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{99317648-DCA4-4D6D-A67B-ACC704C34F04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99317648-DCA4-4D6D-A67B-ACC704C34F04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99317648-DCA4-4D6D-A67B-ACC704C34F04}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{99317648-DCA4-4D6D-A67B-ACC704C34F04}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{99317648-DCA4-4D6D-A67B-ACC704C34F04}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{99317648-DCA4-4D6D-A67B-ACC704C34F04}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{A1F641C6-3D0C-4473-A76C-D304593CCAD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1F641C6-3D0C-4473-A76C-D304593CCAD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1F641C6-3D0C-4473-A76C-D304593CCAD4}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1F641C6-3D0C-4473-A76C-D304593CCAD4}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{A1F641C6-3D0C-4473-A76C-D304593CCAD4}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1F641C6-3D0C-4473-A76C-D304593CCAD4}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A1F641C6-3D0C-4473-A76C-D304593CCAD4} = {DE162CA0-A6FB-4EE1-8BD2-8E48109D8D38}
+	EndGlobalSection
+EndGlobal

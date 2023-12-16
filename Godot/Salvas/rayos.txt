@@ -1,0 +1,7 @@
+ray(point(159,151),point(-194,77))r1;
+line(point(56,-139),point(198,-201))r2;
+draw r1;
+draw r2;
+color blue;
+draw intersect(r1,r2);
+print intersect(r1,r2);

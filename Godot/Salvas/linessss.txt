@@ -1,0 +1,9 @@
+line()r1;
+line() r2;
+//line(point(-29,12),point(27,91))r1;
+//line(point(35,4),point(27,91))r2;
+draw r1;
+draw r2;
+color blue;
+draw intersect(r1,r2);
+print intersect(r1,r2);
