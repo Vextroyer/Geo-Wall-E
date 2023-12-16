@@ -254,7 +254,7 @@ class TypeChecker : GSharpCompilerComponent, IVisitorStmt<object?>, IVisitorExpr
                     if(identifiers[i].Lexeme == "_")continue;
                     try
                     {
-                        scope.SetConstant(identifiers[i].Lexeme,Element.RUNTIME_DEFINED);
+                        scope.SetArgument(identifiers[i].Lexeme,Element.RUNTIME_DEFINED);
                     }
                     catch(ScopeException e){
                         OnErrorFound(stmt,e.Message);

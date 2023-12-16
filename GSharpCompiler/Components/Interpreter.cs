@@ -126,12 +126,10 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         scope.SetArgument(functionStmt.Id.Lexeme, Element.Function.MakeFunction(functionStmt));
         return null;
     }
-    public object? VisitMatchStmt(Stmt.Declaration.Match stmt, Scope scope)
-    {
-        Element evaluated = Evaluate(stmt.Sequence, scope);
-        if (evaluated.Type == ElementType.UNDEFINED)
-        {
-            foreach (Token id in stmt.Identifiers) if (id.Lexeme != "_") scope.SetConstant(id.Lexeme, Element.UNDEFINED);
+    public object? VisitMatchStmt(Stmt.Declaration.Match stmt,Scope scope){
+        Element evaluated = Evaluate(stmt.Sequence,scope);
+        if(evaluated.Type == ElementType.UNDEFINED){
+            foreach(Token id in stmt.Identifiers)if(id.Lexeme != "_")scope.SetArgument(id.Lexeme,Element.UNDEFINED);
             return null;
         }
         Element.Sequence sequence = (evaluated as Element.Sequence)!;
@@ -149,10 +147,10 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
             if (enumerator.MoveNext()) sequenceElement = enumerator.Current;
             else sequenceElement = Element.UNDEFINED;
             //After retrieving the element associate it with the Id.
-            scope.SetConstant(stmt.Identifiers[i].Lexeme, sequenceElement);
+            scope.SetArgument(stmt.Identifiers[i].Lexeme,sequenceElement);
         }
         //Declare the rest.
-        if (stmt.Identifiers[stmt.Identifiers.Count - 1].Lexeme != "_") scope.SetConstant(stmt.Identifiers[stmt.Identifiers.Count - 1].Lexeme, enumerator.Resto);
+        if(stmt.Identifiers[stmt.Identifiers.Count - 1].Lexeme != "_") scope.SetArgument(stmt.Identifiers[stmt.Identifiers.Count - 1].Lexeme,enumerator.Resto);
         return null;
     }
     public object? VisitPrintStmt(Stmt.Print stmt, Scope scope)
@@ -184,7 +182,7 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
         IDrawable drawableElement = (IDrawable)evaluated;
         drawableElement.Comment = stmt.Comment;
         drawables.Add(drawableElement);
-        // Esto lleva arreglo futuro
+        //TODO: fix
         return null;
     }
 
@@ -527,7 +525,12 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
     public Element VisitCallExpr(Expr.Call callExpr, Scope scope)
     {
         //Retrieve the declaration of the function.
-        Element.Function calledFunction = (Element.Function)scope.Get(callExpr.Id.Lexeme, callExpr.Arity);
+        Element.Function calledFunction;
+        try{
+            calledFunction = (Element.Function)scope.Get(callExpr.Id.Lexeme, callExpr.Arity);
+        }catch(ScopeException e){
+            throw new RuntimeException(callExpr,e.Message);
+        }
         //Compute the value of the parameters.
         List<Element> parameters = new List<Element>(callExpr.Arity);
         foreach (Expr expr in callExpr.Parameters) parameters.Add(Evaluate(expr, scope));
@@ -635,6 +638,8 @@ class Interpreter : IVisitorStmt<object?>, IVisitorExpr<Element>
                 return Element.FALSE;
             case ElementType.UNDEFINED:
                 return Element.FALSE;
+            case ElementType.SEQUENCE:
+                return TruthValue((element as Element.Sequence)!.Count);
             default:
                 return Element.TRUE;
         }
