@@ -53,8 +53,6 @@ enum TokenType{
     CIRCLE,
     //The `ARC` keyword
     ARC,
-    //The `measure` keyword.
-    MEASURE,
     //Some Keywords
     MEASURE,COUNT,RANDOMS,SAMPLES,INTERSECT,
     //Colors
