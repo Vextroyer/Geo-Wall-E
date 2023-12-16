@@ -4,3 +4,35 @@
 // print a;
 // c = {1 ... 27} + a;
 // print c;
+
+fib(n) = if(n <= 1) then 1 else fib(n-1)+fib(n-2);
+
+seq(n) = if(n <= 0) then {} else seq(n-1) + {fib(n)};
+
+ print seq(10);
+
+
+
+ genPuntos(n) =
+     let
+         fn = seq(n);//Computa los valores de fibonnacci
+        
+         numToPoint(n) = point(n,n);//Crea un punto cuya coordenada es (n,n)
+        
+         //Develve una secuencia de puntos resultado de aplicarle 
+         itera(secuencia) = if(secuencia) then (let a,resto = secuencia; print a; print resto; in itera(resto) + {numToPoint(a)}) else {};
+
+         puntos = itera(fn);
+     in
+         puntos;
+
+ print genPuntos(10);
+// c,_ = {};
+//  print if({}) then "hola" else "adios";
+//  print if(c) then "hola" else "adios";
+
+//sum(a,b) = a + b;
+
+//Operate(a,b,operation) = operation(a,b);
+
+//print Operate(2,5,sum);
